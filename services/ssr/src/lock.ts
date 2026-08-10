@@ -1,4 +1,4 @@
-import { SsrRenderOperation } from "./ssr-operation";
+import type { SsrRenderOperation } from "./ssr-operation";
 
 let renderLock: Promise<void> = Promise.resolve();
 

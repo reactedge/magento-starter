@@ -1,17 +1,12 @@
 import {WidgetRoot} from "./bootstrap/widget-root.tsx";
 import {createRoot, hydrateRoot} from "react-dom/client";
-
-export interface WidgetOptions {
-    container: HTMLElement;
-    contract: unknown;
-    hydrate?: boolean;
-}
+import type {StaticWidgetOptions} from "@reactedge/public-api/WidgetOptions.ts";
 
 export function Widget({
        container,
        contract,
        hydrate = false,
-   }: WidgetOptions) {
+   }: StaticWidgetOptions) {
     const element = (
         <WidgetRoot contract={contract} />
     );

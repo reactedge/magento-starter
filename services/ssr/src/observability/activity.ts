@@ -1,4 +1,5 @@
-import {context, Span, SpanStatusCode, trace, Tracer} from "@opentelemetry/api";
+import {context, SpanStatusCode, trace } from "@opentelemetry/api";
+import type {Span, Tracer} from "@opentelemetry/api";
 import {OTLPTraceExporter} from "@opentelemetry/exporter-trace-otlp-http";
 import {NodeTracerProvider} from "@opentelemetry/sdk-trace-node";
 import {resourceFromAttributes} from "@opentelemetry/resources";
@@ -106,7 +107,7 @@ export class OpenTelemetryObserver {
 
     addEvent(
         name: string,
-        payload?: Record<string, any>
+        payload?: Record<string, unknown>
     ) {
         this.span.addEvent(
             name,

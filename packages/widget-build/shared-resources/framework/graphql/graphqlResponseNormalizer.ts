@@ -41,6 +41,7 @@ export function normalizeGraphqlResponse(
         try {
             const parsed = JSON.parse(candidate);
 
+            // eslint-disable-next-line no-console
             console.warn("⚠ DEMO PATCH ACTIVE: GraphQL response was polluted. Fallback parser used.");
 
             return parsed;

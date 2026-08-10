@@ -1,54 +1,10 @@
 {
-  "banner": {
-    "active": true,
-    "cdn": "reactedge.json",
-    "css": "banner.css",
-    "ssr": {
-      "strategy": "static"
-    },
-    "imageOptimisation": {
-      "scanFormats": [
-        "jpeg",
-        "jpg",
-        "png",
-        "gif"
-      ],
-      "outputFormat": "webp",
-      "quality": 80
-    }
-  },
-  "usp": {
-    "active": true,
-    "cdn": "default.json",
-    "css": "usp.css",
-    "ssr": {
-      "strategy": "static",
-      "variants": [
-        "desktop",
-        "mobile"
-      ]
-    }
-  },
-  "storefinder": {
-    "active": true,
-    "cdn": "default.json",
-    "ssr": {
-      "strategy": "disabled"
-    }
-  },
   "productgallery": {
     "active": true,
     "cdn": "default.json",
     "css": "productgallery.css",
     "ssr": {
       "strategy": "dynamic"
-    }
-  },
-  "regionmap": {
-    "active": true,
-    "cdn": "default.json",
-    "ssr": {
-      "strategy": "disabled"
     }
   },
   "megamenu": {

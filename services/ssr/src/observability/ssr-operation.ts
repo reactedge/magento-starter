@@ -7,7 +7,7 @@ export class SsrRenderOperation {
 
     constructor() {}
 
-    registerStart(headers: Record<string, any>): void {
+    registerStart(headers: Record<string, unknown>): void {
         this.traceId = headers["x-trace-id"] ?? "";
         this.parentSpanId = headers["x-parent-span-id"] ?? "";
         this.requestId = crypto.randomUUID();

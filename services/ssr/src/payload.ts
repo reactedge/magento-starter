@@ -6,6 +6,8 @@ async function fetchContract(widget: string, contract: string) {
     const parsed = JSON.parse(
         await fs.readFile(contractPath, 'utf8')
     );
+
+    // eslint-disable-next-line no-console
     console.log(`SSR built with contract path: ${contractPath}`)
 
     return parsed;

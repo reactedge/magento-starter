@@ -77,21 +77,6 @@ echo "External Services"
 echo "-----------------"
 echo "Only configure the services required by the widgets you intend to use."
 
-prompt \
-    "Cloudflare Turnstile Site Key (Contact Us)" \
-    CLOUDFLARE_TURNSTILE_SITE_KEY \
-    ""
-
-prompt \
-    "Google Maps API Key (Store Finder, Region Map)" \
-    GOOGLE_MAPS_API_KEY \
-    ""
-
-prompt \
-    "Google Place ID (Google Reviews)" \
-    GOOGLE_PLACE_ID \
-    ""
-
 REACTEDGE_ROOT="$(dirname "$TARGET_ROOT")/reactedge"
 
 echo "Checking ReactEdge workspace: $REACTEDGE_ROOT"
@@ -155,13 +140,6 @@ for dir in "$ROOT"/widgets/*; do
         cat > "$dir/public/reactedge-runtime.json" <<EOF
 {
   "integrations": {
-    "cloudflare": {
-      "siteKey": "$CLOUDFLARE_TURNSTILE_SITE_KEY"
-    },
-    "googleMaps": {
-      "apiKey": "$GOOGLE_MAPS_API_KEY",
-      "placeId": "$GOOGLE_PLACE_ID"
-    },
     "magentoGraphql": {
       "api": "$SITEURL/graphql"
     }
@@ -180,9 +158,6 @@ echo "✅ Runtime configuration generated."
 echo "✅ Configuration written to $CONFIG"
 
 cat > "$CONFIG" <<EOF
-CLOUDFLARE_TURNSTILE_SITE_KEY=$CLOUDFLARE_TURNSTILE_SITE_KEY
-GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
-GOOGLE_PLACE_ID=$GOOGLE_PLACE_ID
 STORE_CODE=$STORE_CODE
 SITEURL=$SITEURL
 TARGET_ROOT=$TARGET_ROOT
@@ -200,7 +175,7 @@ cat > "$ROOT/services/ssr/.env" <<EOF
 SSR_PORT=$SSR_PORT
 EOF
 
-cat > "$ROOT/deployment-orchestrator/.env.dev" <<EOF
+cat > "$ROOT/services/orchestrator/.env.dev" <<EOF
 STORE_CODE=$STORE_CODE
 SITEURL=$SITEURL
 TARGET_ROOT=$TARGET_ROOT

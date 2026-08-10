@@ -18,7 +18,7 @@ const run = async () => {
         throw new Error('Missing contract path');
     }
 
-    let config = JSON.parse(
+    const config = JSON.parse(
         await fs.readFile(contractPath, 'utf8')
     );
 
@@ -33,6 +33,7 @@ const run = async () => {
     try {
         await fs.access(entry);
     } catch {
+        // eslint-disable-next-line no-console
         console.log(`Widget '${widgetName}' does not implement SSR.`);
         return;
     }
