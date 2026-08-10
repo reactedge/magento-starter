@@ -4,21 +4,13 @@ min_version = "2025.7.0"
 node = "22"
 python = "3.13"
 
-[tasks."platform-install"]
-description = "Install the widgets vite environments & the orchestrator"
-run = "./launcher/scripts/platform-install.sh"
-
-[tasks."widgets-update"]
-description = "Update the widgets vite environments"
-run = "./launcher/scripts/widgets-update.sh"
+[tasks.configure]
+description = "Configure ReactEdge integrations"
+run = "./launcher/scripts/widgets-configure.sh"
 
 [tasks."serve"]
 description = "Expose the ReactEdge workspace over HTTP"
 run = "./launcher/scripts/widgets-serve.sh"
-
-[tasks.configure]
-description = "Configure ReactEdge integrations"
-run = "./launcher/scripts/widgets-configure.sh"
 
 [tasks."widget-dev"]
 description = "Run a widget in development mode"

@@ -7,7 +7,10 @@ type Options = {
     version: string
 }
 
-export function manifestPlugin<TPlugin>({ widgetName, version }: Options): TPlugin {
+export function manifestPlugin<TPlugin>({
+    widgetName,
+    version
+}: Options): TPlugin {
     if (!widgetName) {
         throw new Error('manifestPlugin requires widgetName')
     }
@@ -16,9 +19,9 @@ export function manifestPlugin<TPlugin>({ widgetName, version }: Options): TPlug
         name: 'reactedge-manifest-plugin',
         apply: 'build',
 
-        generateBundle(options: any, bundle: any) {
+        generateBundle(options, bundle) {
             const entries = Object.entries(bundle).filter(
-                ([fileName, chunk]: any) =>
+                ([fileName, chunk]) =>
                     chunk.type === 'chunk' && fileName.endsWith('.iife.js')
             )
 
@@ -28,7 +31,7 @@ export function manifestPlugin<TPlugin>({ widgetName, version }: Options): TPlug
                 )
             }
 
-            const [fileName, chunk]: any = entries[0]
+            const [fileName, chunk] = entries[0]
 
             const hash = createHash('sha256')
                 .update(chunk.code)
@@ -64,6 +67,7 @@ export function manifestPlugin<TPlugin>({ widgetName, version }: Options): TPlug
 
             fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
 
+            // eslint-disable-next-line no-console
             console.log(`✔ Manifest generated: ${manifestPath}`)
         }
     } as TPlugin

@@ -1,4 +1,4 @@
-import {getDebugTargets} from "@reactedge/framework/activity/activity.guard";
+import { getDebugTargets } from "@reactedge/framework/activity/activity.guard";
 
 type Level = 'info' | 'warn' | 'error';
 
@@ -54,15 +54,18 @@ export class WidgetActivity
             ts: Date.now(),
         };
 
-        if (this.isActivityEnabled()) {
+        if (this.isEnabled()) {
             const prefix =
                 `[${this.widgetId}] ${phase}`;
 
             if (level === 'error') {
+                // eslint-disable-next-line no-console
                 console.error(prefix, payload);
             } else if (level === 'warn') {
+                // eslint-disable-next-line no-console
                 console.warn(prefix, payload);
             } else {
+                // eslint-disable-next-line no-console
                 console.log(prefix, payload);
             }
 
@@ -77,15 +80,37 @@ export class WidgetActivity
             return;
         }
 
+        // eslint-disable-next-line no-console
         console.group(`[ReactEdge] ${title}`);
 
         if (values) {
             for (const [key, value] of Object.entries(values)) {
+                // eslint-disable-next-line no-console
                 console.log(`${key}:`, value);
             }
         }
 
+        // eslint-disable-next-line no-console
         console.groupEnd();
+    }
+
+    public debug(
+        title: string,
+        values?: Record<string, unknown>
+    ) {
+        if (!this.isEnabled()) {
+            return;
+        }
+
+        // eslint-disable-next-line no-console
+        console.group(`[ReactEdge] ${title}`);
+
+        if (values) {
+            for (const [key, value] of Object.entries(values)) {
+                // eslint-disable-next-line no-console
+                console.debug(`${key}:`, value);
+            }
+        }
     }
 
     private dispatchActivityEvent(
@@ -106,7 +131,7 @@ export class WidgetActivity
         );
     }
 
-    private isActivityEnabled(): boolean {
+    private isEnabled(): boolean {
         const debugTargets = getDebugTargets();
 
         return (

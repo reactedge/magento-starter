@@ -64,6 +64,7 @@ app.post('/render', async (req, res) => {
     } catch (e) {
         ssrOperation.logFailedSsr(e);
 
+        // eslint-disable-next-line no-console
         console.error(e);
 
         res.status(500).json({
@@ -73,7 +74,9 @@ app.post('/render', async (req, res) => {
 });
 
 app.listen(process.env.SSR_PORT, '0.0.0.0', () => {
+    // eslint-disable-next-line no-console
     console.log(`Widgets SSR runtime listening on :${process.env.SSR_PORT}`);
+    // eslint-disable-next-line no-console
     console.log(
         `[SSR] listening on :${process.env.SSR_PORT} (TLS validation ${
             process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0'

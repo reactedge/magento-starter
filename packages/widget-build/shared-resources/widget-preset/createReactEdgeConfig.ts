@@ -3,18 +3,20 @@ export function createWidgetBuildDefaults<TBuild>(
         widgetName: string;
         version: string;
         entry: string;
+        outDir: string;
     }
 ): TBuild {
-    const {widgetName, version, entry } = options;
+    const {widgetName, version, entry, outDir } = options;
 
     return {
-        outDir: `../../workspace/release/source/${widgetName}/`,
+        outDir,
         cssCodeSplit: false,
         emptyOutDir: false,
         lib: {
             entry,
             name: `ReactEdge_${widgetName}`,
             fileName: () => `widget-${widgetName}@${version}.iife.js`,
+            cssFileName: `widget-${widgetName}`,
             formats: ["iife"],
         },
         rollupOptions: {

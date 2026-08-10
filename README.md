@@ -30,17 +30,7 @@ mise --version
 
 ---
 
-## 3. Install the ReactEdge toolchain
-
-```bash
-mise install
-```
-
-This installs the required Node.js and Python versions.
-
----
-
-## 4. Install ReactEdge dependencies
+## 3. Install ReactEdge dependencies
 
 Make the helper scripts executable:
 
@@ -51,12 +41,12 @@ chmod u+x ./launcher/scripts/*.sh
 Install all project dependencies:
 
 ```bash
-mise run platform-install
+npm install
 ```
 
 ---
 
-## 5. Configure ReactEdge
+## 4. Configure ReactEdge
 
 ```bash
 cp .env.sample .env
@@ -78,18 +68,18 @@ The configuration wizard will create:
 
 ---
 
-## 6. Launch a widget locally
+## 5. Launch a widget locally
 
 For example:
 
 ```bash
-mise run widget-dev -- usp
+mise run widget-dev -- productgallery
 ```
 
 or:
 
 ```bash
-mise run widget-dev -- banner
+mise run widget-dev -- megamenu
 ```
 
 ---
@@ -137,24 +127,14 @@ bin/magento module:status ReactEdge_WidgetBridge
 Inspect widget configuration:
 
 ```bash
-bin/magento config:show reactedge/usp/enabled
-bin/magento config:show reactedge/banner/enabled
 bin/magento config:show reactedge/productgallery/enabled
-bin/magento config:show reactedge/storefinder/enabled
 bin/magento config:show reactedge/megamenu/enabled
-bin/magento config:show reactedge/googlereviews/enabled
 ```
 
 ---
 
 ## Configure integrations
 
-Configure Google integrations if required:
-
-```bash
-bin/magento config:set reactedge/google_maps/api_key YOUR_API_KEY
-
-bin/magento config:set reactedge/google_maps/place_id YOUR_PLACE_ID
 ```
 
 Enable server-side rendering:
@@ -170,9 +150,7 @@ bin/magento config:set reactedge/widgets_ssr/enabled 1
 Enable the widgets you want to use:
 
 ```bash
-bin/magento config:set reactedge/usp/enabled 1
-
-bin/magento config:set reactedge/banner/enabled 1
+bin/magento config:set reactedge/megamenu/enabled 1
 
 bin/magento config:set reactedge/productgallery/enabled 1
 ```

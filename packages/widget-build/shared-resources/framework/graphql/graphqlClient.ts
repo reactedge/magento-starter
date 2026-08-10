@@ -36,7 +36,7 @@ export function createGraphqlClient(apiEndpoint: string, storeCode: string, acti
 
         try {
             json = JSON.parse(text);
-        } catch (e) {
+        } catch {
             activity?.log('graphql-failed-query', 'GraphQL Failed query', { api_endpoint: apiEndpoint, query, variables }, 'error');
             activity?.log('graphql-invalid-json', 'GraphQL returned non-JSON response', {
                 endpoint: apiEndpoint,
