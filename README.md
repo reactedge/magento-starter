@@ -9,17 +9,36 @@ cd ReactEdge
 
 ---
 
-## 2. Install mise
+## 2. Install Mise
+
+## Project tasks
+
+Mise is used as a task runner. The commands it executes are defined in
+`mise.toml`, with supporting scripts in `launcher/scripts/`, and can be
+inspected before running them.
+
+| Command | Purpose |
+| --- | --- |
+| `mise run configure` | Generates the local ReactEdge configuration |
+| `mise run widget-dev -- <widget>` | Starts a widget locally with Vite |
+| `mise run widget-build -- <widget>` | Builds a selected widget |
+| `mise run widgets-deploy` | Builds and deploys selected widget assets |
+| `mise run widget-test -- <widget>` | Runs tests for a selected widget |
+
+ReactEdge uses Mise for tool version management and project tasks.
+
+### macOS
+
+```bash
+brew install mise
+```
+
+### Linux / other platforms
+
+Activate Mise for your shell by following the setup instructions shown after installation, or the official Mise documentation.
 
 ```bash
 curl https://mise.run | sh
-```
-
-Activate it (Bash):
-
-```bash
-echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
-source ~/.bashrc
 ```
 
 Verify:
@@ -28,20 +47,22 @@ Verify:
 mise --version
 ```
 
+When you first enter the ReactEdge repository, Mise may ask you to trust
+the project's mise.toml:
+```bash
+mise trust
+```
+
+You can inspect mise.toml before trusting it.
+
 ---
 
 ## 3. Install ReactEdge dependencies
 
-Make the helper scripts executable:
-
-```bash
-chmod u+x ./launcher/scripts/*.sh
-```
-
 Install all project dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 ---
@@ -63,7 +84,7 @@ mise run configure
 The configuration wizard will create:
 
 - `.env`
-- `deployment-orchestrator/.env.dev`
+- `services/orchestrator/.env.dev`
 - `widgets/*/public/reactedge-runtime.json`
 
 ---
@@ -135,8 +156,6 @@ bin/magento config:show reactedge/megamenu/enabled
 
 ## Configure integrations
 
-```
-
 Enable server-side rendering:
 
 ```bash
@@ -195,19 +214,4 @@ To disable automatic Magento configuration, set:
 
 ```bash
 DOCKER_USED=0
-```
-
-### Creating a widget with ChatGPT
-
-To scaffold a new widget with ChatGPT, start a fresh conversation and attach:
-
-* `widget-spec.md`
-* the shared `packages/widget-build/shared-resources/vite_project` folder as a zip archive
-
-Then use the following prompt:
-
-```text
-Create a widget called widget01.
-
-Follow widget-spec.md exactly.
 ```
