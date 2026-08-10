@@ -1,9 +1,13 @@
 {
+  "files": [],
+  "references": [
+    { "path": "./widgets/megamenu" },
+    { "path": "./widgets/productgallery" }
+  ],
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@reactedge/*": [
-        "packages/widget-build/shared-resources/*"
+        "./packages/widget-build/shared-resources/*"
       ]
     }
   }

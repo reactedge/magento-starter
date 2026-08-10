@@ -1,8 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 import {WIDGET_ID} from "../src/Config";
 
 test.describe('Product Gallery Widget', () => {
-    let widget;
+    let widget: Locator;
 
     test.beforeEach(async ({page}) => {
         await page.goto('/?reactedge_debug=eager');
@@ -66,8 +67,13 @@ test.describe('Product Gallery Widget', () => {
 
         await expect(thumbnails).toHaveCount(3);
 
-        // Capture initial src
         const initialSrc = await mainImage.getAttribute('src');
+
+        expect(initialSrc).not.toBeNull();
+
+        if (initialSrc === null) {
+            throw new Error("Expected gallery tile to have a src attribute");
+        }
 
         // Click second thumbnail
         await thumbnails.nth(1).click();
@@ -84,6 +90,12 @@ test.describe('Product Gallery Widget', () => {
         const nextButton = widget.locator('[data-gallery-next]');
 
         const initialSrc = await mainImage.getAttribute('src');
+        expect(initialSrc).not.toBeNull();
+
+        if (initialSrc === null) {
+            throw new Error("Expected gallery tile to have a src attribute");
+        }
+
         await nextButton.click();
         await expect(mainImage).not.toHaveAttribute('src', initialSrc);
 
@@ -98,6 +110,12 @@ test.describe('Product Gallery Widget', () => {
 
         const firstTile = tiles.first();
         const tileSrc = await firstTile.getAttribute('src');
+
+        expect(tileSrc).not.toBeNull();
+
+        if (tileSrc === null) {
+            throw new Error("Expected gallery tile to have a src attribute");
+        }
 
         await firstTile.click();
 
@@ -119,6 +137,12 @@ test.describe('Product Gallery Widget', () => {
         const next = widget.locator('[data-gallery-next]');
 
         const initialSrc = await mainImage.getAttribute('src');
+
+        expect(initialSrc).not.toBeNull();
+
+        if (initialSrc === null) {
+            throw new Error("Expected gallery tile to have a src attribute");
+        }
 
         await next.click();
 

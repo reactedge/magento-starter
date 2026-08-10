@@ -1,9 +1,11 @@
 const DEFAULT_TTL = 60 * 60 * 1000;
 
 export class GraphqlCache {
-    constructor(
-        private readonly ttl: number = DEFAULT_TTL
-    ) {}
+    private readonly ttl: number;
+
+    constructor(ttl: number = DEFAULT_TTL) {
+        this.ttl = ttl;
+    }
 
     get<T>(
         key: string,

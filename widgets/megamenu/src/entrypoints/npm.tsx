@@ -14,7 +14,6 @@ async function main() {
     if (mode === "hydrate") {
         activity.debug("Hydrating existing HTML", {
             contract,
-            runtime,
             html: container.innerHTML
         });
     } else {
