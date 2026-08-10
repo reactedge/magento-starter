@@ -1,4 +1,4 @@
-import type {GraphqlClient} from "../../services/graphql/graphqlClient.ts";
+import type {GraphqlClient} from "@reactedge/framework/graphql/graphqlClient.ts";
 
 export interface SystemState {
     graphqlClient: GraphqlClient;

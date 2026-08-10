@@ -1,8 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 import {WIDGET_ID} from "../src/Config";
 
 test.describe('Megamenu widget (WordPress embed)', () => {
-    let widget;
+    let widget: Locator;
 
     test.beforeEach(async ({page}) => {
         await page.goto('/?reactedge_debug=eager');
