@@ -19,7 +19,7 @@ if [[ ! -f "$CONFIG" ]]; then
 fi
 
 # Initialise workspace.
-if [[ ! -d "$ROOT/workspace" ]]; then
+if [[ ! -f "$ROOT/workspace/registry.json" ]]; then
     if [[ ! -d "$ROOT/workspace.sample" ]]; then
         echo "❌ Missing workspace.sample"
         exit 1
