@@ -5,6 +5,33 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CONFIG="$ROOT/.env"
 
+echo "Preparing ReactEdge workspace..."
+
+# Initialise root environment configuration.
+if [[ ! -f "$CONFIG" ]]; then
+    if [[ ! -f "$ROOT/.env.sample" ]]; then
+        echo "❌ Missing .env.sample"
+        exit 1
+    fi
+
+    cp "$ROOT/.env.sample" "$CONFIG"
+    echo "✓ Created .env from .env.sample"
+fi
+
+# Initialise workspace.
+if [[ ! -d "$ROOT/workspace" ]]; then
+    if [[ ! -d "$ROOT/workspace.sample" ]]; then
+        echo "❌ Missing workspace.sample"
+        exit 1
+    fi
+
+    mkdir -p "$ROOT/workspace"
+    cp -R "$ROOT/workspace.sample/." "$ROOT/workspace/"
+    echo "✓ Created workspace from workspace.sample"
+fi
+
+echo
+
 if [[ -f "$CONFIG" ]]; then
     # Load existing configuration
     set -a
