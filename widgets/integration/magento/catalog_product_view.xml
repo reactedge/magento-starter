@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<page
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+>
+    <body>
+        <referenceBlock name="catalog.preload.product.gallery" remove="true"/>
+
+<!--        <referenceBlock name="product.media" remove="true"/>-->
+
+        <referenceBlock name="product.detail.page">
+            <block
+                name="product.media"
+                class="ReactEdge\WidgetBridge\Block\Widget"
+                template="ReactEdge_WidgetBridge::productgallery.phtml"
+                ifconfig="reactedge/productgallery/enabled"
+            >
+                <arguments>
+                    <argument name="widget_id" xsi:type="string">
+                        productgallery
+                    </argument>
+
+                    <argument name="view_model" xsi:type="object">
+                        ReactEdge\WidgetBridge\ViewModel\Widget
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>
