@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="topmenu_mobile" remove="true"/>
+        <referenceBlock name="topmenu_desktop" remove="true"/>
+
+        <referenceContainer name="topmenu_generic">
+            <block name="megamenu-widget"
+                   class="ReactEdge\WidgetBridge\Block\Widget"
+                   template="ReactEdge_WidgetBridge::megamenu.phtml"
+                   ifconfig="reactedge/megamenu/enabled">
+
+                <arguments>
+                    <argument name="widget_id" xsi:type="string">megamenu</argument>
+                    <argument name="view_model"
+                              xsi:type="object">ReactEdge\WidgetBridge\ViewModel\Widget</argument>
+                </arguments>
+
+            </block>
+        </referenceContainer>
+    </body>
+</page>
