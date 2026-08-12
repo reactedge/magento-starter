@@ -69,12 +69,6 @@ npm ci
 
 ## 4. Configure ReactEdge
 
-```bash
-cp .env.sample .env
-mkdir -p workspace
-cp -R workspace.sample/* workspace/
-```
-
 Generate the local configuration:
 
 ```bash
@@ -182,11 +176,54 @@ bin/magento cache:flush
 
 ---
 
-## Customise widget placement
+## Install Magento layout integration
 
-Copy the starter layout XML files into the active Magento theme and adjust widget placement as required.
+ReactEdge provides starter Magento layout files in:
 
----
+```text
+widgets/integration/magento/
+```
+
+These files define where the ReactEdge widgets are mounted within the Magento storefront.
+
+## Product Gallery
+
+Copy:
+
+```text
+widgets/integration/magento/catalog_product_view.xml
+```
+
+to your active Magento theme:
+
+```text
+app/design/frontend/<Vendor>/<theme>/Magento_Catalog/layout/catalog_product_view.xml
+```
+
+## Megamenu
+
+Copy:
+
+```text
+widgets/integration/magento/default.xml
+widgets/integration/magento/megamenu.xml
+```
+
+to:
+
+```text
+app/design/frontend/<Vendor>/<theme>/Magento_Theme/layout/
+```
+
+If your theme already contains one of these layout files, **do not overwrite it**. Merge the ReactEdge layout instructions into the existing file instead.
+
+The supplied files are starter integrations and can be adjusted to change widget placement within your theme.
+
+After adding or changing Magento layout XML, flush the Magento cache:
+
+```bash
+bin/magento cache:flush
+```
 
 ## Deploy widgets
 
@@ -198,20 +235,7 @@ mise run widgets-deploy
 
 ### Automatic Magento configuration (Docker only)
 
-When `DOCKER_USED=1` in .env, `widgets-deploy` automatically configures Magento after deployment.
-
 The deployment script will:
-
-- configure the Google Maps API key
-- configure the Google Place ID
 - enable server-side rendering
 - enable the selected widgets
 - flush the Magento cache
-
-The default implementation assumes a Docker development environment using the `mageos_php` container.
-
-To disable automatic Magento configuration, set:
-
-```bash
-DOCKER_USED=0
-```
