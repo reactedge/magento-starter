@@ -1,2 +1,4 @@
-@import "product-gallery.switch-button.css";
+@import "product-gallery.zoomview.css";
+@import "product-gallery.gallery.css";
 @import "product-gallery.tiled.css";
+@import "product-gallery.spinner.css";

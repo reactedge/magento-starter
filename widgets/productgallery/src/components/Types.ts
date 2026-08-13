@@ -5,8 +5,11 @@ export interface GalleryTile {
     alt?: string;
 }
 
+export type GalleryMode = "tile" | "gallery";
+
 export interface WidgetConfig {
     readonly tiles:  GalleryTile[];
+    readonly mode: GalleryMode;
     readonly runtime: RuntimeConfig
     readonly integrations: ResolvedConfigIntegrations
 }

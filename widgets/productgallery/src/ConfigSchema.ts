@@ -4,6 +4,11 @@ const IntegrationSchema = z.enum([
     "magentoGraphql"
 ]);
 
+export const GalleryModeSchema = z.enum([
+    "tile",
+    "gallery"
+]);
+
 export const ProductGalleryImageSchema = z.object({
     src: z.url(),
     alt: z.string(),
@@ -20,6 +25,9 @@ export const ProductGalleryImageSchema = z.object({
 export const WidgetConfigSchema = z.object({
     data: z.object({
         images: z.array(ProductGalleryImageSchema),
+        settings: z.object({
+            mode: GalleryModeSchema,
+        }),
     }),
     integration: z.object({
         requires: z.array(IntegrationSchema)

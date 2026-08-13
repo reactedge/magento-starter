@@ -32,7 +32,6 @@ export function readWidgetConfig(
     try {
         const parsedContract = parseConfig(contract);
         const parsedRuntime = parseRuntimeConfig(runtime)
-
         const resolved = resolveConfig(parsedContract, parsedRuntime);
 
         activity?.log(
@@ -61,6 +60,7 @@ export function resolveConfig(
 ): WidgetConfig {
     return {
         tiles: widget.data.images,
+        mode: widget.data.settings.mode,
         runtime: {
             storeCode: runtime.context.storeCode,
             sku: runtime.context.sku

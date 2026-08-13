@@ -1,6 +1,7 @@
 import {WIDGET_ID} from "../Config.ts";
 import {ActivityContextProvider} from "../activity/Context/ActivityContextProvider.tsx";
 import WidgetWrapper from "./WidgetWrapper.tsx";
+
 interface WidgetRootProps {
     contract: unknown;
     runtime: unknown;

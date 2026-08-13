@@ -1,5 +1,4 @@
 import type {WidgetConfig} from "./Types.ts";
-import {useState} from "react";
 import {ProductTiledGallery} from "./ProductTiledGallery.tsx";
 import {ProductGallery} from "./ProductGallery.tsx";
 import {SpinnerOverlay} from "./global/SpinnerOverlay.tsx";
@@ -12,7 +11,6 @@ type Props = {
 };
 
 export const ProductGalleryWidget = ({ config, bootstrap }: Props) => {
-    const [mode, setMode] = useState<"tiled" | "classic">("tiled");
     const { galleryData, galleryError, galleryLoading } =
         useGalleryData(config.runtime.sku, bootstrap);
 
@@ -22,18 +20,7 @@ export const ProductGalleryWidget = ({ config, bootstrap }: Props) => {
 
     return (
         <div>
-            {/* Switch Button */}
-            <button
-                className="switchButton"
-                onClick={() =>
-                    setMode((prev) => (prev === "tiled" ? "classic" : "tiled"))
-                }
-                data-gallery-switch
-            >
-                Switch to {mode === "tiled" ? "Classic" : "Tiled"} View
-            </button>
-
-            {mode === "tiled" ? <ProductTiledGallery tiles={galleryData} /> : <ProductGallery tiles={galleryData} />}
+            {config.mode === "tile" ? <ProductTiledGallery tiles={galleryData} /> : <ProductGallery tiles={galleryData} />}
         </div>
     );
 };
