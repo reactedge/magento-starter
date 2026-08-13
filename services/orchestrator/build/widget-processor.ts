@@ -46,7 +46,7 @@ export async function processWidget(
         buildWidget(widgetName, widgetPath, report);
 
         const registryResult = updateAssetRegistry(widgetName, instanceName, report);
-        let contractResult = await loadContract(widgetName, registryResult.cdn, report);
+        let contractResult = await loadContract(widgetName, registryResult.contract, report);
 
         if (contractResult === null) {
 
@@ -69,7 +69,7 @@ export async function processWidget(
             );
         }
 
-        const contractFile = getFilename(registryResult.cdn)
+        const contractFile = getFilename(registryResult.contract)
 
         const cssSsr = loadSsrCss(widgetName, registryResult.cssFilename)
         if (resolved?.ssr?.strategy === 'static') {

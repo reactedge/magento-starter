@@ -1,7 +1,7 @@
 {
   "productgallery": {
     "active": true,
-    "cdn": "default.json",
+    "contract": "default.json",
     "css": "productgallery.css",
     "ssr": {
       "strategy": "dynamic"
@@ -9,7 +9,7 @@
   },
   "megamenu": {
     "active": true,
-    "cdn": "default.json",
+    "contract": "default.json",
     "css": "megamenu.css",
     "ssr": {
       "strategy": "dynamic"

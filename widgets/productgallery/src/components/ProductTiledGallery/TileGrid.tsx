@@ -1,13 +1,20 @@
 import type {GalleryTile} from "../Types.ts";
 
 interface TileGridProps {
-    tiles: GalleryTile[]
+    tiles: GalleryTile[];
+    maxColumns: number;
     onSelect: (index: number) => void;
 }
 
-export const TileGrid = ({ tiles, onSelect }: TileGridProps) => {
+export const TileGrid = ({ tiles, maxColumns, onSelect }: TileGridProps) => {
     return (
-        <div className="product-gallery__tile-grid" data-gallery-tiled>
+        <div
+            className="product-gallery__tile-grid"
+            style={{
+                "--gallery-max-columns": maxColumns
+            } as React.CSSProperties}
+            data-gallery-tiled
+        >
             {tiles.map((tile, index) => (
                 <button
                     key={index}

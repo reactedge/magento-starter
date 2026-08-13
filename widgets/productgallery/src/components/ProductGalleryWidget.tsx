@@ -20,7 +20,7 @@ export const ProductGalleryWidget = ({ config, bootstrap }: Props) => {
 
     return (
         <div>
-            {config.mode === "tile" ? <ProductTiledGallery tiles={galleryData} /> : <ProductGallery tiles={galleryData} />}
+            {config.settings.mode === "tile" ? <ProductTiledGallery tiles={galleryData} maxColumns={config.settings.maxColumns} /> : <ProductGallery tiles={galleryData} />}
         </div>
     );
 };

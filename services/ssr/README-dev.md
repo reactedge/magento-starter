@@ -6,11 +6,6 @@ WIDGETS_CDN_URL=http://localhost:8098
 PORT=3001
 USP_ENTRY=../../usp/src/ssr/entry
 
-.env for dev
-WIDGETS_CDN_URL=http://widgets-cdn
-USP_ENTRY=/usp/src/ssr/entry
-
-
 ```bash
 curl -vk -X POST https://widgets-ssr.co.uk/render \
   -H "Content-Type: application/json" \

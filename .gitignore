@@ -61,12 +61,10 @@ artifacts/
 
 services/intent-engine/*
 services/**/self-healing/*
-services/cdn/**/contracts/*
 README-DEPLOY-DEMO.md
 
 
 widgets/**/.github
-widgets-cdn
 public/*
 
 # Python bytecode
