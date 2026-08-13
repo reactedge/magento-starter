@@ -4,10 +4,11 @@ import {useGallery} from "../hooks/useGallery.tsx";
 import {TileGrid} from "./ProductTiledGallery/TileGrid.tsx";
 
 interface ProductTiledGalleryProps {
-    tiles: GalleryTile[]
+    tiles: GalleryTile[];
+    maxColumns: number;
 }
 
-export const ProductTiledGallery = ({tiles}: ProductTiledGalleryProps) => {
+export const ProductTiledGallery = ({tiles, maxColumns}: ProductTiledGalleryProps) => {
     const gallery = useGallery(tiles);
 
     if (tiles.length === 0) return null;
@@ -29,6 +30,7 @@ export const ProductTiledGallery = ({tiles}: ProductTiledGalleryProps) => {
     return (
         <TileGrid
             tiles={tiles}
+            maxColumns={maxColumns}
             onSelect={(index) => {
                 gallery.setActiveIndex(index);
                 gallery.setZoomed(true);

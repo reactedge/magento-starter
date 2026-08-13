@@ -5,11 +5,18 @@ export interface GalleryTile {
     alt?: string;
 }
 
-export type GalleryMode = "tile" | "gallery";
+export type GallerySettings =
+    | {
+    readonly mode: "gallery";
+}
+    | {
+    readonly mode: "tile";
+    readonly maxColumns: number;
+};
 
 export interface WidgetConfig {
     readonly tiles:  GalleryTile[];
-    readonly mode: GalleryMode;
+    readonly settings: GallerySettings;
     readonly runtime: RuntimeConfig
     readonly integrations: ResolvedConfigIntegrations
 }

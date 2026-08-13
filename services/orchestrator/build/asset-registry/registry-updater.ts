@@ -42,7 +42,7 @@ export function updateRegistry({ widgetName, buildTarget, registryPath, widgetAs
         entry.integrity = hash;
     }
 
-    const cdn = `/${buildTarget}/contracts/${entry.cdn}`;
+    const contract = `/${buildTarget}/contracts/${entry.contract}`;
 
-    return { src: newSrc, hash, cdn, cssBundle, cssFilename, integrity: entry.integrity };
+    return { src: newSrc, hash, contract, cssBundle, cssFilename, integrity: entry.integrity };
 }

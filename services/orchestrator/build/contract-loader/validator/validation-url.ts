@@ -4,7 +4,7 @@ import {extractUrls} from "../data-extractor/url.ts";
 
 export function validateUrls(
     contract: unknown,
-    cdn: string
+    contract: string
 ): ValidationIssue[] {
 
     const issues: ValidationIssue[] = [];
@@ -29,7 +29,7 @@ export function validateUrls(
                 code: 'invalid_host',
                 path: url,
                 message:
-                    `ContractFile ${cdn} contains disallowed host "${hostname}"`
+                    `ContractFile ${contract} contains disallowed host "${hostname}"`
             });
         }
     }

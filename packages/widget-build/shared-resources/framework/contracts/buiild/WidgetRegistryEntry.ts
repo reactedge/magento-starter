@@ -4,7 +4,7 @@ import type {WidgetImageOptimisationConfig} from "@reactedge/framework/contracts
 export interface WidgetRegistryEntry {
     active: boolean;
     widget?: string;
-    cdn: string;
+    contract: string;
     css?: string;
     ssr?: WidgetSsrConfig;
     imageOptimisation?: WidgetImageOptimisationConfig;

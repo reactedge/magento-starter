@@ -60,7 +60,7 @@ export function resolveConfig(
 ): WidgetConfig {
     return {
         tiles: widget.data.images,
-        mode: widget.data.settings.mode,
+        settings: widget.data.settings,
         runtime: {
             storeCode: runtime.context.storeCode,
             sku: runtime.context.sku

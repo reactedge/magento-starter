@@ -11,12 +11,12 @@ import {wrapContract} from "../contract-loader/wrapper.ts";
 
 export async function loadContract(
     widgetName: string,
-    cdn: string,
+    contract: string,
     report: Report
 ): Promise<ContractResult> {
     let contract = null;
 
-    const contractFile = getFilename(cdn)
+    const contractFile = getFilename(contract)
     const localPath = getContractPath(widgetName, contractFile)
 
     if (fs.existsSync(localPath)) {
@@ -27,7 +27,7 @@ export async function loadContract(
         const issues = await validateContract(
             widgetName,
             contract,
-            cdn
+            contract
         );
         report.info(
             '✔ Loaded local contract',

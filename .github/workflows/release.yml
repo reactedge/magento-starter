@@ -33,20 +33,6 @@ jobs:
 
           ssh-keyscan -H "${{ secrets.WIDGET_SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Install CDN dependencies
-        working-directory: ./services/cdn
-        run: npm ci
-
-      - name: Build CSS bundles
-        working-directory: ./services/cdn
-        run: npx tsx scripts/build-all-css-bundles.ts
-
-      - name: Sync CDN assets
-        run: |
-          rsync -avz --delete \
-            ./services/cdn/www/ \
-            ${{ secrets.WIDGET_SSH_USER }}@${{ secrets.WIDGET_SSH_HOST }}:/var/www/cdn/
-
       - name: Sync SSR runtime
         run: |
           rsync -avz --delete \
