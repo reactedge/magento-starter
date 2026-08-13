@@ -1,4 +1,3 @@
-import {activeThumb, arrowBase, containerStyle, mainImageStyle, thumb, thumbnailStrip} from "./ProductGallery/style.ts";
 import type {GalleryTile} from "./Types.ts";
 import {useGallery} from "../hooks/useGallery.tsx";
 
@@ -6,7 +5,7 @@ interface ProductGalleryProps {
     tiles: GalleryTile[]
 }
 
-export const ProductGallery = ({tiles}: ProductGalleryProps) => {
+export const ProductGallery = ({ tiles }: ProductGalleryProps) => {
     const gallery = useGallery(tiles);
 
     if (tiles.length === 0 || gallery.currentImage === undefined) {
@@ -14,48 +13,65 @@ export const ProductGallery = ({tiles}: ProductGalleryProps) => {
     }
 
     return (
-        <div style={containerStyle} data-gallery-classic>
-            <div
-                style={{ ...arrowBase, left: "20px" }}
+        <div
+            className="product-gallery__slider"
+            data-gallery-classic
+        >
+            <button
+                type="button"
+                className="product-gallery__slider-arrow product-gallery__slider-arrow--previous"
                 onClick={gallery.previous}
+                aria-label="Previous image"
                 data-gallery-prev
             >
                 ‹
-            </div>
+            </button>
 
-            <div
-                style={{ ...arrowBase, right: "20px" }}
+            <button
+                type="button"
+                className="product-gallery__slider-arrow product-gallery__slider-arrow--next"
                 onClick={gallery.next}
+                aria-label="Next image"
                 data-gallery-next
             >
                 ›
-            </div>
+            </button>
 
             <img
                 key={gallery.activeIndex}
                 src={gallery.currentImage.src}
                 alt={gallery.currentImage.alt}
-                style={mainImageStyle}
+                className="product-gallery__slider-main-image"
                 data-gallery-main
             />
 
-            <div style={thumbnailStrip}>
+            <div className="product-gallery__slider-thumbnails">
                 {tiles.map((tile, index) => (
-                    <img
+                    <button
                         key={index}
-                        src={tile.src}
-                        alt={tile.alt}
+                        type="button"
+                        className={[
+                            "product-gallery__slider-thumbnail",
+                            index === gallery.activeIndex
+                                ? "product-gallery__slider-thumbnail--active"
+                                : "",
+                        ].filter(Boolean).join(" ")}
                         onClick={() => gallery.select(index)}
-                        style={{
-                            ...thumb,
-                            ...(index === gallery.activeIndex
-                                ? activeThumb
-                                : {}),
-                        }}
-                        data-gallery-thumb
-                    />
+                        aria-label={`View image ${index + 1}`}
+                        aria-current={
+                            index === gallery.activeIndex
+                                ? "true"
+                                : undefined
+                        }
+                    >
+                        <img
+                            src={tile.src}
+                            alt={tile.alt}
+                            data-gallery-thumb
+                        />
+                    </button>
                 ))}
             </div>
         </div>
     );
-}
+};

@@ -1,5 +1,4 @@
 import type {GalleryTile} from "../Types.ts";
-import {cardStyle, galleryStyle, hiddenStyle, imgStyle, visibleStyle} from "./style.ts";
 
 interface TileGridProps {
     tiles: GalleryTile[]
@@ -8,29 +7,22 @@ interface TileGridProps {
 
 export const TileGrid = ({ tiles, onSelect }: TileGridProps) => {
     return (
-        <div style={galleryStyle} data-gallery-tiled>
-            {tiles.map((tile, index) => {
-                const isVisible = true;
-
-                return (
-                    <div
-                        key={index}
-                        style={{
-                            ...cardStyle,
-                            ...(isVisible ? visibleStyle : hiddenStyle)
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                        onClick={() => onSelect(index)}
-                    >
-                        <img src={tile.src}
-                             alt={tile.alt}
-                             style={imgStyle}
-                             data-gallery-tile
-                        />
-                    </div>
-                );
-            })}
+        <div className="product-gallery__tile-grid" data-gallery-tiled>
+            {tiles.map((tile, index) => (
+                <button
+                    key={index}
+                    type="button"
+                    className="product-gallery__tile"
+                    onClick={() => onSelect(index)}
+                >
+                    <img
+                        src={tile.src}
+                        alt={tile.alt}
+                        className="product-gallery__tile-image"
+                        data-gallery-tile
+                    />
+                </button>
+            ))}
         </div>
-    )
+    );
 };

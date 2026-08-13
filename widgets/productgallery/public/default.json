@@ -1,6 +1,9 @@
 {
   "data": {
-    "images": []
+    "images": [],
+    "settings": {
+      "mode": "tile"
+    }
   },
   "integration": {
     "requires": ["magentoGraphql"]

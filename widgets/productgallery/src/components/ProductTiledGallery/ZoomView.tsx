@@ -1,45 +1,62 @@
-import type {GalleryTile} from "../Types.ts";
-import {arrowBase, fadeStyle, minifyButton, zoomContainer} from "./style.ts";
+import type { GalleryTile } from "../Types.ts";
 
 interface ZoomViewProps {
     image: GalleryTile;
     activeIndex: number;
     onClose: () => void;
     onPrevious: () => void;
-    onNext: () => void
+    onNext: () => void;
 }
 
-export const ZoomView = ({ image, activeIndex, onClose, onPrevious, onNext }: ZoomViewProps) => {
+export const ZoomView = ({
+         image,
+         activeIndex,
+         onClose,
+         onPrevious,
+         onNext
+     }: ZoomViewProps) => {
     return (
-        <div style={zoomContainer} data-gallery-zoom>
-            {/* Minify button */}
-            <div style={minifyButton} onClick={() => onClose()} data-gallery-minify>
+        <div
+            className="product-gallery__zoom"
+            data-gallery-zoom
+        >
+            <button
+                type="button"
+                className="product-gallery__zoom-minify"
+                onClick={onClose}
+                aria-label="Close zoom view"
+                data-gallery-minify
+            >
                 Minify ✕
-            </div>
+            </button>
 
-            {/* Navigation arrows */}
-            <div style={{...arrowBase, left: "20px"}} onClick={onPrevious} data-gallery-prev>
+            <button
+                type="button"
+                className="product-gallery__zoom-arrow product-gallery__zoom-arrow--previous"
+                onClick={onPrevious}
+                aria-label="Previous image"
+                data-gallery-prev
+            >
                 ‹
-            </div>
-            <div style={{...arrowBase, right: "20px"}} onClick={onNext} data-gallery-next>
-                ›
-            </div>
+            </button>
 
-            {/* Main fullscreen image */}
+            <button
+                type="button"
+                className="product-gallery__zoom-arrow product-gallery__zoom-arrow--next"
+                onClick={onNext}
+                aria-label="Next image"
+                data-gallery-next
+            >
+                ›
+            </button>
+
             <img
                 key={activeIndex}
                 src={image.src}
                 alt={image.alt}
-                style={{
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: "85vh",
-                    objectFit: "contain",
-                    borderRadius: "12px",
-                    ...fadeStyle,
-                }}
+                className="product-gallery__zoom-image"
                 data-gallery-main
             />
         </div>
     );
-}
+};
