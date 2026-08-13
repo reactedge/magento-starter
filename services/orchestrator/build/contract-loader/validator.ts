@@ -5,13 +5,13 @@ import type {ValidationIssue} from "../types.ts";
 export async function validateContract(
     widgetName: string,
     contract: unknown,
-    contract: string
+    manifestContract: string
 ): Promise<ValidationIssue[]> {
 
     const urlIssues =
         validateUrls(
             contract,
-            contract
+            manifestContract
         );
 
     const widgetIssues =
