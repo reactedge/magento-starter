@@ -1,14 +1,20 @@
 import { useMagentoGalleryData } from "../infra/useMagentoGalleryData.tsx";
-import type {BootstrapData} from "../../entrypoints/ssr.tsx";
+import { useMagentoGalleryByAttribute } from "../infra/useMagentoGalleryByAttribute.tsx";
+import type { BootstrapData } from "../../entrypoints/ssr.tsx";
+import { useSelectionState } from "../../state/Selection/useSelectionState.tsx";
 
 export function useGalleryData(
     sku: string,
     bootstrap?: BootstrapData
 ) {
-    const initialData = bootstrap?.galleryData
+    const selection = useSelectionState();
+    const initialData = bootstrap?.galleryData;
 
-    const shouldFetch =
-        !initialData;
+    const hasSelection =
+        selection.code !== null &&
+        selection.value !== null;
+
+    const shouldFetch = !initialData;
 
     const {
         magentoGalleryData,
@@ -20,20 +26,35 @@ export function useGalleryData(
         sku
     );
 
+    const {
+        magentoGalleryData: selectedGalleryData,
+        loading: selectionLoading,
+        error: selectionError,
+    } = useMagentoGalleryByAttribute(
+        hasSelection,
+        sku,
+        selection.code,
+        selection.value
+    );
+
+    const baseGalleryData =
+        initialData ?? magentoGalleryData;
+
+    const galleryData = [
+        ...(baseGalleryData ?? []),
+        ...(hasSelection ? selectedGalleryData ?? [] : [])
+    ];
+
     return {
-        galleryData:
-            initialData ??
-            magentoGalleryData,
+        galleryData,
 
         galleryLoading:
-            shouldFetch
-                ? galleryLoading
-                : false,
+            (shouldFetch && galleryLoading) ||
+            (hasSelection && selectionLoading),
 
         galleryError:
-            shouldFetch
-                ? galleryError
-                : null,
+            (shouldFetch ? galleryError : null) ??
+            (hasSelection ? selectionError : null),
 
         refetch,
     };
