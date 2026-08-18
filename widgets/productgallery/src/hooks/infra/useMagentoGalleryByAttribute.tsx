@@ -18,6 +18,7 @@ export function useMagentoGalleryByAttribute(enabled: boolean, sku: string, attr
 
         setLoading(true);
         setError(null);
+        setData(undefined);
 
         try {
             const result = await fetchMagentoGalleryByAttributeData(graphqlClient, sku, attributeCode, attributeValue);

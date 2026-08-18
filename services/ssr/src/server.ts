@@ -15,13 +15,13 @@ import express from 'express';
 import { buildRenderPayload } from "./payload";
 import { SsrRenderOperation } from "./observability/ssr-operation";
 import { resolveDevice } from "./user-agent";
-import {getReactEdgeRoot} from "../../../packages/widget-build/shared-resources/filesystem/reactedgeRoot";
+import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot.ts";
 
 const app = express();
 app.use(express.json());
 
 function resolveEntry(widget: string): string {
-    return `${getReactEdgeRoot()}/widgets/${widget}/src/ssr/entry.tsx`;
+    return `${ReactEdgeRoot.get()}/widgets/${widget}/src/ssr/entry.tsx`;
 }
 
 app.post('/render', async (req, res) => {

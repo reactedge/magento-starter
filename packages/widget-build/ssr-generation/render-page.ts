@@ -1,9 +1,9 @@
 import fs from 'fs/promises';
 import 'dotenv/config';
-import {getReactEdgeRoot} from "../shared-resources/filesystem/reactedgeRoot";
+import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot.ts";
 
 function resolveEntry(widget: string): string {
-    return `${getReactEdgeRoot()}/widgets/${widget}/src/entrypoints/ssr.tsx`;
+    return `${ReactEdgeRoot.get()}/widgets/${widget}/src/entrypoints/ssr.tsx`;
 }
 
 const run = async () => {
