@@ -2,6 +2,7 @@ import { useMagentoGalleryData } from "../infra/useMagentoGalleryData.tsx";
 import { useMagentoGalleryByAttribute } from "../infra/useMagentoGalleryByAttribute.tsx";
 import type { BootstrapData } from "../../entrypoints/ssr.tsx";
 import { useSelectionState } from "../../state/Selection/useSelectionState.tsx";
+import type {GalleryTile} from "../../components/Types.ts";
 
 export function useGalleryData(
     sku: string,
@@ -40,10 +41,7 @@ export function useGalleryData(
     const baseGalleryData =
         initialData ?? magentoGalleryData;
 
-    const galleryData = [
-        ...(baseGalleryData ?? []),
-        ...(hasSelection ? selectedGalleryData ?? [] : [])
-    ];
+    const galleryData = mergeGalleryData(baseGalleryData, selectedGalleryData);
 
     return {
         galleryData,
@@ -58,4 +56,19 @@ export function useGalleryData(
 
         refetch,
     };
+}
+
+function mergeGalleryData(
+    base: GalleryTile[] = [],
+    selected: GalleryTile[] = []
+): GalleryTile[] {
+    const images = new Map(
+        base.map(image => [image.src, image])
+    );
+
+    for (const image of selected) {
+        images.set(image.src, image);
+    }
+
+    return [...images.values()];
 }

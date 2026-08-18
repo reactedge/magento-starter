@@ -28,9 +28,39 @@ The widget is designed for **isolation, determinism, and safe navigation evoluti
 
 ---
 
+## Embedding Contract
+
+The widget is delivered as a standalone JavaScript file and exposed via a custom element.
+
+### Example
+
+```html
+<megamenu-widget></megamenu-widget>
+
+<script type="module">
+  import { mount } from "./api/runtime-widget.tsx";
+  import { ResourceLoader } from "@reactedge/framework/contract";
+
+  const loader = new ResourceLoader();
+
+  const contract = await loader.loadContract("default.json");
+  const runtime = await loader.loadRuntime();
+
+  const element = document.querySelector("megamenu-widget");
+
+  if (!element) {
+    throw new Error("Megamenu element not found");
+  }
+</script>
+```
+
 ## Local development
 
-This project uses Node.js and npm.
+For all the commands below, we assume we are in the widget folder
+
+```bash
+cd widgets/megamenu
+```
 
 From the repository root:
 
@@ -38,11 +68,9 @@ From the repository root:
 npm install
 ```
 
-To run the widget locally:
+Run locally:
 
 ```bash
-cd vite_project
-npm install
 npm run dev
 ```
 
@@ -50,13 +78,19 @@ To run the widget in SSR mode:
 
 ```bash
 cd widgets/megamenu
-npm install
-NODE_TLS_REJECT_UNAUTHORIZED=0 npx tsx scripts/render-page.ts ../../services/cdn/www/megamenu/contracts/fr.json
+NODE_TLS_REJECT_UNAUTHORIZED=0 npx tsx  \
+   --tsconfig widgets/megamenu/tsconfig.app.json  \
+   packages/widget-build/ssr-generation/render-page.ts \
+   megamenu  \
+   widgets/megamenu/public/default.json
 ```
 
 To run the test suite:
+
+Run tests:
+
 ```bash
-npx playwright test --config=tests/playwright.dev.config.ts
+npx playwright test   --config=../../tests/playwright.dev.config.ts   tests/megamenu.spec.ts
 ```
 
 | Host                   | Test to check it works                                                      | Notes on the component                                                                  |
@@ -65,9 +99,3 @@ npx playwright test --config=tests/playwright.dev.config.ts
 | **WordPress**          | Load page → widget JS loads → menu renders without theme hooks              | Works reading the Wordpress menu data and remains independent WP or theme templates. |
 | **Static site**        | Load page → widget JS `200` → menu renders from remote JSON                 | No server-side integration required.                                                    |
 | **Widget host domain** | Network tab shows widget JS loaded once, no duplicate execution             | Widget should remain side-effect free outside its mount point.                          |
-
-
-To run the test suite:
-```bash
-npx playwright test --config=tests/playwright.dev.config.ts
-```

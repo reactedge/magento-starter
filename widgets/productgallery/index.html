@@ -6,7 +6,7 @@
     window.ReactEdgeSignals = window.ReactEdgeSignals || {
         emit: (selection) => {
             window.dispatchEvent(
-                new CustomEvent("reactedge:product-attribute", { detail: selection })
+                new CustomEvent("reactedge:signal", { detail: selection })
             );
         }
     };
@@ -30,12 +30,14 @@
 <div style="padding:20px; border:1px solid #ccc; margin-top:20px;">
     <h3>Intent Debug Panel</h3>
 
-    <button onclick="ReactEdgeSignals.emit({ type: 'product_attribute_changed', code: 'color', value: '57' })">
+    <button onclick="ReactEdgeSignals.emit({ type: 'product_attribute_changed', code: 'color', value: '50' })">
         Simulate Color Orange (value=57)
     </button>
 </div>
 
-<productgallery-widget></productgallery-widget>
+<div style="width: 800px">
+    <productgallery-widget></productgallery-widget>
+</div>
 
 </body>
 </html>

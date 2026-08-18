@@ -1,5 +1,6 @@
 import {readWidgetConfig} from "./Config.ts";
 import {MegamenuContent} from "./components/MobileMegamenu/MenuContent.tsx";
+import {ConfigStateProvider} from "./state/Config/ConfigStateProvider.tsx";
 
 type Props = {
     contract: unknown;
@@ -10,6 +11,8 @@ export const WidgetView = ({ contract }: Props) => {
 
     if (!config) return null;
 
-    return <MegamenuContent items={config?.data.items} theme={config.settings?.theme} />
+    return <ConfigStateProvider settings={config?.settings?.theme}>
+        <MegamenuContent items={config?.data.items} theme={config.settings?.theme} />
+    </ConfigStateProvider>
 };
 
