@@ -1,5 +1,5 @@
 import {useContext} from "react";
-import {LocalInstanceStateContext} from "./ActivtiyContext.tsx";
+import {LocalInstanceStateContext} from "./ActivityContext.tsx";
 import type {WidgetActivity} from "@reactedge/framework/activity";
 
 export function useActivityContext(): WidgetActivity {

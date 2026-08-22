@@ -144,3 +144,33 @@ test.describe('Product Gallery Widget', () => {
         expect(sources).toEqual(initialSources);
     });
 });
+
+
+test.describe('Product Gallery - Magento failures', () => {
+
+    test('does not break when Magento returns no products', async ({ page }) => {
+        await page.route('**/graphql', async route => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    data: {
+                        products: {
+                            items: []
+                        }
+                    }
+                })
+            });
+        });
+
+        await page.goto('/?reactedge_debug=eager');
+
+        const widget = page.locator(`${WIDGET_ID}-widget`);
+
+        await expect(widget).toBeAttached();
+
+        await expect(
+            widget.locator('[data-gallery-tiled]')
+        ).toHaveCount(0);
+    });
+});
