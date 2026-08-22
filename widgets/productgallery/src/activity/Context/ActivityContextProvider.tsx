@@ -1,6 +1,6 @@
 import {type ReactNode} from "react";
 import {WIDGET_ID} from "../../Config.ts";
-import {LocalInstanceStateContext} from "./ActivtiyContext.tsx";
+import {LocalInstanceStateContext} from "./ActivityContext.tsx";
 import {WidgetActivity} from "@reactedge/framework/activity";
 
 interface InstanceStateProviderProps {

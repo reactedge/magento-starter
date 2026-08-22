@@ -1,9 +1,5 @@
 
-export interface WidgetConfig {
-    readonly runtime: RuntimeConfig,
-    readonly data: MegaMenuDataConfig;
-    readonly settings?: {theme: MegaMenuSettingsConfig};
-}
+
 
 export interface RuntimeConfig {
     "platform": "wordpress" | "magento"

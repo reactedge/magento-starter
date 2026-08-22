@@ -36,7 +36,10 @@ npm run dev &
 DEV_PID=$!
 
 cleanup() {
-  kill "$DEV_PID" 2>/dev/null || true
+    if kill -0 "$DEV_PID" 2>/dev/null; then
+        kill "$DEV_PID" 2>/dev/null || true
+        wait "$DEV_PID" 2>/dev/null || true
+    fi
 }
 
 trap cleanup EXIT INT TERM

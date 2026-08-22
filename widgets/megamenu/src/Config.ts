@@ -1,7 +1,6 @@
 import type {
     MegaMenuDataConfig,
     MegaMenuSettingsConfig,
-    WidgetConfig,
     RuntimeConfig
 } from "./domain/megamenu.types.ts";
 import type {WidgetActivity} from "@reactedge/framework/activity";
@@ -9,7 +8,7 @@ import {parseConfig, type SchemaWidgetConfig} from "./ConfigSchema.ts";
 
 export const WIDGET_ID = 'megamenu';
 
-export interface RawWidgetConfig {
+export interface WidgetConfig {
     readonly runtime: RuntimeConfig,
     readonly data: MegaMenuDataConfig;
     readonly settings?: {theme: MegaMenuSettingsConfig};
