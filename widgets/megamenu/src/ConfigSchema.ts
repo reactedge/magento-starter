@@ -9,12 +9,7 @@ const RuntimeSchema = z.object({
 }).strict();
 
 const ThemeSchema = z.object({
-    dataLocale: z.string(),
-    fontColor: z.string(),
-    primaryColor: z.string(),
-    secondaryColor: z.string(),
     urlSuffix: z.string().optional().default(".html"),
-
     dropdownLayouts: z.record(
         z.string(),
         z.enum([

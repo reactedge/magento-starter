@@ -15,7 +15,6 @@ export interface ContractWrapper {
 export interface AssetRegistryResult {
     src: string;
     contract?: string;
-    cssBundle?: string;
     cssFilename?: string;
     integrity: string
 }

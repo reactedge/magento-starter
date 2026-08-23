@@ -8,7 +8,7 @@ import {getContractPath, getWidgetPath} from "../paths.ts";
 import {exec} from "node:child_process";
 import {resolveContractTags} from "../contract-loader/wrapper.ts";
 import {SsrVariant} from "@reactedge/framework/contracts/WidgetSsrConfig.ts";
-import {getReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot.ts";
+import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot.ts";
 
 export async function generateSsr(
     widgetName: string,

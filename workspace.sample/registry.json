@@ -14,5 +14,16 @@
     "ssr": {
       "strategy": "dynamic"
     }
+  },
+  "usp": {
+    "active": true,
+    "contract": "default.json",
+    "ssr": {
+      "strategy": "static",
+      "variants": [
+        "desktop",
+        "mobile"
+      ]
+    }
   }
 }

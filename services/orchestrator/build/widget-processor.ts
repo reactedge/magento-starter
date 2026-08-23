@@ -98,7 +98,7 @@ export async function processWidget(
             id: instanceName,
             widget: widgetName,
             src: registryResult.src,
-            css: registryResult.cssBundle,
+            css: registryResult.cssFilename,
             ssr: {
                 views: ssrViews,
                 css: cssSsr,
