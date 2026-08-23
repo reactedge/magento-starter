@@ -12,7 +12,7 @@ export function MegamenuContent({ items, loading = false, theme }: MegaMenuProps
     if (loading) return <Loading />
 
     return (
-        <div className="mw-megamenu">
+        <div className="megamenu">
             {items && items.map(level1 => {
                 const isActive = activeId === level1.id;
                 const layout = resolveDropdownLayout(level1.url, theme);
@@ -23,7 +23,7 @@ export function MegamenuContent({ items, loading = false, theme }: MegaMenuProps
                     <div
                         key={level1.id}
                         className={[
-                            "mw-megamenu-item",
+                            "megamenu-item",
                             isActive && "is-active",
                             `menu-${menuType}`
                         ].filter(Boolean).join(" ")}
@@ -38,14 +38,14 @@ export function MegamenuContent({ items, loading = false, theme }: MegaMenuProps
                         />
 
                         {menuType !== "none" && (
-                            <div className="mw-megamenu-dropdown">
+                            <div className="megamenu-dropdown">
                                 {menuType === "simple-list" &&
                                     level1.children!.map(child => (
                                         <MenuItem key={child.id} item={child}/>
                                     ))}
 
                                 {menuType === "simple-tiles" && (
-                                    <div className="mw-megamenu-tiles">
+                                    <div className="megamenu-tiles">
                                         {level1.children?.map(item => (
                                             <MenuTile key={item.id} item={item}/>
                                         ))}

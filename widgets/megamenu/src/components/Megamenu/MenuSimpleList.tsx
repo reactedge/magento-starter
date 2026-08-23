@@ -9,12 +9,12 @@ export function MenuSimpleList({ children }: MenuProps) {
     if (!children?.length) return null;
 
     return (
-        <div className="mw-megamenu-col">
-            <ul className="mw-megamenu-col__list">
+        <div className="megamenu-col">
+            <ul className="megamenu-col__list">
                 {children.map(level3 => (
                     <li
                         key={level3.id}
-                        className="mw-megamenu-col__item"
+                        className="megamenu-col__item"
                     >
                         <MenuItem item={level3}/>
                     </li>
