@@ -35,8 +35,7 @@ export function updateAssetRegistry(
         'Asset registry updated',
         {
             widget: name,
-            contract: result.contract,
-            cssBundle: result.cssBundle
+            contract: result.contract
         }
     );
 

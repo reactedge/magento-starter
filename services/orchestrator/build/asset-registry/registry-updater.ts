@@ -4,7 +4,6 @@ import {getConfig} from "../../config.ts";
 
 export function updateRegistry({ widgetName, buildTarget, registryPath, widgetAssetsDir }) {
     const CONFIG = getConfig()
-    let cssBundle= null
 
     const manifestPath = path.join(widgetAssetsDir, `widget-${buildTarget}.manifest.json`);
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
@@ -34,15 +33,11 @@ export function updateRegistry({ widgetName, buildTarget, registryPath, widgetAs
         entry.src = newSrc;
     }
 
-    if (baseEntry.css) {
-        cssBundle = `widget-${buildTarget}.css`;
-    }
-
     if (CONFIG.updateIntegrity && hash) {
         entry.integrity = hash;
     }
 
     const contract = `/${buildTarget}/contracts/${entry.contract}`;
 
-    return { src: newSrc, hash, contract, cssBundle, cssFilename, integrity: entry.integrity };
+    return { src: newSrc, hash, contract, cssFilename, integrity: entry.integrity };
 }

@@ -10,14 +10,14 @@ import {getWidgetAssetsPath} from "../paths.ts";
 
 export function loadSsrCss(
     widgetName: string,
-    cssFilename?: string
+    cssSsrFilename?: string
 ): string | null {
     const widgetAssetsDir =
         getWidgetAssetsPath(
             widgetName
         );
 
-    if (!cssFilename) {
+    if (!cssSsrFilename) {
         return null;
     }
 
@@ -25,7 +25,7 @@ export function loadSsrCss(
         return fs.readFileSync(
             path.join(
                 widgetAssetsDir,
-                cssFilename
+                cssSsrFilename
             ),
             'utf-8'
         );
