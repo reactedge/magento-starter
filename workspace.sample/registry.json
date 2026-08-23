@@ -2,7 +2,6 @@
   "productgallery": {
     "active": true,
     "contract": "default.json",
-    "css": "productgallery.css",
     "ssr": {
       "strategy": "dynamic"
     }
@@ -10,7 +9,6 @@
   "megamenu": {
     "active": true,
     "contract": "default.json",
-    "css": "megamenu.css",
     "ssr": {
       "strategy": "dynamic"
     }
