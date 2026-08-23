@@ -65,6 +65,7 @@ README-DEPLOY-DEMO.md
 
 
 widgets/**/.github
+widgets/*.zip
 public/*
 
 # Python bytecode
@@ -80,3 +81,4 @@ venv/
 
 **/public/reactedge-runtime.json
 workspace/*
+
