@@ -108,33 +108,16 @@ widgets/integration/magento/
 
 These files define where the ReactEdge widgets are mounted within the Magento storefront.
 
-#### Product Gallery
-
 Copy:
 
 ```text
-widgets/integration/magento/catalog_product_view.xml
+widgets/integration/magento/*
 ```
 
 to your active Magento theme:
 
 ```text
-app/design/frontend/<Vendor>/<theme>/Magento_Catalog/layout/catalog_product_view.xml
-```
-
-#### Megamenu
-
-Copy:
-
-```text
-widgets/integration/magento/default.xml
-widgets/integration/magento/megamenu.xml
-```
-
-to:
-
-```text
-app/design/frontend/<Vendor>/<theme>/Magento_Theme/layout/
+app/design/frontend/<Vendor>/<theme>/Magento_Catalog/layout/
 ```
 
 If your theme already contains one of these layout files, **do not overwrite it**. Merge the ReactEdge layout instructions into the existing file instead.
