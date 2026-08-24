@@ -1,13 +1,11 @@
 {
-  "name": "widget-megamenu",
+  "name": "widget-__WIDGET_NAME__",
   "private": true,
-  "version": "1.0.1",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:npm": "vite src/npm -c vite.npm.config.ts",
     "build": "tsc -b && vite build",
-    "build:ssr": "vite build -c vite.npm.config.ts",
     "analyze": "ANALYZE=true vite build",
     "lint": "eslint .",
     "preview": "vite preview"

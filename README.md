@@ -267,3 +267,14 @@ inspected before running them.
 | `mise run widget-build -- <widget>` | Builds a selected widget |
 | `mise run widgets-deploy` | Builds and deploys selected widget assets |
 | `mise run widget-test -- <widget>` | Runs tests for a selected widget |
+
+
+## MCP server
+
+ReactEdge provides an MCP server that exposes platform documentation and
+development tools to MCP-compatible clients.
+
+Start the server with:
+
+```bash
+npx @modelcontextprotocol/inspector npx tsx mcp/server.ts
