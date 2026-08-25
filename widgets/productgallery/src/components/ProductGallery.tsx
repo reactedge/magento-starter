@@ -1,12 +1,14 @@
 import type {GalleryTile} from "./Types.ts";
 import {useGallery} from "../hooks/useGallery.tsx";
+import {useSelectionState} from "../state/Selection/useSelectionState.tsx";
 
 interface ProductGalleryProps {
     tiles: GalleryTile[]
 }
 
 export const ProductGallery = ({ tiles }: ProductGalleryProps) => {
-    const gallery = useGallery(tiles);
+    const selection = useSelectionState();
+    const gallery = useGallery(tiles, selection.value);
 
     if (tiles.length === 0 || gallery.currentImage === undefined) {
         return null;
