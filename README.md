@@ -150,25 +150,9 @@ mise run widgets-deploy
 
 ---
 
-## 8. Verify the installation
-
-Check that the module is installed:
-
-```bash
-bin/magento module:status ReactEdge_WidgetBridge
-```
-
-Inspect widget configuration:
-
-```bash
-bin/magento config:show reactedge/productgallery/enabled
-bin/magento config:show reactedge/megamenu/enabled
-bin/magento config:show reactedge/usp/enabled
-```
-
 ---
 
-## Configure integrations
+## 8. Configure integrations
 
 Enable server-side rendering:
 
@@ -178,7 +162,7 @@ bin/magento config:set reactedge/widgets_ssr/enabled 1
 
 ---
 
-### Enable widgets
+### 9. Enable widgets
 
 Enable the widgets you want to use:
 
@@ -195,9 +179,23 @@ Flush the cache:
 ```bash
 bin/magento cache:flush
 ```
+
+If the commands above fails, check that the module correctly installed:
+
+```bash
+bin/magento module:status ReactEdge_WidgetBridge
+```
+
+Inspect widget configuration:
+
+```bash
+bin/magento config:show reactedge/productgallery/enabled
+bin/magento config:show reactedge/megamenu/enabled
+bin/magento config:show reactedge/usp/enabled
+```
 ---
 
-## 9. Revert to Magento UI
+## 10. Revert to Magento UI
 
 Disable the widgets you don't want to use:
 
@@ -216,7 +214,7 @@ bin/magento cache:flush
 ```
 ---
 
-## 10. Modify and redeploy a widget
+## 11. Modify and redeploy a widget
 
 Widget deployments use the contracts referenced by the workspace registry (see `workspace/registry.json`)
 
@@ -237,7 +235,7 @@ Then clear the ReactEdge Magento cache:
 bin/magento cache:clean reactedge
 ```
 
-## 11. Project tasks
+## 12. Project tasks
 
 Mise is used as a task runner. The commands it executes are defined in
 `mise.toml`, with supporting scripts in `launcher/scripts/`, and can be
@@ -252,7 +250,7 @@ inspected before running them.
 | `mise run widget-test -- <widget>` | Runs tests for a selected widget |
 
 
-## MCP server
+## 13. MCP server
 
 ReactEdge provides an MCP server that exposes platform documentation and
 development tools to MCP-compatible clients.
