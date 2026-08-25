@@ -47,8 +47,10 @@ export function useGalleryData(
         galleryData,
 
         galleryLoading:
-            (shouldFetch && galleryLoading) ||
-            (hasSelection && selectionLoading),
+            shouldFetch && galleryLoading,
+
+        galleryUpdating:
+            hasSelection && selectionLoading,
 
         galleryError:
             (shouldFetch ? galleryError : null) ??
