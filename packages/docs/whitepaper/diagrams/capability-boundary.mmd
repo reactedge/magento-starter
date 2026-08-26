@@ -1,0 +1,29 @@
+flowchart TB
+
+    subgraph Capability["CAPABILITY OWNS"]
+        direction TB
+
+        Entry["index.ts / mount()"]
+        Contract["Contract + Schema"]
+        Components["React components"]
+        State["State / behaviour"]
+        Styles["CSS"]
+        Tests["Tests"]
+    end
+
+    subgraph Framework["REACTEDGE PROVIDES"]
+        direction TB
+
+        Host["Host abstraction"]
+        API["Public API"]
+        Bootstrap["Bootstrap mechanics"]
+        SSR["SSR"]
+        Observability["Observability"]
+        Build["Build / deployment primitives"]
+    end
+
+    Entry -->|"uses"| Host
+    Entry -->|"implements"| API
+    Entry -->|"uses"| Bootstrap
+    Contract -->|"processed by"| Build
+    Components -->|"can be rendered by"| SSR

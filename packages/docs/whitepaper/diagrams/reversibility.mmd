@@ -1,0 +1,11 @@
+flowchart LR
+
+    Native["Native UI"]
+    ReactEdge["ReactEdge UI"]
+
+    Native -->|"ENABLE"| ReactEdge
+    ReactEdge -->|"DISABLE"| Native
+
+    Available["Host implementation remains available"]
+
+    Native --- Available

@@ -1,0 +1,14 @@
+flowchart TB
+
+    Registry["workspace/registry.json"]
+    Build["ReactEdge build"]
+    Widgets["Build selected widgets"]
+    Artefacts["Generate manifests + artefacts"]
+    Host["Create host folder"]
+    Output["Copy registry + generated manifests"]
+
+    Registry --> Build
+    Build --> Widgets
+    Widgets --> Artefacts
+    Artefacts --> Host
+    Host --> Output

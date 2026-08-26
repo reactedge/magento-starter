@@ -1,0 +1,51 @@
+flowchart TB
+
+    subgraph Traditional["Traditional"]
+        direction TB
+
+        Host["Host application"]
+
+        Nav["Navigation"]
+        Gallery["Gallery"]
+        USP["USP"]
+        Other["Other UI"]
+
+        Shared["Shared concerns<br/>CSS · State · SSR · Build · Deployment"]
+
+        Host --> Nav
+        Host --> Gallery
+        Host --> USP
+        Host --> Other
+
+        Nav --> Shared
+        Gallery --> Shared
+        USP --> Shared
+        Other --> Shared
+
+        Lifecycle["One application lifecycle"]
+        Shared --> Lifecycle
+    end
+
+    subgraph ReactEdge["ReactEdge"]
+        direction TB
+
+        Host2["Host application<br/>remains intact"]
+
+        Platform["ReactEdge shared infrastructure<br/>SSR · Build · Contracts · Host"]
+
+        USP2["USP"]
+        Gallery2["Gallery"]
+        Other2["Other capability"]
+
+        Host2 -->|"explicit boundaries"| Platform
+
+        Platform --> USP2
+        Platform --> Gallery2
+        Platform --> Other2
+
+        Independent["Independent capability lifecycles"]
+
+        USP2 --> Independent
+        Gallery2 --> Independent
+        Other2 --> Independent
+    end

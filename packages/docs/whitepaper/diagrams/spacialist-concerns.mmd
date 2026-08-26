@@ -1,0 +1,23 @@
+flowchart TB
+
+    subgraph Specialist["SPECIALIST CONCERNS"]
+        direction TB
+
+        Host["Host architecture"]
+        Deployment["Deployment lifecycle"]
+        Framework["Framework internals"]
+    end
+
+    ReactEdge["ReactEdge"]
+
+    subgraph Capability["UI CAPABILITY"]
+        direction TB
+
+        Primitives["React · HTML · CSS<br/>State · Data · Events"]
+    end
+
+    Host --> ReactEdge
+    Deployment --> ReactEdge
+    Framework --> ReactEdge
+
+    ReactEdge --> Primitives
