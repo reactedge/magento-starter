@@ -3,8 +3,7 @@ import {readWidgetConfig} from "../Config.ts";
 import {useEffect, useState} from "react";
 import {SystemStateProvider} from "../state/System/SystemStateProvider.tsx";
 import {SpinnerOverlay} from "../components/global/SpinnerOverlay.tsx";
-import {ProductGalleryWidget} from "../components/ProductGalleryWidget.tsx";
-import {SelectionStateProvider} from "../state/Selection/SelectionStateProvider.tsx";
+import {Widget__WIDGET_PASCAL_NAME__} from "../components/Widget__WIDGET_PASCAL_NAME__.tsx";
 
 type Props = {
     contract: unknown,
@@ -28,11 +27,9 @@ export default function WidgetWrapper({contract, runtime}: Props) {
     if (!config) return null;
 
     return <SystemStateProvider config={config.integrations} runtime={config.runtime} activity={activity}>
-            <SelectionStateProvider activity={activity}>
                 {!bootReady
                     ? <SpinnerOverlay/>
-                    : <ProductGalleryWidget config={config} />
+                    : <Widget__WIDGET_PASCAL_NAME__ config={config} />
                 }
-            </SelectionStateProvider>
     </SystemStateProvider>
 }

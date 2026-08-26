@@ -1,5 +1,5 @@
 import {readWidgetConfig} from "./Config.ts";
-import {UspWidget} from "./components/UspWidget.tsx";
+import {Widget__WIDGET_PASCAL_NAME__} from "./components/Widget__WIDGET_PASCAL_NAME__.tsx";
 
 type Props = {
     contract?: unknown;
@@ -10,6 +10,6 @@ export const WidgetView = ({ contract }: Props) => {
 
     if (!config) return null;
 
-    return <UspWidget config={config} />
+    return <Widget__WIDGET_PASCAL_NAME__ config={config} />
 };
 

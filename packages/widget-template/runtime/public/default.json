@@ -1,0 +1,11 @@
+{
+  "data": {
+    "title": "I am runtime __WIDGET_NAME__ ready to work"
+  },
+  "settings": {
+    "colour": "red"
+  },
+  "integration": {
+    "requires": ["magentoGraphql"]
+  }
+}

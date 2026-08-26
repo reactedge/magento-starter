@@ -1,9 +1,48 @@
-import {type WidgetConfig} from "./components/Types.ts";
-import type {WidgetActivity} from "@reactedge/framework/activity";
 import {parseConfig, type SchemaWidgetConfig} from "./ConfigSchema.ts";
+import type {WidgetActivity} from "@reactedge/framework/activity";
 import {parseRuntimeConfig, type SchemaRuntimeConfig} from "./ConfigSchemaRuntime.ts";
 
-export const WIDGET_ID = 'productgallery';
+export interface WidgetConfig {
+    readonly data: {
+        title: string;
+    }
+
+    readonly settings: {
+        colour: string;
+    };
+
+    readonly runtime: RuntimeConfig
+    readonly integrations: ResolvedConfigIntegrations
+}
+
+export interface ProductData {
+    sku: string
+    name: string
+}
+
+export interface RuntimeConfig {
+    storeCode: string;
+    sku: string;
+}
+
+export interface ReactEdgeRuntimeConfig {
+    readonly integrations: ReactEdgeRuntimeIntegrations;
+    readonly context: RuntimeConfig
+}
+
+export interface ReactEdgeRuntimeIntegrations {
+    readonly magentoGraphql: {
+        readonly api: string
+    };
+}
+
+export interface ResolvedConfigIntegrations {
+    readonly magentoGraphql: {
+        readonly api: string
+    };
+}
+
+export const WIDGET_ID = '__WIDGET_NAME__';
 
 /**
  * Validates and resolves the Contact Us widget configuration.
@@ -59,8 +98,8 @@ export function resolveConfig(
     runtime: SchemaRuntimeConfig
 ): WidgetConfig {
     return {
-        tiles: widget.data.images,
-        settings: widget.data.settings,
+        data: widget.data,
+        settings: widget.settings,
         runtime: {
             storeCode: runtime.context.storeCode,
             sku: runtime.context.sku

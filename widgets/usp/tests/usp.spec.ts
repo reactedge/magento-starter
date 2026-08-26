@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
 
 test.describe('USP Widget', () => {
-    let usp;
+    let usp: Locator;
 
     test.beforeEach(async ({ page }) => {
         await page.goto('/?reactedge_debug=eager');
