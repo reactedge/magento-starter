@@ -1,34 +1,17 @@
-import {type UspSettings, type UspSlideData} from "./components/Types.ts";
 import {parseConfig} from "./ConfigSchema.ts";
 import type {WidgetActivity} from "@reactedge/framework/activity";
 
 export interface WidgetConfig {
-    /**
-     * Structured banner payload.
-     * Shape is banner-owned and opaque to the platform.
-     */
     readonly data: {
-        slides: UspSlideData[]
+        title: string;
     }
 
-    readonly settings: UspSettings;
+    readonly settings: {
+        colour: string;
+    };
 }
 
-export interface RuntimeConfig {
-    rendering: {
-        userAgent: string;
-    }
-}
-
-export interface RawWidgetConfig {
-    readonly data: {
-        slides: UspSlideData[]
-    }
-
-    readonly settings: UspSettings;
-}
-
-export const WIDGET_ID = 'usp';
+export const WIDGET_ID = '__WIDGET_NAME__';
 
 /**
  * Validates the widget contract and returns an immutable configuration.
@@ -40,17 +23,17 @@ export const WIDGET_ID = 'usp';
  * runtime and the widget implementation for widgets that do not require
  * runtime integrations.
  *
- * @param rawConfig - Widget contract supplied by the host platform.
+ * @param rawContract - Widget contract supplied by the host platform.
  * @param activity - Optional activity logger used during bootstrap.
  * @returns An immutable widget configuration.
  * @throws When the widget contract is invalid.
  */
 export function readWidgetConfig(
-    rawConfig: unknown,
+    rawContract: unknown,
     activity?: WidgetActivity
 ): WidgetConfig {
     try {
-        const contract = parseConfig(rawConfig);
+        const contract = parseConfig(rawContract);
 
         activity?.log(
             'bootstrap',

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<__WIDGET_NAME__-widget></__WIDGET_NAME__-widget>
+
+<script type="module">
+    import { mount } from "./api/runtime-widget.tsx";
+    import { ResourceLoader } from "@reactedge/framework/contract";
+
+    const loader = new ResourceLoader();
+
+    const contract = await loader.loadContract("default.json");
+    const runtime = await loader.loadRuntime();
+
+    const element = document.querySelector("__WIDGET_NAME__-widget");
+
+    if (!element) {
+        throw new Error(
+            "__WIDGET_NAME__-widget element not found"
+        );
+    }
+
+    requestAnimationFrame(() => {
+        mount(element, contract, runtime);
+    });
+</script>
+
+</body>
+</html>

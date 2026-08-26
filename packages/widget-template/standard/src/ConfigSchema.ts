@@ -1,29 +1,16 @@
 import { z } from 'zod';
 
+const WidgetDataSchema = z.object({
+    title: z.string(),
+});
+
+const WidgetSettingsSchema = z.object({
+    colour: z.string(),
+});
+
 export const WidgetConfigSchema = z.object({
-    data: z.object({
-        slides: z.array(
-            z.object({
-                heading: z.string().min(1).max(30).optional(),
-                text: z.string().min(1).max(30)
-            }).strict()
-        ).min(1).max(3)
-    }).strict(),
-
-    settings: z.object({
-        mode: z.object({
-            desktop: z.enum(['static', 'slider']),
-            tablet: z.enum(['static', 'slider']),
-            mobile: z.enum(['static', 'slider'])
-        }).strict(),
-
-        theme: z.enum([
-            'light',
-            'dark',
-            'promo'
-        ]).default('light')
-    }).strict()
-
+    data: WidgetDataSchema,
+    settings: WidgetSettingsSchema,
 }).strict();
 
 export type WidgetConfig =

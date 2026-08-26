@@ -4,39 +4,17 @@ const IntegrationSchema = z.enum([
     "magentoGraphql"
 ]);
 
-export const GalleryModeSchema = z.enum([
-    "tile",
-    "gallery"
-]);
-
-export const ProductGalleryImageSchema = z.object({
-    src: z.url(),
-    alt: z.string(),
-    width: z.number().optional(),
-    height: z.number().optional(),
-    role: z.enum([
-        'base',
-        'thumbnail',
-        'hover',
-        'gallery',
-    ]).optional(),
+const WidgetDataSchema = z.object({
+    title: z.string(),
 });
 
-const GallerySettingsSchema = z.discriminatedUnion("mode", [
-    z.object({
-        mode: z.literal("gallery"),
-    }),
-    z.object({
-        mode: z.literal("tile"),
-        maxColumns: z.number().int().min(1).max(2),
-    }),
-]);
+const WidgetSettingsSchema = z.object({
+    colour: z.string(),
+});
 
 export const WidgetConfigSchema = z.object({
-    data: z.object({
-        images: z.array(ProductGalleryImageSchema),
-        settings: GallerySettingsSchema
-    }),
+    data: WidgetDataSchema,
+    settings: WidgetSettingsSchema,
     integration: z.object({
         requires: z.array(IntegrationSchema)
     }).optional()

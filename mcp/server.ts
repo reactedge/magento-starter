@@ -7,6 +7,7 @@ import {registerMegaMenuResource} from "./resources/megamenu";
 import {registerValidateContractTool} from "./tools/validateContract";
 import {registerValidateStructureTool} from "./tools/validateStructure";
 import { registerListWidgetsTool } from './tools/listWidgets';
+import { registerCreateWidgetTool} from './tools/createWidget'
 
 function createServer() {
     const server = new McpServer({
@@ -21,6 +22,7 @@ function createServer() {
     registerValidateContractTool(server)
     registerValidateStructureTool(server)
     registerListWidgetsTool(server);
+    registerCreateWidgetTool(server);
 
     return server;
 }

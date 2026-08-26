@@ -15,7 +15,7 @@ export function WidgetComponent({
         }}
 
     const bootstrapData = {
-        galleryData: []
+        productData: undefined
     }
 
     return (

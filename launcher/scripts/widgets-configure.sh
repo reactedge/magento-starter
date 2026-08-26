@@ -180,6 +180,26 @@ EOF
     fi
 done
 
+RUNTIME_TEMPLATE="$ROOT/packages/widget-template/runtime"
+
+if [[ -d "$RUNTIME_TEMPLATE/public" ]]; then
+    echo "📦 Generating runtime for runtime widget template"
+
+    cat > "$RUNTIME_TEMPLATE/public/reactedge-runtime.json" <<EOF
+{
+  "integrations": {
+    "magentoGraphql": {
+      "api": "$SITEURL/graphql"
+    }
+  },
+  "context": {
+    "storeCode": "$STORE_CODE",
+    "sku": "$SKU"
+  }
+}
+EOF
+fi
+
 echo
 echo "✅ Runtime configuration generated."
 echo "✅ Configuration written to $CONFIG"

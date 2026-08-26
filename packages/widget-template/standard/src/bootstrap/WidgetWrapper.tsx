@@ -1,5 +1,4 @@
-import {UspWidget} from "../components/UspWidget.tsx";
-import {Spinner} from "../components/Spinner.tsx";
+import {Widget__WIDGET_PASCAL_NAME__} from "../components/Widget__WIDGET_PASCAL_NAME__.tsx";
 import {readWidgetConfig} from "../Config.ts";
 import {useActivityContext} from "../activity/Context/useActivityContext.ts";
 
@@ -13,8 +12,6 @@ export const WidgetWrapper = ({ contract }: Props) => {
 
     if (!config) return null;
 
-    if (config.data.slides.length === 0) return <Spinner />;
-
-    return <UspWidget config={config} />
+    return <Widget__WIDGET_PASCAL_NAME__ config={config} />
 };
 
