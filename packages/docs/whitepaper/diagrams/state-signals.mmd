@@ -1,0 +1,30 @@
+flowchart TB
+
+    subgraph Host["HOST — authoritative state"]
+        direction TB
+
+        Swatch["User selects colour swatch"]
+        State["Host state changes"]
+        Signal["reactedge:signal"]
+
+        Swatch --> State
+        State --> Signal
+    end
+
+    subgraph ReactEdge["Product Gallery"]
+        direction TB
+
+        Current["Existing UI stays visible"]
+        Query["Runtime query"]
+        Update["React UI updates"]
+
+        Current --> Query
+    end
+
+    GraphQL["Host GraphQL"]
+    Variant["Variant gallery"]
+
+    Signal --> Current
+    Query --> GraphQL
+    GraphQL --> Variant
+    Variant --> Update

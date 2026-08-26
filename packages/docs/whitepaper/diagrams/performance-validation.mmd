@@ -1,0 +1,24 @@
+flowchart TB
+
+    Capability["ReactEdge capability"]
+    Orchestrator["Orchestrator<br/>configuration"]
+
+    Production["Production"]
+    Validation["Validation"]
+
+    Lazy["Lazy loading"]
+    Eager["Eager loading"]
+
+    Performance["Page performance"]
+    Deterministic["Deterministic UI"]
+
+    Capability --> Orchestrator
+
+    Orchestrator --> Production
+    Orchestrator --> Validation
+
+    Production --> Lazy
+    Lazy --> Performance
+
+    Validation --> Eager
+    Eager --> Deterministic

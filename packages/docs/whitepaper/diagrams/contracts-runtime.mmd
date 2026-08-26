@@ -1,0 +1,7 @@
+flowchart TB
+
+    Contract["Contract"] --> ContractValidation["Zod validation"]
+    Runtime["Runtime config"] --> RuntimeValidation["Zod validation"]
+
+    ContractValidation --> Capability["Capability"]
+    RuntimeValidation --> Capability

@@ -1,0 +1,10 @@
+flowchart TB
+
+    Contract["Contract"]
+    Schema["Zod schema"]
+    Validated["Validated configuration"]
+    Capability["Capability"]
+
+    Contract --> Schema
+    Schema --> Validated
+    Validated --> Capability
