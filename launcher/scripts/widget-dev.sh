@@ -10,6 +10,8 @@ if [ -z "$WIDGET" ]; then
   exit 1
 fi
 
+npx tsx packages/widget-validation/src/cli.ts "$WIDGET"
+
 cd "widgets/$WIDGET"
 
 npm run dev

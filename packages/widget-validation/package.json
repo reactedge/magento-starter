@@ -1,0 +1,7 @@
+{
+  "name": "@reactedge/widget-validation",
+  "type": "module",
+  "bin": {
+    "reactedge-widget-validate": "./src/cli.ts"
+  }
+}

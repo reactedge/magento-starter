@@ -10,6 +10,8 @@ if [[ -z "$WIDGET" ]]; then
     exit 1
 fi
 
+npx tsx packages/widget-validation/src/cli.ts "$WIDGET"
+
 NODE_TLS_REJECT_UNAUTHORIZED=0 \
 npx tsx \
     --tsconfig "widgets/$WIDGET/tsconfig.app.json" \
