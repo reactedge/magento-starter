@@ -3,6 +3,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot";
 
 async function getWidgetSchema(widget: string) {
     // Prevent paths such as ../../something
@@ -11,7 +12,7 @@ async function getWidgetSchema(widget: string) {
     }
 
     const schemaPath = resolve(
-        process.cwd(),
+        ReactEdgeRoot.get(),
         'widgets',
         widget,
         'src',

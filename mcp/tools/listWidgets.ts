@@ -1,12 +1,12 @@
 import type { McpServer } from '@modelcontextprotocol/server';
-import {
-    existsSync,
-    readdirSync,
-} from 'node:fs';
-import { resolve } from 'node:path';
-import { getWidgetType } from "@reactedge/widget-preset/widgetType"
+import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot";
+import { WidgetRegistry } from "../../packages/widget-registry";
 
 export function registerListWidgetsTool(server: McpServer) {
+    const registry = new WidgetRegistry(
+        ReactEdgeRoot.get(),
+    );
+
     server.registerTool(
         'list_widgets',
         {
@@ -16,42 +16,12 @@ export function registerListWidgetsTool(server: McpServer) {
             inputSchema: {},
         },
         async () => {
-            const widgetsRoot = resolve(
-                process.cwd(),
-                'widgets',
-            );
-
-            if (!existsSync(widgetsRoot)) {
-                return result({
-                    widgets: [],
-                    error: 'ReactEdge widgets directory not found',
-                });
-            }
-
-            const widgets = readdirSync(widgetsRoot, {
-                withFileTypes: true,
-            })
-                .filter((entry) => entry.isDirectory())
-                .filter((entry) =>
-                    existsSync(
-                        resolve(
-                            widgetsRoot,
-                            entry.name,
-                            'package.json',
-                        ),
-                    ),
-                )
-                .map((entry) => {
-                    const widgetRoot = resolve(
-                        widgetsRoot,
-                        entry.name,
-                    );
-
-                    return {
-                        id: entry.name,
-                        type: getWidgetType(widgetRoot),
-                    };
-                })
+            const widgets = registry
+                .list()
+                .map((capability) => ({
+                    id: capability.id,
+                    type: capability.type,
+                }))
                 .sort((a, b) => a.id.localeCompare(b.id));
 
             return result({
