@@ -1,0 +1,15 @@
+{
+  "id": "__WIDGET_NAME__",
+  "widget": "__WIDGET_NAME__",
+  "description": "",
+  "signals": {
+    "consumes": [],
+    "emits": []
+  },
+  "runtime": {
+    "rendering": [
+      "client",
+      "ssr"
+    ]
+  }
+}
