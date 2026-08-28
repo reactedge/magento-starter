@@ -259,3 +259,4 @@ Start the server with:
 
 ```bash
 npx @modelcontextprotocol/inspector npx tsx mcp/server.ts
+npx @modelcontextprotocol/inspector npx tsx browser-mcp/server.ts
