@@ -124,6 +124,18 @@ touch "$REACTEDGE_ROOT/.reactedge-write-test" || {
 rm -f "$REACTEDGE_ROOT/.reactedge-write-test"
 
 echo
+echo "Optional Capabilities"
+echo "---------------------"
+echo "Enable additional ReactEdge capabilities for this installation.
+      Intent Discovery requires the ReactEdge Intent Engine.
+      The installer will configure and run it automatically."
+
+prompt \
+    "Enable Intent Discovery (0 or 1)" \
+    INTENT_DISCOVERY_ENABLED \
+    "0"
+
+echo
 echo "Demo Data"
 echo "---------"
 echo "Used by example widgets during local development."
@@ -132,6 +144,11 @@ prompt \
     "Demo product SKU" \
     SKU \
     "WJ12"
+
+prompt \
+    "Demo category" \
+    CATEGORY \
+    "tops-men"
 
 echo
 echo "Server-Side Rendering (SSR)"
@@ -160,6 +177,15 @@ echo
 
 ALLOW_SELF_SIGNED_SSL=true
 
+if [ "$INTENT_DISCOVERY_ENABLED" == "1" ]; then
+    INTENT_API_CONFIG=',
+    "intentApi": {
+      "baseUrl": "http://localhost:3001"
+    }'
+else
+    INTENT_API_CONFIG=""
+fi
+
 for dir in "$ROOT"/widgets/*; do
     if [[ -d "$dir" && -d "$dir/public" ]]; then
         echo "📦 Generating runtime for $(basename "$dir")"
@@ -170,10 +196,12 @@ for dir in "$ROOT"/widgets/*; do
     "magentoGraphql": {
       "api": "$SITEURL/graphql"
     }
+    $INTENT_API_CONFIG
   },
   "context": {
     "storeCode": "$STORE_CODE",
-    "sku": "$SKU"
+    "sku": "$SKU",
+    "category": "$CATEGORY"
   }
 }
 EOF
@@ -191,10 +219,12 @@ if [[ -d "$RUNTIME_TEMPLATE/public" ]]; then
     "magentoGraphql": {
       "api": "$SITEURL/graphql"
     }
+    $INTENT_API_CONFIG
   },
   "context": {
     "storeCode": "$STORE_CODE",
-    "sku": "$SKU"
+    "sku": "$SKU",
+    "category": "$CATEGORY"
   }
 }
 EOF
@@ -212,6 +242,7 @@ SSR_ENABLED=$SSR_ENABLED
 SSR_PORT=$SSR_PORT
 SSR_BASE_URL=$SSR_BASE_URL
 SKU=$SKU
+CATEGORY=$CATEGORY
 EOF
 
 set -a

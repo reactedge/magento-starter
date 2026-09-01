@@ -1,0 +1,1 @@
+export type TranslationsConfig = Record<string, string> | undefined;

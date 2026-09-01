@@ -1,0 +1,1 @@
+export type OptionLabelMap = Map<string, Map<string, string>>

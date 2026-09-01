@@ -49,7 +49,6 @@ const variantFiles = {
     ],
     runtime: [
         "api/runtime-widget.tsx",
-        "src/ConfigSchemaRuntime.ts",
         "public/reactedge-runtime.json",
     ],
 } as const;
