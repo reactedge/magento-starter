@@ -8,7 +8,7 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
-const WidgetTypeSchema = z.enum(["standard", "runtime"]);
+const WidgetTypeSchema = z.enum(["standard", "runtime", "runtime-shadow"]);
 
 function toPascalCase(value: string): string {
     return value

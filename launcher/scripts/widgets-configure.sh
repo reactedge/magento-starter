@@ -135,6 +135,20 @@ prompt \
     INTENT_DISCOVERY_ENABLED \
     "0"
 
+echo "Google Reviews"
+echo "--------------"
+echo "Display Google customer reviews."
+
+prompt \
+    "Enable Google Reviews (0 or 1)" \
+    GOOGLE_REVIEWS_ENABLED \
+    "0"
+
+if [ "$GOOGLE_REVIEWS_ENABLED" = "1" ]; then
+  prompt "Google Maps API Key" GOOGLE_MAPS_API_KEY ""
+  prompt "Google Place ID" GOOGLE_PLACE_ID ""
+fi
+
 echo
 echo "Demo Data"
 echo "---------"
@@ -186,6 +200,16 @@ else
     INTENT_API_CONFIG=""
 fi
 
+if [ "$GOOGLE_REVIEWS_ENABLED" == "1" ]; then
+    GOOGLE_API_CONFIG=',
+    "googleMaps": {
+      "apiKey": "'"$GOOGLE_MAPS_API_KEY"'",
+      "placeId": "'"$GOOGLE_PLACE_ID"'"
+    }'
+else
+    GOOGLE_API_CONFIG=""
+fi
+
 for dir in "$ROOT"/widgets/*; do
     if [[ -d "$dir" && -d "$dir/public" ]]; then
         echo "📦 Generating runtime for $(basename "$dir")"
@@ -195,8 +219,7 @@ for dir in "$ROOT"/widgets/*; do
   "integrations": {
     "magentoGraphql": {
       "api": "$SITEURL/graphql"
-    }
-    $INTENT_API_CONFIG
+    }$INTENT_API_CONFIG$GOOGLE_API_CONFIG
   },
   "context": {
     "storeCode": "$STORE_CODE",
@@ -218,8 +241,7 @@ if [[ -d "$RUNTIME_TEMPLATE/public" ]]; then
   "integrations": {
     "magentoGraphql": {
       "api": "$SITEURL/graphql"
-    }
-    $INTENT_API_CONFIG
+    }$INTENT_API_CONFIG$GOOGLE_API_CONFIG
   },
   "context": {
     "storeCode": "$STORE_CODE",
@@ -239,10 +261,14 @@ STORE_CODE=$STORE_CODE
 SITEURL=$SITEURL
 TARGET_ROOT=$TARGET_ROOT
 SSR_ENABLED=$SSR_ENABLED
-SSR_PORT=$SSR_PORT
-SSR_BASE_URL=$SSR_BASE_URL
+SSR_PORT="${SSR_PORT:-}"
+SSR_BASE_URL="${SSR_BASE_URL:-}"
 SKU=$SKU
 CATEGORY=$CATEGORY
+INTENT_DISCOVERY_ENABLED=$INTENT_DISCOVERY_ENABLED
+GOOGLE_REVIEWS_ENABLED=$GOOGLE_REVIEWS_ENABLED
+GOOGLE_MAPS_API_KEY="${GOOGLE_MAPS_API_KEY:-}"
+GOOGLE_PLACE_ID="${GOOGLE_PLACE_ID:-}"
 EOF
 
 set -a

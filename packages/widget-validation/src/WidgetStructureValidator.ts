@@ -5,12 +5,33 @@ import {
 import { resolve } from "node:path";
 import { getWidgetType } from "@reactedge/widget-preset/widgetType";
 
+/**
+ * Files required by each widget template.
+ *
+ * These files define the minimum internal structure expected from a widget
+ * using the corresponding template.
+ *
+ * - standard:
+ *   A regular widget with no runtime integration requirements.
+ *
+ * - runtime:
+ *   A widget that consumes runtime integrations. Runtime widgets define
+ *   their own ConfigSchemaRuntime.ts; the validator requires the schema
+ *   to exist but does not prescribe its contents.
+ *
+ * - runtime-shadow:
+ *   A runtime-integrated widget rendered inside a Shadow DOM host.
+ *   Shadow widgets are not required to provide SSR support because their
+ *   rendering model depends on a browser-owned ShadowRoot.
+ */
 const requiredFiles = {
     standard: [
         "src/Config.ts",
         "src/ConfigSchema.ts",
         "src/WidgetView.tsx",
         "src/bootstrap/WidgetWrapper.tsx",
+        "src/entrypoints/ssr.tsx",
+        "src/bootstrap/widget-ssr-component.tsx",
     ],
     runtime: [
         "src/Config.ts",
@@ -18,9 +39,24 @@ const requiredFiles = {
         "src/ConfigSchemaRuntime.ts",
         "src/WidgetView.tsx",
         "src/bootstrap/WidgetWrapper.tsx",
+        "src/entrypoints/ssr.tsx",
+        "src/bootstrap/widget-ssr-component.tsx",
+    ],
+    "runtime-shadow": [
+        "src/Config.ts",
+        "src/ConfigSchema.ts",
+        "src/ConfigSchemaRuntime.ts",
+        "src/bootstrap/WidgetWrapper.tsx",
     ],
 } as const;
 
+/**
+ * Files required by every widget regardless of template.
+ *
+ * Only genuinely common infrastructure belongs here. Template-specific
+ * concerns such as SSR, runtime configuration and host implementation
+ * are declared separately.
+ */
 const sharedFiles = [
     "vite.npm.config.ts",
     "vite.config.ts",
@@ -31,18 +67,25 @@ const sharedFiles = [
     "api/index.ts",
 
     "src/entrypoints/npm.tsx",
-    "src/entrypoints/ssr.tsx",
 
     "src/Widget.tsx",
 
     "src/bootstrap/widget-root.tsx",
-    "src/bootstrap/widget-ssr-component.tsx",
 
     "src/activity/Context/ActivityContextProvider.tsx",
     "src/activity/Context/ActivityContext.tsx",
     "src/activity/Context/useActivityContext.ts",
 ] as const;
 
+/**
+ * Files that identify the public execution variant of a widget.
+ *
+ * A widget must contain exactly one API entrypoint matching its template.
+ *
+ * Runtime schemas are capability-owned contracts. Their presence is
+ * validated, but their structure is intentionally allowed to differ
+ * between widgets according to their runtime dependencies.
+ */
 const variantFiles = {
     standard: [
         "api/widget.tsx",
@@ -51,6 +94,10 @@ const variantFiles = {
         "api/runtime-widget.tsx",
         "public/reactedge-runtime.json",
     ],
+    "runtime-shadow": [
+        "api/runtime-shadow-widget.tsx",
+        "public/reactedge-runtime.json",
+    ]
 } as const;
 
 export interface WidgetStructureValidationResult {

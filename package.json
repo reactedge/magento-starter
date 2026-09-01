@@ -5,7 +5,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -b",
-    "verify": "npm run lint && npm run typecheck && npm run build --workspace=widget-productgallery && npm run build --workspace=widget-megamenu && npm run build --workspace=widget-usp",
+    "verify": "npm run lint && npm run typecheck && npm run build --workspace=widget-productgallery && npm run build --workspace=widget-megamenu && npm run build --workspace=widget-usp && npm run build --workspace=widget-googlereviews ",
     "postinstall": "playwright install chromium",
     "whitepaper:diagrams": "for file in packages/docs/whitepaper/diagrams/*.mmd; do mmdc -i \"$file\" -o \"${file%.mmd}.png\" -w 770; done"
   },
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",
+    "@react-google-maps/api": "^2.20.8",
     "dotenv": "^17.4.2",
     "playwright": "^1.62.1",
     "rollup-plugin-visualizer": "^7.0.1"
