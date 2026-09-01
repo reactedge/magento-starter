@@ -1,24 +1,39 @@
-import {existsSync} from "node:fs";
-import {resolve} from "node:path";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 
-export type WidgetType = 'standard' | 'runtime';
+export type WidgetType =
+    | "standard"
+    | "runtime"
+    | "runtime-shadow";
 
 export function getWidgetType(widgetRoot: string): WidgetType {
-    const standard = existsSync(
-        resolve(widgetRoot, 'api/widget.tsx'),
-    );
+    const entrypoints: Record<WidgetType, boolean> = {
+        standard: existsSync(
+            resolve(widgetRoot, "api/widget.tsx")
+        ),
+        runtime: existsSync(
+            resolve(widgetRoot, "api/runtime-widget.tsx")
+        ),
+        "runtime-shadow": existsSync(
+            resolve(widgetRoot, "api/runtime-shadow-widget.tsx")
+        ),
+    };
 
-    const runtime = existsSync(
-        resolve(widgetRoot, 'api/runtime-widget.tsx'),
-    );
+    const detected = Object.entries(entrypoints)
+        .filter(([, exists]) => exists)
+        .map(([type]) => type as WidgetType);
 
-    if (standard === runtime) {
+    if (detected.length === 0) {
         throw new Error(
-            standard
-                ? 'Widget contains both standard and runtime API entrypoints'
-                : 'Widget contains neither standard nor runtime API entrypoint',
+            "Widget contains no recognised API entrypoint"
         );
     }
 
-    return runtime ? 'runtime' : 'standard';
+    if (detected.length > 1) {
+        throw new Error(
+            `Widget contains multiple API entrypoints: ${detected.join(", ")}`
+        );
+    }
+
+    return detected[0];
 }
