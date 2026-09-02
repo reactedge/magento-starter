@@ -1,0 +1,15 @@
+{
+  "id": "intentdiscovery",
+  "widget": "intentdiscovery",
+  "description": "",
+  "signals": {
+    "consumes": [],
+    "emits": []
+  },
+  "runtime": {
+    "rendering": [
+      "client",
+      "ssr"
+    ]
+  }
+}
