@@ -1,7 +1,7 @@
-import {useState} from "react";
-import {useIntentDecision} from "./useIntentDecision.tsx";
-import type {IntentDiscoveryDataConfig} from "../../domain/intent-discovery.types.ts";
-import type {IntentControllerState} from "../../domain/intent.types.ts";
+import { useState } from "react";
+import { useIntentDecision } from "./useIntentDecision.tsx";
+import type { IntentDiscoveryDataConfig } from "../../types/domain/intent-discovery.types.ts";
+import type { IntentControllerState } from "../../types/domain/intent.types.ts";
 
 export const useIntentController = (
     config: IntentDiscoveryDataConfig

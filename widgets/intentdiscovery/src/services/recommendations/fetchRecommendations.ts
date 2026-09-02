@@ -1,18 +1,18 @@
-import type { MergedAttribute} from "../../types/infra/magento/attribute.types.ts";
-import type {AiRecommendationResponse} from "../../hooks/infra/useAiRecommendations.tsx";
-import type {AttributeFilters} from "../../integration/intent/types.ts";
-import type {GraphqlProduct} from "../../types/infra/magento/product.types.ts";
-import type {IntentApiClient} from "../../integration/intent/intentApiClient.ts";
-import {enrichSuggestions} from "../mappers/suggestions/enrichSuggestions.ts";
-import {buildAiRecommendationPayload} from "../../lib/ai-recommendations.ts";
-import type {OptionLabelMap} from "../../types/domain/option.map.ts";
+import type { MergedAttribute } from "../../types/infra/magento/attribute.types.ts";
+import type { AiRecommendationResponse } from "../../types/domain/ai.recommendations.types.ts"
+import type { AttributeFilters } from "../../integration/intent/types.ts";
+import type { GraphqlProduct } from "../../types/infra/magento/product.types.ts";
+import type { IntentApiClient } from "../../integration/intent/intentApiClient.ts";
+import { enrichSuggestions } from "../mappers/suggestions/enrichSuggestions.ts";
+import { buildAiRecommendationPayload } from "../../lib/ai-recommendations.ts";
+import type { OptionLabelMap } from "../../types/domain/option.map.ts";
 
 export async function fetchRecommendations({
-   attributeScore,
-   attributes,
-   products,
-   optionLabelMap,
-   intentApiClient
+    attributeScore,
+    attributes,
+    products,
+    optionLabelMap,
+    intentApiClient
 }: {
     attributeScore: AttributeFilters
     attributes: MergedAttribute[]

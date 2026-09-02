@@ -1,10 +1,11 @@
-import {parseConfig, type SchemaWidgetConfig} from "./ConfigSchema.ts";
-import type {WidgetActivity} from "@reactedge/framework/activity";
-import {parseRuntimeConfig, type SchemaRuntimeConfig} from "./ConfigSchemaRuntime.ts";
+import { parseConfig, type SchemaWidgetConfig } from "./ConfigSchema.ts";
+import type { WidgetActivity } from "@reactedge/framework/activity";
+import { parseRuntimeConfig, type SchemaRuntimeConfig } from "./ConfigSchemaRuntime.ts";
 import type {
-    IntentDiscoveryDataConfig, TranslationsConfig,
+    IntentDiscoveryDataConfig,
     ReactEdgeRuntimeIntegrations, ResolvedRuntimeConfig
 } from "./types/domain/intent-discovery.types.ts";
+import type { TranslationsConfig } from "./types/domain/translation.ts"
 
 export interface WidgetConfig {
     /**
@@ -15,6 +16,14 @@ export interface WidgetConfig {
     readonly runtime: ResolvedRuntimeConfig
     readonly translations?: TranslationsConfig
     readonly integrations: ReactEdgeRuntimeIntegrations
+}
+
+export interface ReactEdgeRuntimeConfig {
+    readonly integrations: ReactEdgeRuntimeIntegrations;
+    readonly context: {
+        category: string;
+        storeCode: string;
+    }
 }
 
 export interface ResolvedConfigIntegrations {
@@ -68,7 +77,7 @@ export function readWidgetConfig(
         activity?.log(
             'bootstrap',
             'Invalid widget contract',
-            e instanceof Error? e.message: e,
+            e instanceof Error ? e.message : e,
             'error'
         );
 

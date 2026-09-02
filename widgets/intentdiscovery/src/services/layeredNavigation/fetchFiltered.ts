@@ -1,10 +1,10 @@
 import {
     LAYERED_ATTRIBUTE_DATA
 } from "../../hooks/infra/useMagentoLayeredData.tsx";
-import {getAttributesFilter} from "./buildFilter.ts";
-import type {IntentEngineState} from "../../integration/intent/types.ts";
-import type {MagentoProducts, ProductAttributesResponse} from "../../hooks/infra/useProductFilteredAttributeLayer.tsx";
-import type {GraphqlClient} from "@reactedge/framework/graphql/graphqlClient.ts";
+import { getAttributesFilter } from "./buildFilter.ts";
+import type { IntentEngineState } from "../../integration/intent/types.ts";
+import type { MagentoProducts, ProductAttributesResponse } from "../../types/domain/layered-data.types.ts";
+import type { GraphqlClient } from "@reactedge/framework/graphql/graphqlClient.ts";
 
 const filteredCache = new Map()
 

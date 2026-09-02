@@ -26,6 +26,7 @@ export class WidgetActivity
 
     private readonly widgetId: string;
     private readonly instance?: string;
+    private correlationId?: string;
 
     constructor(
         widgetId: string,
@@ -141,5 +142,13 @@ export class WidgetActivity
                 debugTargets.includes(this.widgetId.toLowerCase())
             )
         );
+    }
+
+    setCorrelationId(id: string) {
+        this.correlationId = id;
+    }
+
+    getCorrelationId(): string | undefined {
+        return this.correlationId;
     }
 }

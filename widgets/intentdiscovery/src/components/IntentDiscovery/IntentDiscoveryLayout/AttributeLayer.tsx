@@ -1,10 +1,10 @@
-import {IntentExplanation} from "./AttributeLayer/IntentExplanation.tsx";
-import {AttributeSelectorLayer} from "./AttributeLayer/AttributeSelectorLayer.tsx";
-import {useAttributeLayerController} from "./AttributeLayer/AttributeLayer.controller.ts";
-import type {IntentDiscoveryDataConfig} from "../../../domain/intent-discovery.types.ts";
-import type {IntentControllerState} from "../../../types/domain/intent.types.ts";
-import type {MagentoLayeredNavigation} from "../../../types/domain/layered-data.types.ts";
-import type {CategoryData} from "../../../types/infra/magento/category.types.ts";
+import { IntentExplanation } from "./AttributeLayer/IntentExplanation.tsx";
+import { AttributeSelectorLayer } from "./AttributeLayer/AttributeSelectorLayer.tsx";
+import { useAttributeLayerController } from "./AttributeLayer/AttributeLayer.controller.ts";
+import type { IntentDiscoveryDataConfig } from "../../../types/domain/intent-discovery.types.ts";
+import type { IntentControllerState } from "../../../types/domain/intent.types.ts";
+import type { MagentoLayeredNavigation } from "../../../types/domain/layered-data.types.ts";
+import type { CategoryData } from "../../../types/infra/magento/category.types.ts";
 
 export type Props = {
     config: IntentDiscoveryDataConfig

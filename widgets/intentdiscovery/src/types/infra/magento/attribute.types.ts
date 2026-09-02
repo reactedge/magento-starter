@@ -32,3 +32,5 @@ export type AttributeResponse = {
         items: MagentoAttribute[]
     }
 }
+
+

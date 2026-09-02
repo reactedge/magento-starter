@@ -1,9 +1,9 @@
 import { useCategory } from "../hooks/domain/useCategory.tsx";
-import {IntentDiscoveryLoader} from "./IntentDiscovery/IntentDiscoveryLoader.tsx";
-import {SpinnerOverlay} from "./global/SpinnerOverlay.tsx";
-import type {WidgetConfig} from "../Config.ts";
+import { IntentDiscoveryLoader } from "./IntentDiscovery/IntentDiscoveryLoader.tsx";
+import { SpinnerOverlay } from "./global/SpinnerOverlay.tsx";
+import type { WidgetConfig } from "../Config.ts";
 import { useEffect } from "react";
-import {useActivityContext} from "../activity/Context/useActivityContext.ts";
+import { useActivityContext } from "../activity/Context/useActivityContext.ts";
 
 type Props = {
     config: WidgetConfig

@@ -1,5 +1,5 @@
-import type { MergedAttribute} from "../../types/infra/magento/attribute.types.ts";
-import type {IntentLike} from "../../types/domain/intent.types.ts"
+import type { MergedAttribute } from "../../types/infra/magento/attribute.types.ts";
+import type { IntentLike } from "../../types/domain/selection.preference.ts"
 
 export function isAttributeSelected(
     attributeCode: string,
@@ -61,8 +61,8 @@ export function useSelectedPreferences(
         if (!scores) return null;
 
         const [bestValue] =
-        Object.entries(scores)
-            .sort((a: [string, number], b: [string, number]) => b[1] - a[1])[0] || [];
+            Object.entries(scores)
+                .sort((a: [string, number], b: [string, number]) => b[1] - a[1])[0] || [];
 
         if (!bestValue) return null;
 

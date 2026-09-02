@@ -1,13 +1,13 @@
-import {PreviousFilters} from "./PreviousIntent/PreviousFilters.tsx";
-import {resolvePersistedIntentFilters} from "./PreviousIntent/resolvePersistedIntentFilters.ts";
-import type { MergedAttribute} from "../../../../types/domain/configured.attribute.ts";
-import {useIntentState} from "../../../../state/Intent/useIntentState.ts";
-import {useOptionLabelMap} from "../../../../hooks/domain/useOptionLabelMap.ts";
+import { PreviousFilters } from "./PreviousIntent/PreviousFilters.tsx";
+import { resolvePersistedIntentFilters } from "./PreviousIntent/resolvePersistedIntentFilters.ts";
+import type { MergedAttribute } from "../../../../types/infra/magento/attribute.types.ts";
+import { useIntentState } from "../../../../state/Intent/useIntentState.ts";
+import { useOptionLabelMap } from "../../../../hooks/domain/useOptionLabelMap.ts";
 import {
     intentPersistence,
     type PersistedIntentV1
 } from "../../../../services/intentPersistence/intentPersistence.service.ts";
-import {useTranslationState} from "../../../../state/Translation/useTranslationState.ts";
+import { useTranslationState } from "../../../../state/Translation/useTranslationState.ts";
 
 type Props = {
     attributes: MergedAttribute[]
@@ -22,7 +22,7 @@ export type IntentDisplayAttribute = {
 
 export const PreviousIntent = ({ attributes }: Props) => {
     const { dispatch } = useIntentState();
-    const {t} = useTranslationState()
+    const { t } = useTranslationState()
 
     const optionLabelMap = useOptionLabelMap(attributes);
     const intent = intentPersistence.load();

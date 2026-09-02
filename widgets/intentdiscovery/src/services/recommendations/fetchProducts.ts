@@ -1,5 +1,5 @@
 import {buildProductQuery, type ProductsResponse} from "../../hooks/infra/useMagentoProducts.tsx";
-import type {MagentoProductFilter} from "../../hooks/domain/useOptionSelectionFilter.tsx";
+import type {MagentoProductFilter} from "../../types/domain/selection.filter.ts";
 import type {GraphqlProduct} from "../../types/infra/magento/product.types.ts";
 import {getDynamicAttributes} from "./buildFilter.ts";
 import type {IntentEngineState} from "../../integration/intent/types.ts";

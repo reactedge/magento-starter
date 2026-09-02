@@ -1,5 +1,5 @@
-import type {PersistedIntentV1} from "../../services/intentPersistence/intentPersistence.service.ts";
-import type {EnrichedSuggestion} from "../../types/infra/magento/product.types.ts";
+import type { PersistedIntentV1 } from "../../services/intentPersistence/intentPersistence.service.ts";
+import type { EnrichedSuggestion } from "../../types/infra/magento/product.types.ts";
 
 export type AttributeOptionScores = Record<string, number>;
 
@@ -60,7 +60,7 @@ export type IntentStatus =
 
 export type IntentEvent =
     | { type: "RESULTS_UPDATED"; totalFiltered: number }
-    | { type: "FILTER_CHANGED"; attributeCode:string, optionValue:string }
+    | { type: "FILTER_CHANGED"; attributeCode: string, optionValue: string }
     | { type: "FILTER_RESET" }
     | { type: "INTERPRETATION_STARTED" }
     | { type: "INTERPRETATION_PROCESSING" }

@@ -1,8 +1,8 @@
 import React from "react";
-import {type ReactNode} from "react";
-import {LocalInteractionStateContext, readInteraction, INTERACTION_STORAGE_KEY} from "./InteractionState.tsx";
+import { type ReactNode } from "react";
+import { LocalInteractionStateContext, readInteraction, INTERACTION_STORAGE_KEY } from "./InteractionState.tsx";
 import type { InteractionInfoState } from "./type.ts";
-import {useImmer} from "use-immer";
+import { useImmer } from "use-immer";
 
 interface InteractionStateProviderProps {
     children: ReactNode;

@@ -1,6 +1,6 @@
-import type {MagentoProductFilter} from "../../hooks/domain/useOptionSelectionFilter.tsx";
-import {intentToFilter} from "../../lib/option-match.ts";
-import type {IntentEngineState} from "../../integration/intent/types.ts";
+import type { MagentoProductFilter } from "../../types/domain/selection.filter.ts";
+import { intentToFilter } from "../../lib/option-match.ts";
+import type { IntentEngineState } from "../../integration/intent/types.ts";
 
 export const getCategoryFilter = (categoryIds: string[]) => {
     const filter: MagentoProductFilter = {
@@ -17,16 +17,27 @@ export const getAttributesFilter = (categoryIds: string[], intentState?: IntentE
     const intentFilter = intentToFilter(intentState);
 
     Object.entries(intentFilter).forEach(([attribute, value]) => {
-        if (Array.isArray(value)) {
-            if (value.length === 1) {
-                filter[attribute] = { eq: value[0] }
-            } else if (value.length > 1) {
-                filter[attribute] = { in: value }
-            }
-        } else {
-            filter[attribute] = { eq: value }
+        if (!Array.isArray(value)) {
+            filter[attribute] = { eq: value };
+            return;
         }
-    })
+
+        if (value.length === 0) {
+            return;
+        }
+
+        if (value.length === 1) {
+            const [selectedValue] = value;
+
+            if (selectedValue !== undefined) {
+                filter[attribute] = { eq: selectedValue };
+            }
+
+            return;
+        }
+
+        filter[attribute] = { in: value };
+    });
 
     return filter
 }

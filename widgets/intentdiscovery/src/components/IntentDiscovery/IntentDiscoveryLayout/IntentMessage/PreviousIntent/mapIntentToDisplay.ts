@@ -1,7 +1,7 @@
-import type {IntentDisplayAttribute} from "../PreviousIntent.tsx";
-import type { MergedAttribute} from "../../../../../types/domain/configured.attribute.ts";
-import type {AttributeFilters} from "../../../../../integration/intent/types.ts";
-import type {OptionLabelMap} from "../../../../../domain/intent-discovery.types.ts";
+import type { IntentDisplayAttribute } from "../PreviousIntent.tsx";
+import type { MergedAttribute } from "../../../../../types/infra/magento/attribute.types.ts";
+import type { AttributeFilters } from "../../../../../integration/intent/types.ts";
+import type { OptionLabelMap } from "../../../../../types/domain/option.map.ts";
 
 type AttributeMap = Record<string, MergedAttribute>;
 

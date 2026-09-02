@@ -1,19 +1,21 @@
-import type {BaseProduct, GraphqlProduct} from "../../types/infra/magento/product.types.ts";
-import {stripHtml} from "../../lib/string.ts";
-import type {OptionLabelMap} from "../../domain/intent-discovery.types.ts";
+import type { BaseProduct, GraphqlProduct } from "../../types/infra/magento/product.types.ts";
+import { stripHtml } from "../../lib/string.ts";
+import type { OptionLabelMap } from "../../types/domain/option.map.ts";
 
 export function mapProduct(p: GraphqlProduct, optionLabelMap: OptionLabelMap): BaseProduct | null {
-    if (!p.small_image.url ||  !p.price_range) return null
+    if (!p.small_image.url || !p.price_range) return null
+
+    const description = stripHtml(p.short_description?.html);
 
     return {
         sku: p.sku,
         title: p.name,
-        description: stripHtml(p.short_description?.html),
+        ...(description !== undefined && { description }),
         url: `/${getProductUrl(p)}`,
-        imageUrl: p.matched_variant_image?.url?? p.small_image.url,
-        price: p.price_range.minimum_price?.final_price,
+        imageUrl: p.matched_variant_image?.url ?? p.small_image.url,
+        price: p.price_range.minimum_price.final_price,
         attributes: extractAttributes(p, optionLabelMap)
-    }
+    };
 }
 
 const getProductUrl = (product: GraphqlProduct) => {

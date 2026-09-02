@@ -1,6 +1,6 @@
-import {Icon} from "./Icon.tsx";
-import {decodeHtmlEntities} from "../../../../lib/string.ts";
-import type { MergedAttribute} from "../../../../types/domain/configured.attribute.ts";
+import { Icon } from "./Icon.tsx";
+import { decodeHtmlEntities } from "../../../../lib/string.ts";
+import type { MergedAttribute } from "../../../../types/infra/magento/attribute.types.ts";
 
 type AttributeTileProps = {
     attr: MergedAttribute;
@@ -26,15 +26,15 @@ export const AttributeTile = ({ attr, isSelected, value, onClick }: AttributeTil
             </span>
 
             {value && <span className="choice-tile__info">
-            {visible.map(v => (
-                <span key={v} className="badge">{decodeHtmlEntities(v)}</span>
-            ))}
+                {visible.map(v => (
+                    <span key={v} className="badge">{decodeHtmlEntities(v)}</span>
+                ))}
                 {remaining > 0 && (
                     <span className="badge badge--more">+{remaining}</span>
                 )}
             </span>}
 
-            <Icon attribute_code={attr.code}/>
+            <Icon attribute_code={attr.code} />
         </div>
     )
 }

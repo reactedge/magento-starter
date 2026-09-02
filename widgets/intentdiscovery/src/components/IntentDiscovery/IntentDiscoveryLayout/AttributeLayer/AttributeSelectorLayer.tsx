@@ -1,13 +1,13 @@
-import {AttributeTile} from "./AttributeTile.tsx";
-import type {MagentoLayeredNavigation} from "../../../../types/domain/layered-data.types.ts";
-import type {IntentDiscoveryDataConfig} from "../../../../domain/intent-discovery.types.ts";
-import {useInteractionState} from "../../../../state/Interaction/useInteractionState.ts";
-import {useState} from "react";
-import {useIntentState} from "../../../../state/Intent/useIntentState.ts";
-import type { MergedAttribute} from "../../../../types/domain/configured.attribute.ts";
-import {useIntentAttributes} from "../../../../hooks/domain/useIntentAttributes.tsx";
-import {useTranslationState} from "../../../../state/Translation/useTranslationState.ts";
-import {useSelectedPreferences} from "../../../../hooks/domain/useSelectedPreference.ts";
+import { AttributeTile } from "./AttributeTile.tsx";
+import type { MagentoLayeredNavigation } from "../../../../types/domain/layered-data.types.ts";
+import type { IntentDiscoveryDataConfig } from "../../../../types/domain/intent-discovery.types.ts";
+import { useInteractionState } from "../../../../state/Interaction/useInteractionState.ts";
+import { useState } from "react";
+import { useIntentState } from "../../../../state/Intent/useIntentState.ts";
+import type { MergedAttribute } from "../../../../types/infra/magento/attribute.types.ts";
+import { useIntentAttributes } from "../../../../hooks/domain/useIntentAttributes.tsx";
+import { useTranslationState } from "../../../../state/Translation/useTranslationState.ts";
+import { useSelectedPreferences } from "../../../../hooks/domain/useSelectedPreference.ts";
 
 type Props = {
     attributeLayerData: MagentoLayeredNavigation
@@ -20,7 +20,7 @@ export const AttributeSelectorLayer = ({
 }: Props) => {
     const { setActiveAttribute } = useInteractionState();
     const [showAll, setShowAll] = useState(false);
-    const {intentState} = useIntentState()
+    const { intentState } = useIntentState()
     const { interactionState } = useInteractionState()
 
     const allAttributes = useIntentAttributes(attributeLayerData.attributes as MergedAttribute[], config)

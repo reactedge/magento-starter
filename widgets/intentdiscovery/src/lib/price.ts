@@ -12,7 +12,17 @@ export const formatMoney = (amount: number = 0) => {
 export const formatRange = (str: string) => {
     const prices = str.split('-')
 
-    return `${formatMoney(parseInt(prices[0]))} - ${formatMoney(parseInt(prices[1]))}`
+    if (prices.length < 2) {
+        return formatMoney(parseInt(prices[0] ?? "0"));
+    }
+
+    const [minPrice, maxPrice] = prices;
+
+    if (minPrice === undefined || maxPrice === undefined) {
+        return "";
+    }
+
+    return `${formatMoney(parseInt(minPrice))} - ${formatMoney(parseInt(maxPrice))}`;
 }
 
 export function formatPrice(value: number, currency: string) {

@@ -1,10 +1,10 @@
-import type {IntentEngineState} from "../integration/intent/types.ts";
-import type {MergedAttributeOption} from "../hooks/infra/useMagentoLayeredData.tsx";
-import type { MergedAttribute} from "../../types/infra/magento/attribute.types.ts";
+import type { IntentEngineState } from "../integration/intent/types.ts";
+import type { MergedAttributeOption } from "../types/infra/magento/attribute.types.ts";
+import type { MergedAttribute } from "../types/infra/magento/attribute.types.ts";
 
 export function enrichWithIntent(attribute: MergedAttribute, intent: IntentEngineState) {
     const intentScores =
-        intent?.attributeScore?.[attribute.attribute_code] || {};
+        intent?.attributeScore?.[attribute.code] || {};
 
     return {
         ...attribute,
@@ -33,7 +33,7 @@ export function intentToFilter(intentState?: IntentEngineState) {
         if (!options) continue;
 
         const values = Object.entries(options)
-            .filter(([,score]) => score > 0)
+            .filter(([, score]) => score > 0)
             .map(([value]) => value);
 
         if (values.length > 0) {

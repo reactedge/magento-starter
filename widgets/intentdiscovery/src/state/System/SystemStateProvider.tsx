@@ -1,19 +1,20 @@
 import React from "react";
-import {type ReactNode, useMemo} from "react";
-import {LocalSystemStateContext} from "./SystemState.tsx";
-import type {WidgetActivity} from "@reactedge/framework/activity";
-import type {ResolvedConfigIntegrations, RuntimeConfig} from "../../Config.ts";
-import {createGraphqlService} from "@reactedge/framework/graphql/graphql.service.ts";
-import {createIntentEngine} from "../../integration/intent/IntentEngine.ts";
-import {createIntentApiClient} from "../../integration/intent/intentApiClient.ts";
-import type {BootstrapData} from "../../ssr/bootstrap.ts"
+import { type ReactNode, useMemo } from "react";
+import { LocalSystemStateContext } from "./SystemState.tsx";
+import type { WidgetActivity } from "@reactedge/framework/activity";
+import type { ResolvedConfigIntegrations } from "../../Config.ts";
+import type { ResolvedRuntimeConfig } from "../../types/domain/intent-discovery.types.ts"
+import { createGraphqlService } from "@reactedge/framework/graphql/graphql.service.ts";
+import { createIntentEngine } from "../../integration/intent/IntentEngine.ts";
+import { createIntentApiClient } from "../../integration/intent/intentApiClient.ts";
+import type { BootstrapData } from "../../entrypoints/ssr.tsx"
 
 interface SystemStateProviderProps {
     children: ReactNode;
     config: ResolvedConfigIntegrations;
-    runtime: RuntimeConfig;
+    runtime: ResolvedRuntimeConfig;
     activity?: WidgetActivity;
-    bootstrap?: BootstrapData;
+    bootstrap?: BootstrapData | undefined;
 }
 
 const LocalStateProvider = LocalSystemStateContext.Provider;

@@ -1,15 +1,15 @@
-import type {MagentoLayeredNavigation} from "../../../../../types/domain/layered-data.types.ts";
-import {useFindAttributeOptionsByCode} from "../../../../../hooks/domain/useFindAttributeOptionsByCode.tsx";
-import type {MergedAttributeOption} from "../../../../../types/domain/configured.attribute.ts";
-import {formatRange} from "../../../../../lib/price.ts";
+import type { MagentoLayeredNavigation } from "../../../../../types/domain/layered-data.types.ts";
+import { useFindAttributeOptionsByCode } from "../../../../../hooks/domain/useFindAttributeOptionsByCode.tsx";
+import type { MergedAttributeOption } from "../../../../../types/infra/magento/attribute.types.ts";
+import { formatRange } from "../../../../../lib/price.ts";
 
 interface StepFinderProps {
     attributeLayerData: MagentoLayeredNavigation
 }
 
-export const StepPriceFinder = ({attributeLayerData}: StepFinderProps) => {
+export const StepPriceFinder = ({ attributeLayerData }: StepFinderProps) => {
     const option = 'price'
-    const {attributeData} = useFindAttributeOptionsByCode(option, attributeLayerData)
+    const { attributeData } = useFindAttributeOptionsByCode(option, attributeLayerData)
 
     const onChange = () => {
         //
@@ -30,8 +30,8 @@ export const StepPriceFinder = ({attributeLayerData}: StepFinderProps) => {
                     />
 
                     <span className="choice-tile__label">
-                            {formatRange(option.label)}
-                        </span>
+                        {formatRange(option.label)}
+                    </span>
                 </label>
             ))}
         </div>

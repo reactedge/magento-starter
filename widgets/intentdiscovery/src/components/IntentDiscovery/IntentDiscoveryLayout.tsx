@@ -1,22 +1,22 @@
-import type {IntentDiscoveryDataConfig} from "../../domain/intent-discovery.types.ts";
-import type {CategoryData} from "../../types/infra/magento/category.types.ts";
-import {useIntentController} from "../../hooks/domain/useIntentController.tsx";
-import {useIntentState} from "../../state/Intent/useIntentState.ts";
-import {SearchSpinnerOverlay} from "../global/SearchSpinnerOverlay.tsx";
-import {IntentMessage} from "./IntentDiscoveryLayout/IntentMessage.tsx";
-import {AttributeLayer} from "./IntentDiscoveryLayout/AttributeLayer.tsx";
-import {IntentDiscoveryOptions} from "./IntentDiscoveryLayout/IntentDiscoveryOptions.tsx";
-import {ProductRecommendations} from "./IntentDiscoveryLayout/ProductRecommendations.tsx";
-import {useLayeredNavigation} from "../../hooks/domain/useLayeredNavigation.tsx";
-import {ErrorState} from "../global/ErrorState.tsx";
-import {useActivityContext} from "../../activity/Context/useActivityContext.ts";
+import type { IntentDiscoveryDataConfig } from "../../types/domain/intent-discovery.types.ts";
+import type { CategoryData } from "../../types/infra/magento/category.types.ts";
+import { useIntentController } from "../../hooks/domain/useIntentController.tsx";
+import { useIntentState } from "../../state/Intent/useIntentState.ts";
+import { SearchSpinnerOverlay } from "../global/SearchSpinnerOverlay.tsx";
+import { IntentMessage } from "./IntentDiscoveryLayout/IntentMessage.tsx";
+import { AttributeLayer } from "./IntentDiscoveryLayout/AttributeLayer.tsx";
+import { IntentDiscoveryOptions } from "./IntentDiscoveryLayout/IntentDiscoveryOptions.tsx";
+import { ProductRecommendations } from "./IntentDiscoveryLayout/ProductRecommendations.tsx";
+import { useLayeredNavigation } from "../../hooks/domain/useLayeredNavigation.tsx";
+import { ErrorState } from "../global/ErrorState.tsx";
+import { useActivityContext } from "../../activity/Context/useActivityContext.ts";
 
 export interface Props {
     config: IntentDiscoveryDataConfig
     categoryData: CategoryData
 }
 
-export const IntentDiscoveryLayout = ({ config, categoryData}: Props) => {
+export const IntentDiscoveryLayout = ({ config, categoryData }: Props) => {
     const activity = useActivityContext()
     const { intent } = useIntentController(config)
     const { intentState } = useIntentState()

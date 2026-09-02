@@ -37,7 +37,9 @@ export type MagentoProduct = {
 }
 
 
-export type GraphqlProduct = MagentoProduct & Record<string, string | null | undefined>
+export type GraphqlProduct =
+    MagentoProduct &
+    Record<string, string | null | undefined | { html: string }>;
 
 export type APISuggestion = {
     sku: string

@@ -1,5 +1,5 @@
-import type {CategoryData, MagentoCategoryChild} from "../types/infra/magento/category.types.ts";
-import type {ResolvedIntentDiscoveryConfig} from "../domain/intent-discovery.types.ts";
+import type { CategoryData, MagentoCategoryChild } from "../types/infra/magento/category.types.ts";
+import type { WidgetConfig } from "../Config.ts";
 
 export const categoryLayereIds = (
     category?: CategoryData
@@ -18,7 +18,7 @@ export const categoryLayereIds = (
 
 export const isCategoryActive = (
     categoryUrlKey: string,
-    config: ResolvedIntentDiscoveryConfig
+    config: WidgetConfig
 ): boolean => {
     const enabledCategories =
         config.data.enabledCategories;

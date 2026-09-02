@@ -1,7 +1,7 @@
-import {useEffect, useState} from "react";
-import {useSystemState} from "../../state/System/useSystemState.ts";
-import {getError} from "../../lib/error.ts";
-import type {AttributeResponse} from "../../types/infra/magento/attribute.types.ts";
+import { useEffect, useState, useCallback } from "react";
+import { useSystemState } from "../../state/System/useSystemState.ts";
+import { getError } from "../../lib/error.ts";
+import type { AttributeResponse } from "../../types/infra/magento/attribute.types.ts";
 
 const QUERY = `
     {
@@ -25,25 +25,27 @@ export function useProductAttributes() {
     const [error, setError] = useState<Error | null>(null);
     const { graphqlClient } = useSystemState()
 
+    const load = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const result = await graphqlClient<AttributeResponse>(
+                QUERY, {}
+            );
+            setData(result);
+        } catch (err: unknown) {
+            setError(getError(err));
+        } finally {
+            setLoading(false);
+        }
+    }, [
+        graphqlClient
+    ]);
+
     useEffect(() => {
-        const load = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const result = await graphqlClient<AttributeResponse>(
-                    QUERY, {}
-                );
-                setData(result);
-            } catch (err: unknown) {
-                setError(getError(err));
-            } finally {
-                setLoading(false);
-            }
-        };
-
         load();
-    }, [graphqlClient]);
+    }, [graphqlClient, load]);
 
     return { magentoAttributes: data?.attributesList.items, loading, error, refetch: load };
 }

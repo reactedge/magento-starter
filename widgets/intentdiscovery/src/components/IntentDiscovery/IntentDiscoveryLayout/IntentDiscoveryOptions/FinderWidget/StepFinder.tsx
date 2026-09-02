@@ -2,9 +2,9 @@ import type { MagentoLayeredNavigation } from "../../../../../types/domain/layer
 import { useInteractionState } from "../../../../../state/Interaction/useInteractionState.ts";
 import { useFindAttributeOptionsByCode } from "../../../../../hooks/domain/useFindAttributeOptionsByCode.tsx";
 import { useIntentState } from "../../../../../state/Intent/useIntentState.ts";
-import type { MergedAttributeOption } from "../../../../../types/domain/configured.attribute.ts";
+import type { MergedAttributeOption } from "../../../../../types/infra/magento/attribute.types.ts";
 import { unescapeHtml } from "../../../../../lib/string.ts";
-import {useActivityContext} from "../../../../../activity/Context/useActivityContext.ts";
+import { useActivityContext } from "../../../../../activity/Context/useActivityContext.ts";
 
 interface StepFinderProps {
     optionCode: string

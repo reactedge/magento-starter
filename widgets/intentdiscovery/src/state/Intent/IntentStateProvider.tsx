@@ -15,32 +15,38 @@ import type {
     IntentEvent
 } from "../../integration/intent/types.ts";
 import { useSystemState } from "../System/useSystemState.ts";
-import type { IntentDiscoveryDataConfig } from "../../domain/intent-discovery.types.ts";
+import type { IntentDiscoveryDataConfig } from "../../types/domain/intent-discovery.types.ts";
 import type { MagentoLayeredNavigation } from "../../types/domain/layered-data.types.ts";
 import { parseFiltersFromUrl } from "./parseIntentFiltersFromUrl.ts";
 import { intentPersistence } from "../../services/intentPersistence/intentPersistence.service.ts";
 import { computeAiReadiness } from "../../domain/intent/readiness.ts";
 import { intentReducer } from "./intent.reducer.ts";
 import { runIntentEffects } from "./intent.effects.ts";
-import type {WidgetActivity} from "@reactedge/framework/activity";
+import type { WidgetActivity } from "@reactedge/framework/activity";
 
 interface IntentStateProviderProps {
     children: ReactNode;
     config: IntentDiscoveryDataConfig;
-    configuredLayeredAttributes: MagentoLayeredNavigation;
+    configuredLayeredAttributes?: MagentoLayeredNavigation;
     activity?: WidgetActivity
 }
 
 const MIN_TEXT_LENGTH = 50
 const LocalStateProvider = LocalIntentStateContext.Provider;
 
-export const IntentStateProvider: React.FC<IntentStateProviderProps> = ({ children, config, configuredLayeredAttributes,activity }) => {
+export const IntentStateProvider: React.FC<IntentStateProviderProps> = ({ children, config, configuredLayeredAttributes, activity }) => {
     const [intentState, setIntentState] = useState<IntentEngineState>(loadIntentState());
     const { intentEngine } = useSystemState()
 
+    if (configuredLayeredAttributes === undefined) {
+        throw new Error('Configured Layered Attributes cannot be empty');
+    }
+
+    const layeredAttributes = configuredLayeredAttributes;
+
     const allowedAttributes = useMemo(
         () => configuredLayeredAttributes?.attributes ?? [],
-        [configuredLayeredAttributes?.attributes]
+        [configuredLayeredAttributes]
     );
 
     const allowedAttributeCodes = useMemo(
@@ -52,7 +58,7 @@ export const IntentStateProvider: React.FC<IntentStateProviderProps> = ({ childr
         attributeLayerData: MagentoLayeredNavigation
     ) {
         const threshold = config.ai?.matchThreshold ?? MIN_TEXT_LENGTH
-        return computeAiReadiness(configuredLayeredAttributes, attributeLayerData, threshold)
+        return computeAiReadiness(layeredAttributes, attributeLayerData, threshold)
     }
 
     const setPreference = (attributeCode: string, optionValue: string) => {

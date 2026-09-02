@@ -1,8 +1,9 @@
-import {useEffect, useState} from "react";
-import {useSystemState} from "../../state/System/useSystemState.ts";
-import {getError} from "../../lib/error.ts";
-import {useOptionSelectionFilter} from "../domain/useOptionSelectionFilter.tsx";
-import type {CategoryData} from "../../types/infra/magento/category.types.ts";
+import { useEffect, useState, useCallback } from "react";
+import { useSystemState } from "../../state/System/useSystemState.ts";
+import { getError } from "../../lib/error.ts";
+import { useOptionSelectionFilter } from "../domain/useOptionSelectionFilter.tsx";
+import type { CategoryData } from "../../types/infra/magento/category.types.ts";
+import type { ProductAttributesResponse } from "../../types/domain/layered-data.types.ts"
 
 const QUERY = `
      query MagentoProducts($filter: ProductAttributeFilterInput!) {
@@ -22,32 +23,6 @@ const QUERY = `
     }
 `;
 
-export interface MagentoAggregationOption {
-    count: number;
-    label: string;
-    value: string;
-    swatch_data?: {
-        value: string // "#000000" OR image URL depending on type
-        type: "ColorSwatchData" | "ImageSwatchData"
-    } | null
-}
-
-export interface MagentoAggregation {
-    attribute_code: string;
-    label: string;
-    count: number;
-    options: MagentoAggregationOption[];
-}
-
-export interface MagentoProducts {
-    total_count: number;
-    aggregations: MagentoAggregation[];
-};
-
-export type ProductAttributesResponse = {
-    products: MagentoProducts;
-}
-
 export const useProductFilteredAttributeLayer = (categoryData: CategoryData) => {
     const [data, setData] = useState<ProductAttributesResponse>();
     const [loading, setLoading] = useState(false);
@@ -56,29 +31,32 @@ export const useProductFilteredAttributeLayer = (categoryData: CategoryData) => 
 
     const filter = useOptionSelectionFilter(categoryData)
 
+    const load = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const result = await graphqlClient<ProductAttributesResponse>(
+                QUERY,
+                { filter }
+            );
+
+            setData(result);
+        } catch (err: unknown) {
+            setError(getError(err));
+        } finally {
+            setLoading(false);
+        }
+    }, [
+        graphqlClient,
+        filter
+    ]);
+
     useEffect(() => {
         if (!filter) return;
 
-        const load = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const result = await graphqlClient<ProductAttributesResponse>(
-                    QUERY,
-                    { filter }
-                );
-
-                setData(result);
-            } catch (err: unknown) {
-                setError(getError(err));
-            } finally {
-                setLoading(false);
-            }
-        };
-
         void load();
-    }, [filter, graphqlClient]);
+    }, [filter, graphqlClient, load]);
 
     return {
         magentoAttributesLayer: data?.products,

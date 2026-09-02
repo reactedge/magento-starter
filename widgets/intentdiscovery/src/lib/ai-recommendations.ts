@@ -1,9 +1,10 @@
-import type {AttributeFilters, IntentEngineState} from "../integration/intent/types.ts";
-import type {AiRecommendationRequest} from "../hooks/infra/useAiRecommendations.tsx";
-import type {AiInterpretationRequest} from "../hooks/infra/useAiInterpreter.tsx";
-import type {IntentDiscoveryDataConfig, OptionLabelMap} from "../domain/intent-discovery.types.ts";
-import type {GraphqlProduct} from "../types/infra/magento/product.types.ts";
-import type { MergedAttribute} from "../types/domain/configured.attribute.ts";
+import type { AttributeFilters, IntentEngineState } from "../integration/intent/types.ts";
+import type { AiRecommendationRequest } from "../types/domain/ai.recommendations.types.ts";
+import type { AiInterpretationRequest } from "../types/domain/ai.interpretation.types.ts";
+import type { IntentDiscoveryDataConfig } from "../types/domain/intent-discovery.types.ts";
+import type { OptionLabelMap } from "../types/domain/option.map.ts";
+import type { GraphqlProduct } from "../types/infra/magento/product.types.ts";
+import type { MergedAttribute } from "../types/infra/magento/attribute.types.ts";
 
 export function buildAiRecommendationPayload(
     rawSignals: AttributeFilters,
@@ -17,7 +18,9 @@ export function buildAiRecommendationPayload(
     const transformedProducts = products.map(product => ({
         sku: product.sku,
         title: product.name,
-        shortDescription: product.short_description?.html,
+        ...(product.short_description?.html !== undefined && {
+            shortDescription: product.short_description.html
+        }),
         attributes: resolveProductAttributes(
             product,
             relevantAttributes,

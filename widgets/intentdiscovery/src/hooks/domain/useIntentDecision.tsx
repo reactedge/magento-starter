@@ -1,5 +1,5 @@
-import type {IntentDiscoveryDataConfig} from "../../domain/intent-discovery.types.ts";
-import {useDebounce} from "../useDebounce.tsx";
+import type { IntentDiscoveryDataConfig } from "../../types/domain/intent-discovery.types.ts";
+import { useDebounce } from "../useDebounce.tsx";
 
 const MIN_TEXT_LENGTH = 50
 

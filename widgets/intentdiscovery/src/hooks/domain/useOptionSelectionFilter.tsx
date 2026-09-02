@@ -1,12 +1,12 @@
-import type {CategoryData} from "../../types/infra/magento/category.types.ts";
-import {categoryLayereIds} from "../../lib/category.ts";
-import {useMemo} from "react";
-import {intentToFilter} from "../../lib/option-match.ts";
-import {useIntentState} from "../../state/Intent/useIntentState.ts";
-import type {MagentoProductFilter} from "../../types/domain/selection.filter.ts"
+import type { CategoryData } from "../../types/infra/magento/category.types.ts";
+import { categoryLayereIds } from "../../lib/category.ts";
+import { useMemo } from "react";
+import { intentToFilter } from "../../lib/option-match.ts";
+import { useIntentState } from "../../state/Intent/useIntentState.ts";
+import type { MagentoProductFilter } from "../../types/domain/selection.filter.ts"
 
 export function useOptionSelectionFilter(categoryData?: CategoryData) {
-    const {intentState} = useIntentState()
+    const { intentState } = useIntentState()
 
     const categoryIds = useMemo(
         () => categoryLayereIds(categoryData),
@@ -26,17 +26,27 @@ export function useOptionSelectionFilter(categoryData?: CategoryData) {
         };
 
         Object.entries(intentFilter).forEach(([attribute, value]) => {
-            if (Array.isArray(value)) {
-                if (value.length === 1) {
-                    filter[attribute] = { eq: value[0] }
-                } else if (value.length > 1) {
-                    filter[attribute] = { in: value }
-                }
-            } else {
-                filter[attribute] = { eq: value }
+            if (!Array.isArray(value)) {
+                filter[attribute] = { eq: value };
+                return;
             }
-        })
 
+            if (value.length === 0) {
+                return;
+            }
+
+            if (value.length === 1) {
+                const [selectedValue] = value;
+
+                if (selectedValue !== undefined) {
+                    filter[attribute] = { eq: selectedValue };
+                }
+
+                return;
+            }
+
+            filter[attribute] = { in: value };
+        });
         return filter;
 
     }, [categoryIds, intentFilter]);

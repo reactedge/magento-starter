@@ -1,6 +1,6 @@
-import type {AiRecommendationRequest, AiRecommendationResponse} from "../../hooks/infra/useAiRecommendations.tsx";
-import type {AiInterpretationRequest, AiInterpretationResponse} from "../../hooks/infra/useAiInterpreter.tsx";
-import type {WidgetActivity} from "@reactedge/framework/activity";
+import type { AiRecommendationRequest, AiRecommendationResponse } from "../../types/domain/ai.recommendations.types.ts"
+import type { AiInterpretationRequest, AiInterpretationResponse } from "../../types/domain/ai.interpretation.types.ts";
+import type { WidgetActivity } from "@reactedge/framework/activity";
 
 export interface IntentApiClientConfig {
     baseUrl: string;
@@ -32,7 +32,7 @@ export const createIntentApiClient = (
         });
 
         if (!response.ok) {
-            activity?.log('ai-engine', 'AI Engine failed',null, 'error')
+            activity?.log('ai-engine', 'AI Engine failed', null, 'error')
             throw new Error(`Intent API request failed: ${path}`);
         }
 

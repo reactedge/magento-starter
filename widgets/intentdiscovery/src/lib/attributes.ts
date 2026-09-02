@@ -1,6 +1,6 @@
-import type {IntentDiscoveryDataConfig} from "../domain/intent-discovery.types.ts";
-import type { MergedAttribute} from "../types/domain/configured.attribute.ts";
-import type {AttributeFilters} from "../integration/intent/types.ts";
+import type { IntentDiscoveryDataConfig } from "../types/domain/intent-discovery.types.ts";
+import type { MergedAttribute } from "../types/infra/magento/attribute.types.ts";
+import type { AttributeFilters } from "../integration/intent/types.ts";
 
 export function applyIntentConfig(
     attributes: MergedAttribute[],

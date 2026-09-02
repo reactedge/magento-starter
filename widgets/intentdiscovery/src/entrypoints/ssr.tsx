@@ -1,13 +1,15 @@
 import { renderToString } from 'react-dom/server';
-import {WIDGET_ID} from "../Config.ts";
-import type { ReactEdgeRuntimeConfig, ProductData } from "../Config.ts";
+import { WIDGET_ID } from "../Config.ts";
 import { WidgetView } from "../WidgetView.tsx";
+import type { MagentoLayeredNavigation } from "../types/domain/layered-data.types.ts"
+import type { CategoryData } from "../types/infra/magento/category.types.ts";
 
 export interface BootstrapData {
-    productData: ProductData | undefined;
+    categoryData: CategoryData | null
+    layeredData: MagentoLayeredNavigation | null
 }
 
-export const renderHtml = (config: unknown, runtime: ReactEdgeRuntimeConfig, bootstrap: BootstrapData): string => {
+export const renderHtml = (config: unknown, runtime: unknown, bootstrap: BootstrapData): string => {
     return renderToString(
         <div className={`reactedge-${WIDGET_ID}`}>
             <WidgetView contract={config} runtime={runtime} bootstrapData={bootstrap} />

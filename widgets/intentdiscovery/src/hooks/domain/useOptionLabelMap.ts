@@ -1,6 +1,6 @@
-import {useMemo} from "react";
-import type {OptionLabelMap} from "../../domain/intent-discovery.types.ts";
-import type { MergedAttribute} from "../../types/infra/magento/attribute.types.ts";
+import { useMemo } from "react";
+import type { OptionLabelMap } from "../../types/domain/option.map.ts";
+import type { MergedAttribute } from "../../types/infra/magento/attribute.types.ts";
 
 export function useOptionLabelMap(
     attributes?: MergedAttribute[] | null

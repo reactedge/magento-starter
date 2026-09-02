@@ -3,9 +3,9 @@ import type {
     EnrichedSuggestion,
     GraphqlProduct
 } from "../../../types/infra/magento/product.types.ts";
-import {mapSuggestion} from "./mapSuggestion.ts";
-import {mapProduct} from "../../../hooks/mappers/product.ts";
-import type {OptionLabelMap} from "../../../domain/intent-discovery.types.ts";
+import { mapSuggestion } from "./mapSuggestion.ts";
+import { mapProduct } from "../../../hooks/mappers/product.ts";
+import type { OptionLabelMap } from "../../../types/domain/option.map.ts";
 
 export function enrichSuggestions(
     suggestions: APISuggestion[],

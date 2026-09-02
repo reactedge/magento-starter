@@ -38,7 +38,7 @@ export class IntentEngine {
         if (lastSegment?.endsWith(".html")) {
             lastSegment = lastSegment.replace(".html", "");
         }
-        this.state.currentUrl = lastSegment
+        this.state.currentUrl = lastSegment || ""
     }
 
     applySignals(signals: Record<string, Record<string, number>>) {

@@ -1,5 +1,5 @@
-import type {GraphqlClient} from "../../lib/graphql.ts";
-import type {CategoryData} from "../../types/infra/magento/category.types.ts";
+import type { GraphqlClient } from "@reactedge/framework/graphql/graphqlClient.ts";
+import type { CategoryData } from "../../types/infra/magento/category.types.ts";
 
 export type CategoryResponse = {
     categories: {
@@ -38,5 +38,11 @@ export async function fetchMagentoCategory(
         }
     );
 
-    return data?.categories.items?.[0]
+    const category = data.categories.items[0];
+
+    if (!category) {
+        throw new Error(`Magento category not found for url_key: ${urlKey}`);
+    }
+
+    return category;
 }

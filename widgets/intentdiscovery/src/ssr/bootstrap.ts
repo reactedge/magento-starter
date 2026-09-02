@@ -1,8 +1,11 @@
 import type { ReactEdgeRuntimeConfig } from "../Config.ts";
+import type { IntentDiscoveryDataConfig } from "../types/domain/intent-discovery.types.ts"
 import { WIDGET_ID } from "../Config.ts";
 import fs from 'node:fs/promises';
-import {createGraphqlService} from "@reactedge/framework/graphql/graphql.service.ts"
-import {fetchMagentoProductData} from "../services/magento/fetchMagentoProductData";
+import { createGraphqlService } from "@reactedge/framework/graphql/graphql.service.ts"
+import { fetchMagentoCategory } from "../services/magento/fetchMagentoCategory.ts";
+import { getLayeredNavigation } from "../services/layeredNavigation/layeredNavigation.service.ts";
+import { getConfiguredLayeredNavigation } from "../services/layeredNavigation/configuredLayeredNavigation.service.ts"
 
 export async function loadRuntime(): Promise<ReactEdgeRuntimeConfig> {
     const path =
@@ -13,7 +16,10 @@ export async function loadRuntime(): Promise<ReactEdgeRuntimeConfig> {
     );
 }
 
-export async function buildBootstrap(runtime: ReactEdgeRuntimeConfig) {
+export async function buildBootstrap(
+    config: IntentDiscoveryDataConfig,
+    runtime: ReactEdgeRuntimeConfig
+) {
     const graphqlApi = getGraphqQlAPI(runtime);
 
     const graphqlClient = createGraphqlService(
@@ -21,14 +27,28 @@ export async function buildBootstrap(runtime: ReactEdgeRuntimeConfig) {
         runtime.context.storeCode
     );
 
-    const productData =
-        await fetchMagentoProductData(
+    const categoryData =
+        await fetchMagentoCategory(
             graphqlClient,
-            runtime.context.sku
+            runtime.context.category
+        );
+
+    const configuredLayeredData = await getConfiguredLayeredNavigation(
+        categoryData,
+        graphqlClient
+    )
+
+    const layeredData =
+        await getLayeredNavigation(
+            categoryData,
+            graphqlClient,
+            config,
+            configuredLayeredData
         );
 
     return {
-        productData
+        categoryData,
+        layeredData
     };
 }
 
