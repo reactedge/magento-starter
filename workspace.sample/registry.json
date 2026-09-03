@@ -23,5 +23,12 @@
         "mobile"
       ]
     }
+  },
+  "intentdiscovery": {
+    "active": true,
+    "contract": "default.json",
+    "ssr": {
+      "strategy": "dynamic"
+    }
   }
 }

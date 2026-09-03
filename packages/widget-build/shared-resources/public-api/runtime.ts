@@ -1,3 +1,5 @@
+import type {ObservabilityConfig} from "@reactedge/framework/observability/config";
+
 /**
  * Services exposed by the ReactEdge platform to widgets.
  *
@@ -14,6 +16,8 @@ export interface ReactEdgeRuntimeConfig {
     readonly rendering?: {
         readonly userAgent?: "mobile" | "desktop";
     };
+
+    readonly observability: ObservabilityConfig
 }
 
 export interface ReactEdgeRuntimeIntegrations {
