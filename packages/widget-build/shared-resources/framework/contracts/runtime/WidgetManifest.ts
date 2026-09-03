@@ -11,6 +11,6 @@ export interface WidgetManifest {
         strategy: 'static' | 'dynamic' | 'disabled';
     };
     integrity?: string | null;
-    contract?: unknown;
+    contract?: Record<string, unknown>;
     contractFile?: string | null;
 }

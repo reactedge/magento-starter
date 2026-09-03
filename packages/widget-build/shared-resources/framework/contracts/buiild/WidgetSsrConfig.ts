@@ -1,4 +1,4 @@
-import type {SsrStrategy} from "../../../../../../deployment-orchestrator/scripts/build/rebuild-registry/schema";
+import type {SsrStrategy} from "../../../../../../services/orchestrator/build/rebuild-registry/schema";
 
 export interface WidgetSsrConfig {
     strategy: SsrStrategy;
