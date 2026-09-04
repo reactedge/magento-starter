@@ -4,9 +4,10 @@ export function createWidgetBuildDefaults<TBuild>(
         version: string;
         entry: string;
         outDir: string;
+        emitCss?: boolean;
     }
 ): TBuild {
-    const {widgetName, version, entry, outDir } = options;
+    const {widgetName, version, entry, outDir, emitCss } = options;
 
     return {
         outDir,
@@ -16,7 +17,9 @@ export function createWidgetBuildDefaults<TBuild>(
             entry,
             name: `ReactEdge_${widgetName}`,
             fileName: () => `widget-${widgetName}@${version}.iife.js`,
-            cssFileName: `widget-${widgetName}`,
+            ...(emitCss && {
+                cssFileName: `widget-${widgetName}`,
+            }),
             formats: ["iife"],
         },
         rollupOptions: {

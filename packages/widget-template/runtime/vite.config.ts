@@ -43,5 +43,6 @@ export default defineConfig({
         widgetDir,
         `../../workspace/release/source/${widgetName}`
     ),
+    emitCss: true
   }),
 });

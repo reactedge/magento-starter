@@ -47,6 +47,14 @@ export function manifestPlugin({
                 );
             }
 
+            const cssEntry = Object.entries(bundle).find(
+                ([fileName, output]) =>
+                    output.type === "asset" &&
+                    fileName.endsWith(".css")
+            );
+
+            const cssFilename = cssEntry?.[0];
+
             const [fileName, output] = entries[0];
 
             if (output.type !== "chunk") {
@@ -63,8 +71,6 @@ export function manifestPlugin({
             const newFileName =
                 `widget-${widgetName}@${hash}.iife.js`;
 
-            const cssFilename = `widget-${widgetName}.css`;
-
             bundle[newFileName] = {
                 ...output,
                 fileName: newFileName
@@ -76,7 +82,7 @@ export function manifestPlugin({
                 widget: widgetName,
                 version,
                 hash,
-                cssFilename,
+                ...(cssFilename && { cssFilename }),
                 filename: newFileName,
                 built_at: new Date().toISOString()
             };
