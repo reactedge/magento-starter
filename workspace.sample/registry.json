@@ -30,5 +30,12 @@
     "ssr": {
       "strategy": "dynamic"
     }
+  },
+  "editorword": {
+    "active": true,
+    "contract": "default.json",
+    "ssr": {
+      "strategy": "disabled"
+    }
   }
 }
