@@ -23,7 +23,8 @@ export function loadConfig(
         updateIntegrity: process.env.UPDATE_INTEGRITY
             ? process.env.UPDATE_INTEGRITY === 'true'
             : false,
-        ssrEnabled: false
+        ssrEnabled: process.env.SSR_ENABLED,
+        phpEnvironment: process.env.PHP_ENV
     };
 }
 

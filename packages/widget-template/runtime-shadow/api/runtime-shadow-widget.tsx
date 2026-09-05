@@ -6,7 +6,7 @@ import type {ReactEdgeRuntimeConfig} from "@reactedge/public-api/runtime.ts";
 import {ShadowHostProvider} from "@reactedge/framework/host.ts";
 import {createRoot} from "react-dom/client";
 import {WidgetRoot} from "../src/bootstrap/widget-root.tsx"
-import {styles} from "../src//styles/entry.ts";
+import {styles} from "../src/styles/entry.ts";
 
 const mount = (
     el: HTMLElement,

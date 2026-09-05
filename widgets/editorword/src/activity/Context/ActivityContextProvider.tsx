@@ -3,14 +3,14 @@ import {WIDGET_ID} from "../../Config.ts";
 import {LocalInstanceStateContext} from "./ActivityContext.tsx";
 import {WidgetActivity} from "@reactedge/framework/activity";
 
-interface InstanceStateProviderProps {
+interface ActivityStateProviderProps {
     children: ReactNode;
     hostElement?: HTMLElement;
 }
 
 const LocalStateProvider = LocalInstanceStateContext.Provider;
 
-export const ActivityContextProvider: React.FC<InstanceStateProviderProps> = ({
+export const ActivityContextProvider: React.FC<ActivityStateProviderProps> = ({
          children,
          hostElement
      }) => {

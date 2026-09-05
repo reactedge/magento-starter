@@ -1,3 +1,4 @@
+import "../src/styles/widget.css";
 /**
  * Public npm entry point.
  */

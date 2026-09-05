@@ -187,6 +187,11 @@ if [[ "$SSR_ENABLED" == "1" ]]; then
         "https://widgets-ssr.co.uk"
 fi
 
+prompt \
+    "Generate PHP integration artefacts (0 or 1)" \
+    PHP_ENV \
+    "1"
+
 echo
 
 ALLOW_SELF_SIGNED_SSL=true
@@ -269,6 +274,7 @@ INTENT_DISCOVERY_ENABLED=$INTENT_DISCOVERY_ENABLED
 GOOGLE_REVIEWS_ENABLED=$GOOGLE_REVIEWS_ENABLED
 GOOGLE_MAPS_API_KEY="${GOOGLE_MAPS_API_KEY:-}"
 GOOGLE_PLACE_ID="${GOOGLE_PLACE_ID:-}"
+PHP_ENV=$PHP_ENV
 EOF
 
 set -a
@@ -284,6 +290,7 @@ STORE_CODE=$STORE_CODE
 SITEURL=$SITEURL
 TARGET_ROOT=$TARGET_ROOT
 SSR_ENABLED=$SSR_ENABLED
+PHP_ENV=$PHP_ENV
 EOF
 
 cat > "$ROOT/browser-mcp/.env" <<EOF

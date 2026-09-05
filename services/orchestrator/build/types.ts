@@ -31,6 +31,7 @@ export interface Config {
     allowedHosts: string[],
     updateIntegrity: boolean,
     ssrEnabled: boolean;
+    phpEnvironment: boolean;
 }
 
 export interface ValidationIssue {

@@ -24,9 +24,9 @@ export function buildWidget(
         return;
     }
 
-    const buildCommand = config.ssrEnabled
-        ? "build:ssr"
-        : "build";
+    const buildCommand = config.phpEnvironment === 1
+        ? "build"
+        : "build:ssr";
 
 
     report.info(

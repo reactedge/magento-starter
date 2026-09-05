@@ -26,6 +26,10 @@ export default defineConfig({
     ),
   },
   build: createNpmBuildDefaults<BuildOptions>({
-    widgetName
+    entry: resolve(widgetDir, "api/index.ts"),
+    outDir: resolve(
+        widgetDir,
+        `../../workspace/release/source/${widgetName}`
+    )
   }),
 });

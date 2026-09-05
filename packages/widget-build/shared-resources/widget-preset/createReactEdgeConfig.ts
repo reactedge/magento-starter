@@ -35,16 +35,25 @@ export function createWidgetBuildDefaults<TBuild>(
 
 export function createNpmBuildDefaults<TBuild>({
    widgetName,
+   entry,
+   outDir,
+   emitCss
 }: {
     widgetName: string;
+    entry: string;
+    outDir: string;
+    emitCss?: boolean;
 }): TBuild {
     return {
-        outDir: `../../workspace/release/source/${widgetName}/`,
+        outDir,
         emptyOutDir: false,
         lib: {
-            entry: "api/index.ts",
+            entry,
             formats: ["es"],
             fileName: () => "index.js",
+            ...(emitCss && {
+                cssFileName: `widget-${widgetName}`,
+            }),
         },
         rollupOptions: {
             external: [
@@ -54,6 +63,9 @@ export function createNpmBuildDefaults<TBuild>({
                 "react-dom/server",
                 "react/jsx-runtime",
             ],
+            output: {
+                inlineDynamicImports: true,
+            },
         },
     } as TBuild
 }
