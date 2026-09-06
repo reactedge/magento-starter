@@ -1,8 +1,9 @@
 import fs from "fs/promises";
-import {getReactEdgeRoot} from "../../../packages/widget-build/shared-resources/filesystem/reactedgeRoot";
+import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot";
+
 
 async function fetchContract(widget: string, contract: string) {
-    const contractPath = `${getReactEdgeRoot()}/workspace/default/contracts/${widget}/${contract}`
+    const contractPath = `${ReactEdgeRoot.get()}/workspace/default/contracts/${widget}/${contract}`
     const parsed = JSON.parse(
         await fs.readFile(contractPath, 'utf8')
     );

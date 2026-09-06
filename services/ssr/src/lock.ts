@@ -1,12 +1,12 @@
-import type { SsrRenderOperation } from "./ssr-operation";
+import type {LockOperationContract} from "./observability/lock-operation";
 
 let renderLock: Promise<void> = Promise.resolve();
 
 export async function withRenderLock<T>(
-    operation: SsrRenderOperation,
+    lockOperation: LockOperationContract,
     fn: () => Promise<T>
 ): Promise<T> {
-    operation.registerStart();
+    lockOperation.registerStart();
 
     const previous = renderLock;
     let release!: () => void;
@@ -18,12 +18,12 @@ export async function withRenderLock<T>(
     await previous;
     await new Promise(resolve => setTimeout(resolve, 3000));
 
-    operation.logLockAcquired();
+    lockOperation.logLockAcquired();
 
     try {
         return await fn();
     } catch (e) {
-        operation.logFailedLock(e)
+        lockOperation.logFailedLock(e)
     } finally {
         release();
     }
