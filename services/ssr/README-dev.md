@@ -20,6 +20,9 @@ curl -vk -X POST https://widgets-ssr.co.uk/render \
       },
       "storeCode": "default",
       "category": null
+    },
+    "options": {
+      "observability": true
     }
   }'
 ```
@@ -39,6 +42,9 @@ curl -vk -X POST https://widgets-ssr.co.uk/render \
       },
       "storeCode": "default",
       "category": null
+    },
+    "options": {
+      "observability": true
     }
   }' > /dev/null
 ```
@@ -57,6 +63,9 @@ curl -vk -X POST https://ssr-origin.reactedge.net/render \
 },
 "storeCode": "default",
 "category": null
+},
+"options": {
+  "observability": true
 }
 }'
 ```
