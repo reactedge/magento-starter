@@ -15,7 +15,7 @@ export class NoopLockOperation implements LockOperationContract {
 
     logFailedLock(): void {}
 
-    logLockAcquired(): void;
+    logLockAcquired(): void {}
 
     addEvent(): void {}
 

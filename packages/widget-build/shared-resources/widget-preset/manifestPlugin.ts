@@ -47,13 +47,7 @@ export function manifestPlugin({
                 );
             }
 
-            const cssEntry = Object.entries(bundle).find(
-                ([fileName, output]) =>
-                    output.type === "asset" &&
-                    fileName.endsWith(".css")
-            );
-
-            const cssFilename = cssEntry?.[0];
+            const cssFilename = `widget-${widgetName}.css`;
 
             const [fileName, output] = entries[0];
 
