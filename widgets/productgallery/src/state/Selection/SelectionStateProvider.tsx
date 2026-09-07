@@ -1,7 +1,6 @@
 import React, { type ReactNode, useEffect, useState } from "react";
 import {
-    initialState,
-    SelectionStateContext
+    initialState, LocalDocumentStateContext
 } from "./SelectionState.tsx";
 import type { SelectionState } from "./type.ts";
 import type {WidgetActivity} from "@reactedge/framework/activity";
@@ -11,13 +10,16 @@ interface SelectionStateProviderProps {
     activity?: WidgetActivity
 }
 
-const LocalStateProvider = SelectionStateContext.Provider;
+const LocalStateProvider = LocalDocumentStateContext.Provider;
 
 export const SelectionStateProvider: React.FC<SelectionStateProviderProps> = ({
       children, activity
   }) => {
     const [selectionState, setSelectionState] =
         useState<SelectionState>(initialState);
+
+    const [selectionLoading, setSelectionLoading] =
+        useState(false);
 
     useEffect(() => {
         const handler = (event: Event) => {
@@ -47,7 +49,13 @@ export const SelectionStateProvider: React.FC<SelectionStateProviderProps> = ({
     }, [activity]);
 
     return (
-        <LocalStateProvider value={selectionState}>
+        <LocalStateProvider
+            value={{
+                selection: selectionState,
+                selectionLoading,
+                setSelectionLoading,
+            }}
+        >
             {children}
         </LocalStateProvider>
     );

@@ -8,7 +8,7 @@ export function useGalleryData(
     sku: string,
     bootstrap?: BootstrapData
 ) {
-    const selection = useSelectionState();
+    const { selection} = useSelectionState();
     const initialData = bootstrap?.galleryData;
 
     const hasSelection =
@@ -41,7 +41,7 @@ export function useGalleryData(
     const baseGalleryData =
         initialData ?? magentoGalleryData;
 
-    const galleryData = mergeGalleryData(baseGalleryData, selectedGalleryData);
+    const galleryData = mergeGalleryData(baseGalleryData, selectionLoading ? [] : selectedGalleryData);
 
     return {
         galleryData,

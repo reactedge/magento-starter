@@ -10,7 +10,7 @@ interface ProductTiledGalleryProps {
 }
 
 export const ProductTiledGallery = ({tiles, maxColumns}: ProductTiledGalleryProps) => {
-    const selection = useSelectionState();
+    const {selection} = useSelectionState();
     const gallery = useGallery(tiles, selection.value);
 
     if (tiles.length === 0) return null;
