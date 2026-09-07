@@ -131,6 +131,20 @@ echo "Enable additional ReactEdge capabilities for this installation.
       The installer will configure and run it automatically."
 
 prompt \
+    "Enable Observability (0 or 1)" \
+    OBSERVABILITY_ENABLED \
+    "0"
+
+if [[ "$OBSERVABILITY_ENABLED" == "1" ]]; then
+    prompt \
+        "OpenTelemetry collector host" \
+        OTEL_HOST \
+        "https://otel.reactedge.net/v1/traces"
+else
+    OTEL_HOST=""
+fi
+
+prompt \
     "Enable Intent Discovery (0 or 1)" \
     INTENT_DISCOVERY_ENABLED \
     "0"
@@ -188,8 +202,24 @@ if [[ "$SSR_ENABLED" == "1" ]]; then
 fi
 
 echo
+echo "Environment"
+echo "-----------"
 
-ALLOW_SELF_SIGNED_SSL=true
+prompt \
+    "Environment (development or production)" \
+    REACTEDGE_ENV \
+    "development"
+
+if [[ "$REACTEDGE_ENV" != "development" && "$REACTEDGE_ENV" != "production" ]]; then
+    echo "❌ Environment must be 'development' or 'production'."
+    exit 1
+fi
+
+if [[ "$REACTEDGE_ENV" == "development" ]]; then
+        ALLOW_SELF_SIGNED_SSL=true
+    else
+        ALLOW_SELF_SIGNED_SSL=false
+    fi
 
 if [ "$INTENT_DISCOVERY_ENABLED" == "1" ]; then
     INTENT_API_CONFIG=',
@@ -269,6 +299,8 @@ INTENT_DISCOVERY_ENABLED=$INTENT_DISCOVERY_ENABLED
 GOOGLE_REVIEWS_ENABLED=$GOOGLE_REVIEWS_ENABLED
 GOOGLE_MAPS_API_KEY="${GOOGLE_MAPS_API_KEY:-}"
 GOOGLE_PLACE_ID="${GOOGLE_PLACE_ID:-}"
+REACTEDGE_ENV=$REACTEDGE_ENV
+OTEL_HOST="${OTEL_HOST:-}"
 EOF
 
 set -a
@@ -277,6 +309,8 @@ set +a
 
 cat > "$ROOT/services/ssr/.env" <<EOF
 SSR_PORT=$SSR_PORT
+ALLOW_SELF_SIGNED_SSL=$ALLOW_SELF_SIGNED_SSL
+OTEL_HOST=$OTEL_HOST
 EOF
 
 cat > "$ROOT/services/orchestrator/.env.dev" <<EOF
