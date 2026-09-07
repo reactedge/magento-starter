@@ -1,8 +1,6 @@
 import {OpenTelemetryObserver} from "./activity";
 import {logger} from "../logger";
 import type {Span} from "@opentelemetry/api";
-import type {LockOperationContract} from "./lock-operation";
-import {LockOperation, NoopLockOperation} from "./lock-operation";
 
 export interface RenderOperation {
     registerStart(headers: Record<string, unknown>): void;
@@ -10,14 +8,13 @@ export interface RenderOperation {
     logWidgetImported(): void;
     logRenderingStarted(): void;
     logCompletion(htmlLength: number): void;
-    logResponseSent(waitingLock: number): void;
+    logResponseSent(): void;
     logFailedSsr(error: unknown): void;
     getRequestId(): string;
 }
 
 type Operations = {
     render: RenderOperation;
-    lock: LockOperationContract;
 };
 
 export function createOperations(
@@ -25,16 +22,14 @@ export function createOperations(
 ): Operations {
     if (!observabilityEnabled) {
         return {
-            render: new NoopRenderOperation(),
-            lock: new NoopLockOperation(),
+            render: new NoopRenderOperation()
         };
     }
 
     const render = new SsrRenderOperation();
 
     return {
-        render,
-        lock: new LockOperation(render),
+        render
     };
 }
 
@@ -151,12 +146,11 @@ export class SsrRenderOperation {
         this.telemetry.addEvent('widget.ssr.started', {})
     }
 
-    logResponseSent(waitingLock: number) {
+    logResponseSent() {
         logger.info('[SSR DONE]', {
             requestId: this.requestId
         });
 
-        this.telemetry.addEvent('lock.wait.ms', { waitingLock })
         this.telemetry.addEvent('widget.ssr.sent', {})
         this.telemetry.endOperation()
     }
