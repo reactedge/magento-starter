@@ -8,3 +8,9 @@ export interface SelectionState {
     code: string | null;
     value: string | null;
 }
+
+export interface SelectionStateContext {
+    selection: SelectionState,
+    selectionLoading: boolean,
+    setSelectionLoading: (loading: boolean) => void;
+}

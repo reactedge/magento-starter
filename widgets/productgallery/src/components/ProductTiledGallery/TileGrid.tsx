@@ -1,4 +1,6 @@
 import type {GalleryTile} from "../Types.ts";
+import {StandardSpinner} from "../global/StandardSpinner.tsx";
+import {useSelectionState} from "../../state/Selection/useSelectionState.tsx";
 
 interface TileGridProps {
     tiles: GalleryTile[];
@@ -7,6 +9,8 @@ interface TileGridProps {
 }
 
 export const TileGrid = ({ tiles, maxColumns, onSelect }: TileGridProps) => {
+    const {selectionLoading} = useSelectionState()
+
     return (
         <div
             className="product-gallery__tile-grid"
@@ -30,6 +34,11 @@ export const TileGrid = ({ tiles, maxColumns, onSelect }: TileGridProps) => {
                     />
                 </button>
             ))}
+            {selectionLoading && (
+                <div className="product-gallery__loader">
+                    <StandardSpinner />
+                </div>
+            )}
         </div>
     );
 };

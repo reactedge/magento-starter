@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import type { SelectionState } from "./type.ts";
-import { SelectionStateContext } from "./SelectionState.tsx";
+import type {SelectionStateContext} from "./type.ts";
+import {LocalDocumentStateContext} from "./SelectionState.tsx";
 
-export function useSelectionState(): SelectionState {
-    const context = useContext(SelectionStateContext);
+export function useSelectionState(): SelectionStateContext {
+    const context = useContext(LocalDocumentStateContext);
 
     if (!context) {
         throw new Error(

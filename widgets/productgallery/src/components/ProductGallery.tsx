@@ -7,7 +7,7 @@ interface ProductGalleryProps {
 }
 
 export const ProductGallery = ({ tiles }: ProductGalleryProps) => {
-    const selection = useSelectionState();
+    const {selection} = useSelectionState();
     const gallery = useGallery(tiles, selection.value);
 
     if (tiles.length === 0 || gallery.currentImage === undefined) {
