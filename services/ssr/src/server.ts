@@ -16,7 +16,6 @@ import { buildRenderPayload } from "./payload";
 import {createOperations} from "./observability/ssr-operation";
 import { resolveDevice } from "./user-agent";
 import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot.ts";
-import { withRenderLock } from "./lock";
 
 const app = express();
 app.use(express.json());
@@ -30,54 +29,51 @@ app.post('/render', async (req, res) => {
         req.body.options?.observability === true;
 
     const {
-        render: ssrOperation,
-        lock: lockOperation
+        render: ssrOperation
     } = createOperations(observabilityEnabled);
     ssrOperation.registerStart(req.headers);
 
-    await withRenderLock(lockOperation, async () => {
-        try {
-            const payload =
-                await buildRenderPayload({
-                    ...req.body,
-                    runtimeConfig: req.body.runtimeConfig,
-                    ssrContext: {
-                        userAgent: resolveDevice(req.headers['user-agent'])
-                    }
-                });
+    try {
+        const payload =
+            await buildRenderPayload({
+                ...req.body,
+                runtimeConfig: req.body.runtimeConfig,
+                ssrContext: {
+                    userAgent: resolveDevice(req.headers['user-agent'])
+                }
+            });
 
-            ssrOperation.logPayload(payload);
+        ssrOperation.logPayload(payload);
 
-            const entry = resolveEntry(payload.widget);
+        const entry = resolveEntry(payload.widget);
 
-            const { renderHtml, buildBootstrap } = await import(entry);
+        const { renderHtml, buildBootstrap } = await import(entry);
 
-            ssrOperation.logWidgetImported();
+        ssrOperation.logWidgetImported();
 
-            const bootstrap =
-                buildBootstrap
-                    ? await buildBootstrap(payload.runtimeConfig)
-                    : undefined;
+        const bootstrap =
+            buildBootstrap
+                ? await buildBootstrap(payload.runtimeConfig)
+                : undefined;
 
-            ssrOperation.logRenderingStarted();
+        ssrOperation.logRenderingStarted();
 
-            const html = renderHtml(payload.contract, payload.runtimeConfig, bootstrap);
+        const html = renderHtml(payload.contract, payload.runtimeConfig, bootstrap);
 
-            ssrOperation.logCompletion(html.length)
+        ssrOperation.logCompletion(html.length)
 
-            res
-                .set('X-SSR-Worker', 'local')
-                .set('X-SSR-Cache', 'MISS')
-                .send(`
-                <!-- SSR:${ssrOperation.getRequestId()} -->
-                ${html}
-            `);
+        res
+            .set('X-SSR-Worker', 'local')
+            .set('X-SSR-Cache', 'MISS')
+            .send(`
+            <!-- SSR:${ssrOperation.getRequestId()} -->
+            ${html}
+        `);
 
-            ssrOperation.logResponseSent(lockOperation.getWaitingLock())
-        } catch (e) {
-            ssrOperation.logFailedSsr(e)
-        }
-    });
+        ssrOperation.logResponseSent()
+    } catch (e) {
+        ssrOperation.logFailedSsr(e)
+    }
 });
 
 app.listen(process.env.SSR_PORT, '0.0.0.0', () => {
