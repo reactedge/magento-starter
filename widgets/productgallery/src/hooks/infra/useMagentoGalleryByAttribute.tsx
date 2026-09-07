@@ -32,7 +32,7 @@ export function useMagentoGalleryByAttribute(enabled: boolean, sku: string, attr
             setLoading(false);
             setSelectionLoading(false)
         }
-    }, [enabled, sku, graphqlClient,  attributeCode, attributeValue]);
+    }, [enabled, sku, graphqlClient,  attributeCode, attributeValue, setSelectionLoading]);
 
     useEffect(() => {
         void load();
