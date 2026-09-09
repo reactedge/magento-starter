@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import dotenv from 'dotenv';
-import type {Config} from "./build/types.ts";
+import type { Config } from "./build/types.ts";
 
 let CONFIG: Config;
 
@@ -14,6 +14,7 @@ export function loadConfig(
     });
 
     CONFIG = {
+        target: envFile,
         storeCode: process.env.STORE_CODE!,
         targetSiteUrl: process.env.SITEURL!,
         allowedHosts: (process.env.ALLOWED_HOSTS ?? '')

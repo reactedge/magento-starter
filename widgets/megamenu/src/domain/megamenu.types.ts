@@ -1,8 +1,4 @@
 
-export interface RuntimeConfig {
-    "platform": "wordpress" | "magento"
-}
-
 export interface MegaMenuDataConfig {
     readonly items: NavItem[];
 }

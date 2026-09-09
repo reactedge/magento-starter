@@ -38,7 +38,7 @@ The widget is delivered as a standalone JavaScript file and exposed via a custom
 <megamenu-widget></megamenu-widget>
 
 <script type="module">
-  import { mount } from "./api/runtime-widget.tsx";
+  import { mount } from "./api/widget.tsx";
   import { ResourceLoader } from "@reactedge/framework/contract";
 
   const loader = new ResourceLoader();

@@ -3,8 +3,8 @@
  */
 
 import path from 'path';
-import {getConfig} from "../config.ts";
-import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot.ts";
+import { getConfig } from "../config.ts";
+import { ReactEdgeRoot } from "@reactedge/filesystem/reactedgeRoot.ts";
 
 export function getWidgetPath(
     widgetName: string
@@ -53,6 +53,19 @@ export function getContractPath(
         'contracts',
         widgetName,
         contractFile
+    );
+}
+
+export function getSsrArtifactPath(
+    artifactPath: string
+): string {
+    const CONFIG = getConfig()
+    return path.join(
+        ReactEdgeRoot.get(),
+        'workspace',
+        CONFIG.storeCode,
+        'ssr',
+        artifactPath
     );
 }
 

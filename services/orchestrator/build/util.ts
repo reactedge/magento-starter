@@ -1,6 +1,9 @@
 // util.ts
 import { getConfig } from "../config.ts";
 import { pathToFileURL } from "node:url";
+import { randomUUID } from 'node:crypto';
+import { rename, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
 
 export function getFilename(
     value: string
@@ -66,4 +69,26 @@ export async function waitForServer(
     }
 
     throw new Error(`Server did not start within ${timeout}ms`);
+}
+
+export async function writeAtomicFile(
+    content: string, path: string
+): Promise<string> {
+    const temporaryPath = resolve(
+        dirname(path),
+        `.ssr-${randomUUID()}.tmp`,
+    );
+
+    await writeFile(
+        temporaryPath,
+        content,
+        'utf8',
+    );
+
+    await rename(
+        temporaryPath,
+        path,
+    );
+
+    return path;
 }

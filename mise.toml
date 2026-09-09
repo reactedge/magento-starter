@@ -34,6 +34,10 @@ run = "./launcher/scripts/widget-build.sh {{arg(name='widget', required=true)}}"
 description = "Rennder a SSR view for a widget"
 run = "./launcher/scripts/widget-ssr.sh {{arg(name='widget', required=true)}}"
 
+[tasks."widgets-build-manifest"]
+description = "Build the ReactEdge deployment orchestrator"
+run = "./launcher/scripts/widgets-build-manifest.sh"
+
 [tasks."widgets-deploy"]
 description = "Build the ReactEdge deployment orchestrator"
 run = "./launcher/scripts/widgets-deploy.sh"
