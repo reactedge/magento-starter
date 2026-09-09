@@ -1,13 +1,15 @@
 /**
  * Resolves and loads widget contracts from disk. Returns contract metadata and parsed content.
  */
-import type {ContractResult, ContractWrapper} from "../types.ts";
+import type { ContractResult, ContractWrapper } from "../types.ts";
 import fs from "fs";
-import {getContractPath} from "../paths.ts";
-import {Report} from "../report.ts";
-import {getFilename} from "../util.ts";
-import {validateContract} from "../contract-loader/validator.ts";
-import {wrapContract} from "../contract-loader/wrapper.ts";
+import { getContractPath } from "../paths.ts";
+import { Report } from "../report.ts";
+import { getFilename, writeAtomicFile } from "../util.ts";
+import { validateContract } from "../contract-loader/validator.ts";
+import { wrapContract } from "../contract-loader/wrapper.ts";
+import { mergeContractData } from "../contract-loader/data-processor/contract-data-merger";
+import path from "path";
 
 export async function loadContract(
     widgetName: string,
@@ -22,6 +24,12 @@ export async function loadContract(
     if (fs.existsSync(localPath)) {
         const content = fs.readFileSync(localPath, 'utf-8');
         contract = JSON.parse(content) as ContractWrapper
+
+        contract = await mergeContractData(
+            contract,
+            localPath,
+        );
+
         contract = wrapContract(contract)
 
         const issues = await validateContract(

@@ -8,23 +8,27 @@ export function resolveEntry(widget: string): string {
 
 const run = async () => {
     const widgetName = process.argv[2];
-    const contractPath = process.argv[3];
+    const variant = process.argv[3];
 
     if (!widgetName) {
         throw new Error('Missing widget name');
     }
 
-    if (!contractPath) {
-        throw new Error('Missing contract path');
+    if (!variant) {
+        throw new Error('Missing variant');
     }
 
-    const config = JSON.parse(
-        await fs.readFile(contractPath, 'utf8')
-    );
+    const contractJson = await readStdin();
+
+    if (!contractJson.trim()) {
+        throw new Error('Missing contract');
+    }
+
+    const config = JSON.parse(contractJson);
 
     let runtime = {
         rendering: {
-            userAgent: process.argv[4] ?? ''
+            userAgent: process.argv[3] ?? ''
         }
     };
 
@@ -53,3 +57,21 @@ const run = async () => {
 };
 
 run();
+
+async function readStdin(): Promise<string> {
+    return new Promise((resolve, reject) => {
+        let data = '';
+
+        process.stdin.setEncoding('utf8');
+
+        process.stdin.on('data', chunk => {
+            data += chunk;
+        });
+
+        process.stdin.on('end', () => {
+            resolve(data);
+        });
+
+        process.stdin.on('error', reject);
+    });
+}

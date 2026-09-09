@@ -26,6 +26,7 @@ export interface ContractResult {
 }
 
 export interface Config {
+    target: string,
     storeCode: string;
     targetSiteUrl: string,
     allowedHosts: string[],

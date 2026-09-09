@@ -3,21 +3,11 @@ import {parseConfig} from "./ConfigSchema.ts";
 import type {WidgetActivity} from "@reactedge/framework/activity";
 
 export interface WidgetConfig {
-    /**
-     * Structured banner payload.
-     * Shape is banner-owned and opaque to the platform.
-     */
     readonly data: {
         slides: UspSlideData[]
     }
 
     readonly settings: UspSettings;
-}
-
-export interface RuntimeConfig {
-    rendering: {
-        userAgent: string;
-    }
 }
 
 export const WIDGET_ID = 'usp';

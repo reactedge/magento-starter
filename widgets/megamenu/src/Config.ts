@@ -1,7 +1,6 @@
 import type {
     MegaMenuDataConfig,
-    MegaMenuSettingsConfig,
-    RuntimeConfig
+    MegaMenuSettingsConfig
 } from "./domain/megamenu.types.ts";
 import type {WidgetActivity} from "@reactedge/framework/activity";
 import {parseConfig, type SchemaWidgetConfig} from "./ConfigSchema.ts";
@@ -9,7 +8,6 @@ import {parseConfig, type SchemaWidgetConfig} from "./ConfigSchema.ts";
 export const WIDGET_ID = 'megamenu';
 
 export interface WidgetConfig {
-    readonly runtime: RuntimeConfig,
     readonly data: MegaMenuDataConfig;
     readonly settings?: {theme: MegaMenuSettingsConfig};
 }
@@ -59,16 +57,15 @@ export function readWidgetConfig(
 
 
 function resolvedWidgetConfig(
-    schameConfig: SchemaWidgetConfig
+    schemaConfig: SchemaWidgetConfig
 ): WidgetConfig {
     return {
-        runtime: schameConfig.runtime,
-        data: schameConfig.data,
+        data: schemaConfig.data,
         settings: {
-            ...schameConfig.settings,
+            ...schemaConfig.settings,
             theme: {
-                ...schameConfig.settings.theme,
-                dropdownLayouts: schameConfig.settings.theme.dropdownLayouts !== undefined?  schameConfig.settings.theme.dropdownLayouts: {}
+                ...schemaConfig.settings.theme,
+                dropdownLayouts: schemaConfig.settings.theme.dropdownLayouts !== undefined?  schemaConfig.settings.theme.dropdownLayouts: {}
             }
         }
     };

@@ -1,0 +1,50 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach ReactEdge MCP",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "Orchestrator: build",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run build",
+      "cwd": "${workspaceFolder}/services/orchestrator"
+    },
+    {
+      "name": "SSR Worker",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/services/orchestrator",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "program": "${workspaceFolder}/services/orchestrator/ssr-worker.ts",
+      "env": {
+        "REDIS_URL": "redis://localhost:6379"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "SSR: Orchestrator + Worker",
+      "configurations": [
+        "Orchestrator: build",
+        "SSR Worker"
+      ]
+    }
+  ]
+}

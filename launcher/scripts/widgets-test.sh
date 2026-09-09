@@ -13,7 +13,7 @@ export SITEURL
 echo "🚀 Building test orchestrator"
 
 (
-    cd "$ROOT/deployment-orchestrator"
+    cd "$ROOT/services/orchestrator"
     npm run test
 )
 

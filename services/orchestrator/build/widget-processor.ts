@@ -8,13 +8,13 @@ import { Report } from "./report.ts";
 import { updateAssetRegistry } from "./widget-processor/asset-registry.ts";
 import { loadContract } from "./widget-processor/contract-loader.ts";
 import { loadSsrCss } from "./widget-processor/ssr-css-loader.ts";
-import { generateSsr } from "./widget-processor/ssr-generator.ts";
 import { writeManifest } from "./widget-processor/manifest-writer.ts";
 import { getWidgetPath } from "./paths.ts";
-import { getFilename } from "./util.ts";
 import { ContractImageProcessor } from "./contract-loader/optimiser/validate-images.ts";
-import type {BuildWidgetRegistry} from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
-import type {SsrViewMap} from "@reactedge/framework/contracts/buiild/WidgetSsrConfig.ts";
+import type { BuildWidgetRegistry } from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
+import type { SsrViewMap } from "@reactedge/framework/contracts/buiild/WidgetSsrConfig.ts";
+import { enqueueSsrGeneration } from "../ssr-worker/queue.ts"
+import { getConfig } from "../config.ts";
 
 export async function processWidget(
     instanceName: string,
@@ -69,28 +69,45 @@ export async function processWidget(
             );
         }
 
-        const contractFile = getFilename(registryResult.contract)
+        const contractFile = 'release.json'; //getFilename(registryResult.contract)
 
         const cssSsr = loadSsrCss(widgetName, registryResult.cssFilename)
-        if (resolved?.ssr?.strategy === 'static') {
+
+        const ssrStrategy =
+            resolved?.ssr?.strategy ?? 'disabled';
+
+        if (ssrStrategy !== 'disabled') {
             const variants =
-                resolved.ssr.variants ?? ['desktop'];
+                resolved?.ssr?.variants ?? ['desktop'];
 
             for (const variant of variants) {
+
                 report.info(
-                    `SSR variant ${variant} started`,
+                    `SSR variant ${variant} queued`,
                     {
                         widget: instanceName,
-                        contractFile
-                    }
+                        contract: contractResult,
+                        strategy: ssrStrategy,
+                    },
                 );
-                ssrViews[variant] =
-                    await generateSsr(
-                        widgetName,
-                        contractFile,
-                        variant,
-                        report
-                    );
+
+                const CONFIG = getConfig()
+
+                const result = await enqueueSsrGeneration({
+                    target: CONFIG.target,
+                    widget: widgetName,
+                    contract: contractResult,
+                    variant,
+                    outputFile: `${instanceName}/output.html`,
+                });
+
+                report.info(
+                    `SSR variant ${variant} generated`,
+                    {
+                        widget: instanceName,
+                        artifactPath: result.artifactPath,
+                    },
+                );
             }
         }
 
@@ -100,7 +117,6 @@ export async function processWidget(
             src: registryResult.src,
             css: registryResult.cssFilename,
             ssr: {
-                views: ssrViews,
                 css: cssSsr,
                 strategy: resolved?.ssr?.strategy
             },

@@ -1,13 +1,6 @@
 import { z } from 'zod';
 import type {NavItem} from "./domain/megamenu.types.ts";
 
-const RuntimeSchema = z.object({
-    platform: z.enum([
-        'magento',
-        'wordpress'
-    ])
-}).strict();
-
 const ThemeSchema = z.object({
     urlSuffix: z.string().optional().default(".html"),
     dropdownLayouts: z.record(
@@ -39,8 +32,6 @@ const MenuItemSchema: z.ZodType<NavItem> =
 
 export const WidgetConfigSchema =
     z.object({
-        runtime: RuntimeSchema,
-
         data: z.object({
             items: z.array(
                 MenuItemSchema

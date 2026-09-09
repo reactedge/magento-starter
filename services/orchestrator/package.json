@@ -5,7 +5,7 @@
     "test": "tsx --tsconfig tsconfig.json test.ts"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.9.5"
   },
   "dependencies": {
     "@inquirer/prompts": "^8.5.2",
@@ -14,7 +14,9 @@
     "@opentelemetry/resources": "^2.7.1",
     "@opentelemetry/sdk-trace-node": "^2.7.1",
     "@opentelemetry/sdk-trace-web": "^2.7.1",
+    "bullmq": "^6.3.4",
     "dotenv": "^17.4.2",
+    "ioredis": "^6.0.0",
     "sharp": "^0.35.2",
     "undici": "^8.2.0",
     "zod": "^4.4.3"
