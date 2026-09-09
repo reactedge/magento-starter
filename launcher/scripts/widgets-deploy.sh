@@ -13,6 +13,7 @@ REACTEDGE_WORKSPACE="$(dirname "$TARGET_ROOT")/reactedge"
 mkdir -p "$REACTEDGE_WORKSPACE"
 
 rsync -av --delete \
+    --exclude='.git/' \
     "$ROOT/workspace/" \
     "$REACTEDGE_WORKSPACE/"
 
