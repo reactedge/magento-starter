@@ -86,7 +86,7 @@ Update `composer.json`:
 Install the ReactEdge bridge:
 
 ```bash
-composer require reactedge/widgetbridgelight
+composer require reactedge/widgetbridge
 ```
 
 Enable the module:
