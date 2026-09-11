@@ -1,6 +1,7 @@
 import type {OnScrollMode, ResolvedWidget, WidgetLoadMode, WidgetModule} from "./types.ts";
 import type { RuntimeWidgetRegistry } from "@reactedge/framework/contracts/runtime/RuntimeWidgetRegistry.ts";
 import {buildRuntimeConfig, stripMeta} from "./util.ts";
+import type {ActivityPayload} from "@reactedge/framework/activity";
 import {WidgetActivity} from "@reactedge/framework/activity";
 import {registerInstance, startObservability} from "./observability";
 import type { WidgetGlobalKey} from "./types.ts"
@@ -151,6 +152,8 @@ export async function mountWidget(el: HTMLElement) {
             return;
         }
 
+        listenForReady(el, entry.id);
+
         if (entry.contract !== null) {
             const contract = entry.contract ? stripMeta(entry.contract) : null;
             mod.mount(el, contract, runtimeConfig);
@@ -158,6 +161,55 @@ export async function mountWidget(el: HTMLElement) {
             mod.mount(el, null, runtimeConfig);
         }
     }
+}
+
+function activateWidget(el: HTMLElement): void {
+    const instance = el.closest<HTMLElement>(
+        '[data-reactedge-instance]'
+    );
+
+    if (!instance) {
+        return;
+    }
+
+    const ssr = instance.querySelector<HTMLElement>(
+        '[data-reactedge-ssr]'
+    );
+
+    if (!ssr) {
+        return;
+    }
+
+    el.hidden = false;
+    ssr.hidden = true;
+}
+
+function listenForReady(
+    el: HTMLElement,
+    instance: string
+): void {
+    const handler = (event: Event) => {
+        const customEvent =
+            event as CustomEvent<ActivityPayload>;
+        if (
+            customEvent.detail.instance !== instance ||
+            customEvent.detail.phase !== 'widget-ready'
+        ) {
+            return;
+        }
+
+        activateWidget(el);
+
+        window.removeEventListener(
+            'reactedge:activity',
+            handler
+        );
+    };
+
+    window.addEventListener(
+        'reactedge:activity',
+        handler
+    );
 }
 
 function getWidgetType(el: HTMLElement): string | null {

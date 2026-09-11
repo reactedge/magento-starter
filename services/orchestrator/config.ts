@@ -24,7 +24,9 @@ export function loadConfig(
         updateIntegrity: process.env.UPDATE_INTEGRITY
             ? process.env.UPDATE_INTEGRITY === 'true'
             : false,
-        ssrEnabled: false
+        ssrEnabled: process.env.SSR_ENABLED
+            ? process.env.SSR_ENABLED === '1'
+            : false,
     };
 }
 

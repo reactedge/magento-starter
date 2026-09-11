@@ -3,7 +3,7 @@
     "active": true,
     "contract": "default.json",
     "ssr": {
-      "strategy": "dynamic"
+      "strategy": "static"
     }
   },
   "megamenu": {

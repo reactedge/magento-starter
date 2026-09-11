@@ -9,12 +9,13 @@ import { updateAssetRegistry } from "./widget-processor/asset-registry.ts";
 import { loadContract } from "./widget-processor/contract-loader.ts";
 import { loadSsrCss } from "./widget-processor/ssr-css-loader.ts";
 import { writeManifest } from "./widget-processor/manifest-writer.ts";
-import { getWidgetPath } from "./paths.ts";
+import { getContractPath, getWidgetPath } from "./paths.ts";
 import { ContractImageProcessor } from "./contract-loader/optimiser/validate-images.ts";
 import type { BuildWidgetRegistry } from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
 import type { SsrViewMap } from "@reactedge/framework/contracts/buiild/WidgetSsrConfig.ts";
 import { enqueueSsrGeneration } from "../ssr-worker/queue.ts"
 import { getConfig } from "../config.ts";
+import { resolveGenerationInputs } from "../ssr-worker/queue-input-resolver";
 
 export async function processWidget(
     instanceName: string,
@@ -76,7 +77,9 @@ export async function processWidget(
         const ssrStrategy =
             resolved?.ssr?.strategy ?? 'disabled';
 
-        if (ssrStrategy !== 'disabled') {
+        const CONFIG = getConfig()
+
+        if (CONFIG.ssrEnabled && ssrStrategy !== 'disabled') {
             const variants =
                 resolved?.ssr?.variants ?? ['desktop'];
 
@@ -91,25 +94,37 @@ export async function processWidget(
                     },
                 );
 
-                const CONFIG = getConfig()
-
-                const result = await enqueueSsrGeneration({
-                    target: CONFIG.target,
-                    widget: widgetName,
-                    contract: contractResult,
-                    variant,
-                    outputFile: `${instanceName}/output.html`,
-                });
-
-                report.info(
-                    `SSR variant ${variant} generated`,
-                    {
-                        widget: instanceName,
-                        artifactPath: result.artifactPath,
-                    },
+                const localPath = getContractPath(widgetName, contractFile)
+                const generationInputs = await resolveGenerationInputs(
+                    contractResult,
+                    localPath
                 );
+
+                for (const input of generationInputs) {
+                    const result = await enqueueSsrGeneration({
+                        target: CONFIG.target,
+                        widget: widgetName,
+                        contract: input.contract,
+                        ...(input.key !== undefined && { key: input.key }),
+                        variant,
+                        outputFile: `${instanceName}/output${input.key !== undefined ? `-${input.key}` : ''}.html`,
+                    });
+
+                    report.info(
+                        `SSR variant ${variant} generated`,
+                        {
+                            widget: instanceName,
+                            artifactPath: result.artifactPath,
+                        },
+                    );
+                }
             }
         }
+
+        const {
+            entries: _entries,
+            ...manifestContract
+        } = contractResult;
 
         const manifest = {
             id: instanceName,
@@ -121,7 +136,7 @@ export async function processWidget(
                 strategy: resolved?.ssr?.strategy
             },
             integrity: registryResult.integrity,
-            contract: contractResult,
+            contract: manifestContract,
             contractFile
         };
 

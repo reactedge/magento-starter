@@ -114,6 +114,28 @@ export class WidgetActivity
         }
     }
 
+    public ready(): void {
+        const phase = 'widget-ready'
+        const payload: ActivityPayload = {
+            widget: this.widgetId,
+            instance: this.instance ?? this.widgetId,
+            phase,
+            message: 'The widget is now ready to take over the SSR',
+            level: 'info',
+            data: null,
+            ts: Date.now(),
+        };
+
+        if (this.isEnabled()) {
+            const prefix =
+                `[${this.widgetId}] ${phase}`;
+            // eslint-disable-next-line no-console
+            console.log(prefix, payload);
+        }
+
+        this.dispatchActivityEvent(payload);
+    }
+
     private dispatchActivityEvent(
         payload: ActivityPayload
     ): void {

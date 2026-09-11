@@ -5,7 +5,7 @@ import {WIDGET_ID} from "../Config.ts";
 
 export const renderHtml = (config: WidgetConfig): string => {
     return renderToString(
-        <div className={`reactedge-${WIDGET_ID}`}>
+        <div data-reactedge-ssr className={`reactedge-${WIDGET_ID}`}>
             <WidgetView contract={config}/>
         </div>
     );

@@ -4,7 +4,7 @@ export function getDebugTargets(): string[] | null {
     }
 
     const params = new URLSearchParams(window.location.search);
-    const value = params.get('re-debug');
+    const value = params.get('reactedge_debug');
 
     if (!value) return null;
 
