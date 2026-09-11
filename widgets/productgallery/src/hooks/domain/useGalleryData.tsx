@@ -1,8 +1,8 @@
 import { useMagentoGalleryData } from "../infra/useMagentoGalleryData.tsx";
 import { useMagentoGalleryByAttribute } from "../infra/useMagentoGalleryByAttribute.tsx";
-import type { BootstrapData } from "../../entrypoints/ssr.tsx";
 import { useSelectionState } from "../../state/Selection/useSelectionState.tsx";
 import type {GalleryTile} from "../../components/Types.ts";
+import type {BootstrapData} from "../../entrypoints/ssr.tsx";
 
 export function useGalleryData(
     sku: string,
@@ -15,7 +15,7 @@ export function useGalleryData(
         selection.code !== null &&
         selection.value !== null;
 
-    const shouldFetch = !initialData;
+    const shouldFetch = bootstrap === undefined;
 
     const {
         magentoGalleryData,
@@ -43,6 +43,10 @@ export function useGalleryData(
 
     const galleryData = mergeGalleryData(baseGalleryData, selectionLoading ? [] : selectedGalleryData);
 
+    const ready =
+        galleryData.length > 0 &&
+        !galleryLoading;
+
     return {
         galleryData,
 
@@ -57,6 +61,7 @@ export function useGalleryData(
             (hasSelection ? selectionError : null),
 
         refetch,
+        ready
     };
 }
 

@@ -14,13 +14,9 @@ export function WidgetComponent({
             userAgent: 'desktop'
         }}
 
-    const bootstrapData = {
-        galleryData: []
-    }
-
     return (
-        <div className={`reactedge-${WIDGET_ID}`}>
-            <WidgetView contract={contract} runtime={runtime} bootstrapData={bootstrapData}/>
+        <div data-reactedge-ssr className={`reactedge-${WIDGET_ID}`}>
+            <WidgetView contract={contract} runtime={runtime} />
         </div>
     );
 }

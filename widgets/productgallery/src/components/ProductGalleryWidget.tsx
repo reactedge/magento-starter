@@ -1,19 +1,27 @@
 import type {GalleryTile, WidgetConfig} from "./Types.ts";
 import {ProductTiledGallery} from "./ProductTiledGallery.tsx";
 import {ProductGallery} from "./ProductGallery.tsx";
-import {SpinnerOverlay} from "./global/SpinnerOverlay.tsx";
 import {useGalleryData} from "../hooks/domain/useGalleryData.tsx";
-import type {BootstrapData} from "../entrypoints/ssr.tsx";
 import {ProductImage} from "./ProductImage.tsx"
+import type {BootstrapData} from "../entrypoints/ssr.tsx";
+import {SpinnerOverlay} from "./global/SpinnerOverlay.tsx";
+import {useEffect} from "react";
 
 type Props = {
-    config: WidgetConfig
-    bootstrap?: BootstrapData
+    config: WidgetConfig;
+    bootstrap?: BootstrapData;
+    onReady?: () => void;
 };
 
-export const ProductGalleryWidget = ({ config, bootstrap }: Props) => {
-    const { galleryData, galleryError, galleryLoading } =
+export const ProductGalleryWidget = ({ config, bootstrap, onReady }: Props) => {
+    const { galleryData, galleryError, galleryLoading, ready } =
         useGalleryData(config.runtime.sku, bootstrap);
+
+    useEffect(() => {
+        if (ready) {
+            onReady?.();
+        }
+    }, [ready, onReady]);
 
     if (galleryLoading) return <SpinnerOverlay />;
     if (galleryError) return null; // if the connection to Magento fails, we fail silently

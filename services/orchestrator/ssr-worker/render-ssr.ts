@@ -42,16 +42,11 @@ const run = async () => {
         return;
     }
 
-    const { renderHtml, buildBootstrap, loadRuntime } = await import(entry);
+    const { renderHtml, loadRuntime } = await import(entry);
 
     if (loadRuntime) runtime = await loadRuntime()
-    const bootstrap =
-        buildBootstrap
-            ? await buildBootstrap(runtime)
-            : undefined;
 
-
-    const finalHtml = renderHtml(config, runtime, bootstrap)
+    const finalHtml = renderHtml(config, runtime)
 
     process.stdout.write(finalHtml);
 };
