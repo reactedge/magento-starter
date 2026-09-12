@@ -1,12 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import pkg from "./package.json";
+import pkg from "./package.json" with { type: "json" };
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
-import { manifestPlugin } from "../../packages/widget-build/shared-resources/widget-preset/manifestPlugin";
-import { createWidgetBuildDefaults } from "../../packages/widget-build/shared-resources/widget-preset/createReactEdgeConfig";
-import { reactEdgeVisualizer } from "../../packages/widget-build/shared-resources/widget-preset/reactEdgeVisualizer";
+import { manifestPlugin } from "../../packages/widget-build/shared-resources/widget-preset/manifestPlugin.ts";
+import { createWidgetBuildDefaults } from "../../packages/widget-build/shared-resources/widget-preset/createReactEdgeConfig.ts";
+import { reactEdgeVisualizer } from "../../packages/widget-build/shared-resources/widget-preset/reactEdgeVisualizer.ts";
 
 const isAnalyze = process.env.ANALYZE === "true";
 const widgetName = pkg.name.replace(/^widget-/, "");
@@ -43,6 +43,5 @@ export default defineConfig({
         widgetDir,
         `../../workspace/release/source/${widgetName}`
     ),
-    emitCss: false
   }),
 });

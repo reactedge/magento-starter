@@ -65,12 +65,7 @@ export function manifestPlugin({
             const newFileName =
                 `widget-${widgetName}@${hash}.iife.js`;
 
-            bundle[newFileName] = {
-                ...output,
-                fileName: newFileName
-            };
-
-            delete bundle[fileName];
+            output.fileName = newFileName;
 
             const manifest = {
                 widget: widgetName,

@@ -25,7 +25,6 @@ export function createWidgetBuildDefaults<TBuild>(
         },
         rollupOptions: {
             output: {
-                inlineDynamicImports: true,
                 assetFileNames: `widget-${widgetName}.[ext]`,
             },
         },
