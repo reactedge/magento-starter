@@ -5,9 +5,10 @@ export function createWidgetBuildDefaults<TBuild>(
         entry: string;
         outDir: string;
         emitCss?: boolean;
+        sourcemap?: boolean
     }
 ): TBuild {
-    const {widgetName, version, entry, outDir, emitCss } = options;
+    const {widgetName, version, entry, outDir, emitCss, sourcemap } = options;
 
     return {
         outDir,
@@ -29,7 +30,7 @@ export function createWidgetBuildDefaults<TBuild>(
             },
         },
         minify: true,
-        sourcemap: false
+        sourcemap: sourcemap?? false
     } as TBuild
 }
 

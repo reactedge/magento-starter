@@ -39,11 +39,15 @@ function isActiveItem(itemUrl: string | null, origin?: string): boolean {
         return false;
     }
 
-    const base =
-        origin ?? window.location.pathname;
+    const currentPath =
+        origin ??  (typeof window !== "undefined"
+            ? window.location.href
+            : undefined);
 
-    const currentPath = base;
-    
+    if (currentPath === undefined) {
+        return false;
+    }
+
     return normalisePath(itemUrl) === normalisePath(currentPath);
 }
 

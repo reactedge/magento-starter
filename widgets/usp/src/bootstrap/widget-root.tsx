@@ -13,9 +13,9 @@ export function WidgetRoot({
     return (
         <div className={`reactedge-${WIDGET_ID}`}>
             <ActivityContextProvider
-                {...(hostElement ? {hostElement} : {})}
+                {...(hostElement ? { hostElement } : {})}
             >
-                <WidgetWrapper contract={contract}/>
+                <WidgetWrapper contract={contract} />
             </ActivityContextProvider>
         </div>
     );
