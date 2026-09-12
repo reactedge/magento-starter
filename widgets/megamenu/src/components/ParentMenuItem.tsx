@@ -17,7 +17,7 @@ export function ParentMenuItem({
     const label = (
         <span
             className={[
-                "mw-parent-label",
+                "parent-label",
                 isActive && "is-active",
                 isBreadcrumb && "is-breadcrumb",
                 hasSubmenu && "has-submenu"
@@ -28,7 +28,7 @@ export function ParentMenuItem({
         >
             {item.label}
             {hasSubmenu && (
-                <span className="mw-parent-arrow" aria-hidden="true">
+                <span className="parent-arrow" aria-hidden="true">
                     ▼
                 </span>
             )}
@@ -39,12 +39,12 @@ export function ParentMenuItem({
         return (
             <a
                 href={item.url}
-                className="mw-parent-link"
+                className="parent-link"
             >
                 {label}
             </a>
         );
     }
 
-    return <div className="mw-parent-item">{label}</div>;
+    return <div className="parent-item">{label}</div>;
 }

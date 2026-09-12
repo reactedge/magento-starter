@@ -16,7 +16,6 @@ export function MenuTiled({ children }: MenuProps) {
                         key={level2.id}
                         className="megamenu-col__item"
                     >
-                        {/*<MenuTile key={level2.id} item={level2}/>*/}
                         <MenuItem item={level2}/>
                     </li>
                 ))}

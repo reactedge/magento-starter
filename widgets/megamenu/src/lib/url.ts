@@ -40,10 +40,10 @@ function isActiveItem(itemUrl: string | null, origin?: string): boolean {
     }
 
     const base =
-        origin ?? 'http://localhost';
+        origin ?? window.location.pathname;
 
     const currentPath = base;
-
+    
     return normalisePath(itemUrl) === normalisePath(currentPath);
 }
 
