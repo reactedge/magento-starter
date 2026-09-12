@@ -10,13 +10,13 @@ export function CtaItemLink({ url, label, icon }: CtaLinkProps) {
     return (
         <a
             href={url}
-            className="mw-cta-link"
+            className="cta-link"
         >
-            <span className="mw-cta-link__label">{label}</span>
+            <span className="cta-link__label">{label}</span>
 
             {icon && (
                 <span
-                    className="mw-cta-link__icon"
+                    className="cta-link__icon"
                     aria-hidden="true"
                 >
                     {icon && renderIcon(icon)}

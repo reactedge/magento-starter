@@ -8,17 +8,17 @@ export function MenuTile({ item }: MenuTileProps) {
     return (
         <a
             href={item.url}
-            className="mw-menu-tile"
+            className="menu-tile"
         >
             {item.image && (
                 <img
                     src={item.image}
                     alt={item.label}
-                    className="mw-menu-tile__image"
+                    className="menu-tile__image"
                 />
             )}
 
-            <span className="mw-menu-tile__label">
+            <span className="menu-tile__label">
                 {item.label}
             </span>
         </a>

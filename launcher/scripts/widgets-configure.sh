@@ -99,6 +99,11 @@ prompt \
     TARGET_ROOT \
     "/var/www/docker_mageos/magento"
 
+prompt \
+    "Is the environment a PHP environment (eg: Magento) - (0 or 1)" \
+    PHP_ENV \
+    "1"
+
 echo
 echo "External Services"
 echo "-----------------"
@@ -289,6 +294,7 @@ echo "✅ Configuration written to $CONFIG"
 cat > "$CONFIG" <<EOF
 STORE_CODE=$STORE_CODE
 SITEURL=$SITEURL
+PHP_ENV=$PHP_ENV
 TARGET_ROOT=$TARGET_ROOT
 SSR_ENABLED=$SSR_ENABLED
 SSR_PORT="${SSR_PORT:-}"
@@ -318,6 +324,7 @@ STORE_CODE=$STORE_CODE
 SITEURL=$SITEURL
 TARGET_ROOT=$TARGET_ROOT
 SSR_ENABLED=$SSR_ENABLED
+PHP_ENV=$PHP_ENV
 EOF
 
 cat > "$ROOT/browser-mcp/.env" <<EOF

@@ -9,7 +9,7 @@ export const ItemLink = ({ url, label, isInBreadcrumb }: ItemLinkProps) => {
     return (
         <a
             href={url}
-            className={`mw-link ${isInBreadcrumb ? "in-breadcrumb" : ""}`}
+            className={`link${isInBreadcrumb ? " in-breadcrumb" : ""}`}
         >
             {label}
         </a>

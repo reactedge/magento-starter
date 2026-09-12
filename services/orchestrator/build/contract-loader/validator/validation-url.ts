@@ -20,11 +20,10 @@ export function validateUrls(
         const hostname =
             new URL(url).hostname;
 
-        if (
-            !config.allowedHosts.includes(
-                hostname
-            )
-        ) {
+        if (!isAllowedUrl(url, {
+            allowedHosts: config.allowedHosts,
+            targetSiteUrl: config.targetSiteUrl
+        })) {
             issues.push({
                 code: 'invalid_host',
                 path: url,
@@ -35,4 +34,21 @@ export function validateUrls(
     }
 
     return issues;
+}
+
+function isAllowedUrl(
+    url: string,
+    config: {
+        allowedHosts: string[];
+        targetSiteUrl: string;
+    }
+): boolean {
+    const hostname = new URL(url).hostname;
+    const targetHostname =
+        new URL(config.targetSiteUrl).hostname;
+
+    return (
+        hostname === targetHostname ||
+        config.allowedHosts.includes(hostname)
+    );
 }

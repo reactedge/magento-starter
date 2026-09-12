@@ -27,6 +27,9 @@ export function loadConfig(
         ssrEnabled: process.env.SSR_ENABLED
             ? process.env.SSR_ENABLED === '1'
             : false,
+        phpEnv: process.env.PHP_ENV
+            ? process.env.PHP_ENV === '1'
+            : false,
     };
 }
 

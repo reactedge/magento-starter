@@ -45,7 +45,6 @@
 .usp-static-bar {
     display: flex;
     width: 100%;
-    padding: 2rem;
 
     background: #fff;
     border: 1px solid #e5e7eb;

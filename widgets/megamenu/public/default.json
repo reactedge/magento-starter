@@ -4,47 +4,47 @@
       {
         "id": "38",
         "label": "What's New",
-        "url": "https://mageos-docker.magsite.co.uk/what-is-new.html",
+        "url": "http://localhost:5173/what-is-new.html",
         "image": null,
         "children": []
       },
       {
         "id": "20",
         "label": "Women",
-        "url": "https://mageos-docker.magsite.co.uk/women.html",
+        "url": "http://localhost:5173/women.html",
         "image": null,
         "children": [
           {
             "id": "21",
             "label": "Tops",
-            "url": "https://mageos-docker.magsite.co.uk/women/tops-women.html",
+            "url": "http://localhost:5173/women/tops-women.html",
             "image": null,
             "children": [
               {
                 "id": "23",
                 "label": "Jackets",
-                "url": "https://mageos-docker.magsite.co.uk/women/tops-women/jackets-women.html",
+                "url": "http://localhost:5173/women/tops-women/jackets-women.html",
                 "image": null,
                 "children": []
               },
               {
                 "id": "24",
                 "label": "Hoodies & Sweatshirts",
-                "url": "https://mageos-docker.magsite.co.uk/women/tops-women/hoodies-and-sweatshirts-women.html",
+                "url": "http://localhost:5173/women/tops-women/hoodies-and-sweatshirts-women.html",
                 "image": null,
                 "children": []
               },
               {
                 "id": "25",
                 "label": "Tees",
-                "url": "https://mageos-docker.magsite.co.uk/women/tops-women/tees-women.html",
+                "url": "http://localhost:5173/women/tops-women/tees-women.html",
                 "image": null,
                 "children": []
               },
               {
                 "id": "26",
                 "label": "Bras & Tanks",
-                "url": "https://mageos-docker.magsite.co.uk/women/tops-women/tanks-women.html",
+                "url": "http://localhost:5173/women/tops-women/tanks-women.html",
                 "image": null,
                 "children": []
               }
@@ -53,20 +53,20 @@
           {
             "id": "22",
             "label": "Bottoms",
-            "url": "https://mageos-docker.magsite.co.uk/women/bottoms-women.html",
+            "url": "http://localhost:5173/women/bottoms-women.html",
             "image": null,
             "children": [
               {
                 "id": "27",
                 "label": "Pants",
-                "url": "https://mageos-docker.magsite.co.uk/women/bottoms-women/pants-women.html",
+                "url": "http://localhost:5173/women/bottoms-women/pants-women.html",
                 "image": null,
                 "children": []
               },
               {
                 "id": "28",
                 "label": "Shorts",
-                "url": "https://mageos-docker.magsite.co.uk/women/bottoms-women/shorts-women.html",
+                "url": "http://localhost:5173/women/bottoms-women/shorts-women.html",
                 "image": null,
                 "children": []
               }
@@ -77,40 +77,40 @@
       {
         "id": "11",
         "label": "Men",
-        "url": "https://mageos-docker.magsite.co.uk/men.html",
+        "url": "http://localhost:5173/men.html",
         "image": null,
         "children": [
           {
             "id": "12",
             "label": "Tops",
-            "url": "https://mageos-docker.magsite.co.uk/men/tops-men.html",
+            "url": "http://localhost:5173/men/tops-men.html",
             "image": null,
             "children": [
               {
                 "id": "14",
                 "label": "Jackets",
-                "url": "https://mageos-docker.magsite.co.uk/men/tops-men/jackets-men.html",
+                "url": "http://localhost:5173/men/tops-men/jackets-men.html",
                 "image": null,
                 "children": []
               },
               {
                 "id": "15",
                 "label": "Hoodies & Sweatshirts",
-                "url": "https://mageos-docker.magsite.co.uk/men/tops-men/hoodies-and-sweatshirts-men.html",
+                "url": "http://localhost:5173/men/tops-men/hoodies-and-sweatshirts-men.html",
                 "image": null,
                 "children": []
               },
               {
                 "id": "16",
                 "label": "Tees",
-                "url": "https://mageos-docker.magsite.co.uk/men/tops-men/tees-men.html",
+                "url": "http://localhost:5173/men/tops-men/tees-men.html",
                 "image": null,
                 "children": []
               },
               {
                 "id": "17",
                 "label": "Tanks",
-                "url": "https://mageos-docker.magsite.co.uk/men/tops-men/tanks-men.html",
+                "url": "http://localhost:5173/men/tops-men/tanks-men.html",
                 "image": null,
                 "children": []
               }
@@ -119,20 +119,20 @@
           {
             "id": "13",
             "label": "Bottoms",
-            "url": "https://mageos-docker.magsite.co.uk/men/bottoms-men.html",
+            "url": "http://localhost:5173/men/bottoms-men.html",
             "image": null,
             "children": [
               {
                 "id": "18",
                 "label": "Pants",
-                "url": "https://mageos-docker.magsite.co.uk/men/bottoms-men/pants-men.html",
+                "url": "http://localhost:5173/men/bottoms-men/pants-men.html",
                 "image": null,
                 "children": []
               },
               {
                 "id": "19",
                 "label": "Shorts",
-                "url": "https://mageos-docker.magsite.co.uk/men/bottoms-men/shorts-men.html",
+                "url": "http://localhost:5173/men/bottoms-men/shorts-men.html",
                 "image": null,
                 "children": []
               }
@@ -143,28 +143,28 @@
       {
         "id": "3",
         "label": "Gear",
-        "url": "https://mageos-docker.magsite.co.uk/gear.html",
+        "url": "http://localhost:5173/gear.html",
         "image": null,
         "children": [
           {
             "id": "4",
             "label": "Bags",
-            "url": "https://mageos-docker.magsite.co.uk/gear/bags.html",
-            "image": "https://mageos-docker.magsite.co.uk/media/catalog/category/bag.jpg",
+            "url": "http://localhost:5173/gear/bags.html",
+            "image": "media/catalog/category/bag.jpg",
             "children": []
           },
           {
             "id": "5",
             "label": "Fitness Equipment",
-            "url": "https://mageos-docker.magsite.co.uk/gear/fitness-equipment.html",
-            "image": "https://mageos-docker.magsite.co.uk/media/catalog/category/equipment.jpg",
+            "url": "http://localhost:5173/gear/fitness-equipment.html",
+            "image": "media/catalog/category/equipment.jpg",
             "children": []
           },
           {
             "id": "6",
             "label": "Watches",
-            "url": "https://mageos-docker.magsite.co.uk/gear/watches.html",
-            "image": "https://mageos-docker.magsite.co.uk/media/catalog/category/watches.jpg",
+            "url": "http://localhost:5173/gear/watches.html",
+            "image": "media/catalog/category/watches.jpg",
             "children": []
           }
         ]
@@ -172,13 +172,13 @@
       {
         "id": "9",
         "label": "Training",
-        "url": "https://mageos-docker.magsite.co.uk/training.html",
+        "url": "http://localhost:5173/training.html",
         "image": null,
         "children": [
           {
             "id": "10",
             "label": "Video Download",
-            "url": "https://mageos-docker.magsite.co.uk/training/training-video.html",
+            "url": "http://localhost:5173/training/training-video.html",
             "image": null,
             "children": []
           }
@@ -187,7 +187,7 @@
       {
         "id": "37",
         "label": "Sale",
-        "url": "https://mageos-docker.magsite.co.uk/sale.html",
+        "url": "http://localhost:5173/sale.html",
         "image": null,
         "children": []
       }
