@@ -50,6 +50,7 @@ export const WIDGET_ID = 'intentdiscovery';
  * required to render the captcha.
  *
  * @param contract - Widget contract supplied by the host platform.
+ * @param bootstrap - Widget bootstrap supplied by the host platform.
  * @param runtime - Runtime services supplied by the orchestrator.
  * @param activity - Activity logger for bootstrap events.
  * @returns An immutable Contact Us configuration.
@@ -57,6 +58,7 @@ export const WIDGET_ID = 'intentdiscovery';
  */
 export function readWidgetConfig(
     contract: unknown,
+    bootstrap: unknown,
     runtime: unknown,
     activity?: WidgetActivity
 ): WidgetConfig {
@@ -68,7 +70,10 @@ export function readWidgetConfig(
         activity?.log(
             'bootstrap',
             'Config resolved',
-            resolved
+            {
+                resolved,
+                bootstrap
+            }
         );
 
         return Object.freeze(resolved);

@@ -3,13 +3,12 @@ import {ProductTiledGallery} from "./ProductTiledGallery.tsx";
 import {ProductGallery} from "./ProductGallery.tsx";
 import {useGalleryData} from "../hooks/domain/useGalleryData.tsx";
 import {ProductImage} from "./ProductImage.tsx"
-import type {BootstrapData} from "../entrypoints/ssr.tsx";
 import {SpinnerOverlay} from "./global/SpinnerOverlay.tsx";
 import {useEffect} from "react";
 
 type Props = {
     config: WidgetConfig;
-    bootstrap?: BootstrapData;
+    bootstrap: GalleryTile[];
     onReady?: () => void;
 };
 

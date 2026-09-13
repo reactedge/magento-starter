@@ -6,12 +6,13 @@ import {SelectionStateProvider} from "../state/Selection/SelectionStateProvider.
 
 type Props = {
     contract: unknown,
+    bootstrap: unknown,
     runtime: unknown;
 }
 
-export default function WidgetWrapper({contract, runtime}: Props) {
+export default function WidgetWrapper({contract, bootstrap, runtime}: Props) {
     const activity = useActivityContext()
-    const config = readWidgetConfig(contract, runtime, activity);
+    const config = readWidgetConfig(contract, bootstrap, runtime, activity);
 
     if (!config) return null;
 
@@ -19,6 +20,7 @@ export default function WidgetWrapper({contract, runtime}: Props) {
             <SelectionStateProvider activity={activity}>
                 <ProductGalleryWidget
                     config={config}
+                    bootstrap={config.tiles}
                     onReady={() => activity.ready()}/>
             </SelectionStateProvider>
     </SystemStateProvider>

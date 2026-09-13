@@ -4,12 +4,14 @@ import WidgetWrapper from "./WidgetWrapper.tsx";
 
 interface WidgetRootProps {
     contract: unknown;
+    bootstrap: unknown;
     runtime: unknown;
     hostElement?: HTMLElement;
 }
 
 export function WidgetRoot({
    contract,
+   bootstrap,
    runtime,
    hostElement,
 }: WidgetRootProps) {
@@ -18,7 +20,7 @@ export function WidgetRoot({
             <ActivityContextProvider
                 {...(hostElement ? { hostElement } : {})}
             >
-                <WidgetWrapper contract={contract} runtime={runtime} />
+                <WidgetWrapper contract={contract} bootstrap={bootstrap} runtime={runtime} />
             </ActivityContextProvider>
         </div>
     );

@@ -3,6 +3,7 @@ import {UspWidget} from "./components/UspWidget.tsx";
 
 type Props = {
     contract?: unknown;
+    bootstrap?: unknown
 };
 
 export const WidgetView = ({ contract }: Props) => {

@@ -22,7 +22,6 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        inlineDynamicImports: true,
         assetFileNames: `widget-loader.[ext]`,
       },
     },
@@ -33,7 +32,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
     alias: {
       "@reactedge": resolve(
-          __dirname,
+          import.meta.dirname,
           "../../../packages/widget-build/shared-resources"
       ),
     },

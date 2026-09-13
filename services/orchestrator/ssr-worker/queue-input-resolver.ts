@@ -14,7 +14,7 @@ export function resolveGenerationInputs(
 
     if (!fs.existsSync(dataPath)) {
         return [{
-            contract,
+            contract
         }];
     }
 
@@ -24,10 +24,8 @@ export function resolveGenerationInputs(
 
     if (!generationData.entries?.length) {
         return [{
-            contract: {
-                ...contract,
-                ...generationData,
-            },
+            contract,
+            bootstrap: generationData
         }];
     }
 
@@ -48,14 +46,9 @@ export function resolveGenerationInputs(
         );
 
         return {
-            contract: {
-                data: {
-                    ...contract.data,
-                    images: data.images,
-                },
-                integration: contract.integration,
-            },
-            key: data.key,
+            contract: contract,
+            bootstrap: data,
+            key: entry.key
         }
     });
 }

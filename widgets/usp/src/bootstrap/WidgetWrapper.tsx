@@ -5,6 +5,7 @@ import {useActivityContext} from "../activity/Context/useActivityContext.ts";
 
 type Props = {
     contract?: unknown
+    bootstrap?: unknown
 };
 
 export const WidgetWrapper = ({ contract }: Props) => {

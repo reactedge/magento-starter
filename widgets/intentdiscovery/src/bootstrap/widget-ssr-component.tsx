@@ -23,7 +23,7 @@ export function WidgetComponent({
 
     return (
         <div className={`reactedge-${WIDGET_ID}`}>
-            <WidgetView contract={contract} runtime={runtime} bootstrapData={bootstrapData} />
+            <WidgetView contract={contract} runtime={runtime} bootstrap={bootstrapData} />
         </div>
     );
 }

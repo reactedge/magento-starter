@@ -12,7 +12,7 @@ export interface BootstrapData {
 export const renderHtml = (config: unknown, runtime: unknown, bootstrap: BootstrapData): string => {
     return renderToString(
         <div className={`reactedge-${WIDGET_ID}`}>
-            <WidgetView contract={config} runtime={runtime} bootstrapData={bootstrap} />
+            <WidgetView contract={config} runtime={runtime} bootstrap={bootstrap} />
         </div>
     );
 };

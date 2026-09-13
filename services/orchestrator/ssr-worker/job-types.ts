@@ -7,6 +7,7 @@ export type SsrGenerationRequest = {
     target: string; // this is to propagate the config inside the worker process
     widget: string;
     contract: unknown;
+    bootstrap: unknown;
     variant: string;
     key?: string;
 
@@ -33,5 +34,6 @@ export interface GenerationData {
 export interface GenerationInput {
     key?: string;
     contract: ContractResult;
+    bootstrap: unknown;
     data?: unknown;
 }

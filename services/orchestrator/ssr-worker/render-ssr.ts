@@ -18,13 +18,16 @@ const run = async () => {
         throw new Error('Missing variant');
     }
 
-    const contractJson = await readStdin();
+    const jsson = await readStdin();
 
-    if (!contractJson.trim()) {
+    if (!jsson.trim()) {
         throw new Error('Missing contract');
     }
 
-    const config = JSON.parse(contractJson);
+    const data = JSON.parse(jsson);
+
+    const config = data.contract;
+    const bootstrap = data.bootstrap;
 
     let runtime = {
         rendering: {
@@ -46,7 +49,7 @@ const run = async () => {
 
     if (loadRuntime) runtime = await loadRuntime()
 
-    const finalHtml = renderHtml(config, runtime)
+    const finalHtml = renderHtml(config, bootstrap, runtime)
 
     process.stdout.write(finalHtml);
 };

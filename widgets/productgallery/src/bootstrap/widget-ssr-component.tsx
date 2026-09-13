@@ -3,11 +3,13 @@ import {WidgetView} from "../WidgetView.tsx";
 
 interface WidgetRootProps {
     contract: unknown;
+    bootstrap: unknown;
     hostElement?: HTMLElement;
 }
 
 export function WidgetComponent({
-       contract
+       contract,
+       bootstrap
    }: WidgetRootProps) {
     const runtime = {
         rendering: {
@@ -16,7 +18,7 @@ export function WidgetComponent({
 
     return (
         <div data-reactedge-ssr className={`reactedge-${WIDGET_ID}`}>
-            <WidgetView contract={contract} runtime={runtime} />
+            <WidgetView contract={contract} bootstrap={bootstrap} runtime={runtime} />
         </div>
     );
 }
