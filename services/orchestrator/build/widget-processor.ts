@@ -16,6 +16,7 @@ import type { SsrViewMap } from "@reactedge/framework/contracts/buiild/WidgetSsr
 import { enqueueSsrGeneration } from "../ssr-worker/queue.ts"
 import { getConfig } from "../config.ts";
 import { resolveGenerationInputs } from "../ssr-worker/queue-input-resolver";
+import {getFilename} from "./util";
 
 export async function processWidget(
     instanceName: string,
@@ -70,7 +71,7 @@ export async function processWidget(
             );
         }
 
-        const contractFile = 'release.json'; //getFilename(registryResult.contract)
+        const contractFile = getFilename(registryResult.contract)
 
         const cssSsr = loadSsrCss(widgetName, registryResult.cssFilename)
 
@@ -105,9 +106,10 @@ export async function processWidget(
                         target: CONFIG.target,
                         widget: widgetName,
                         contract: input.contract,
+                        bootstrap: input.bootstrap,
                         ...(input.key !== undefined && { key: input.key }),
                         variant,
-                        outputFile: `${instanceName}/output${input.key !== undefined ? `-${input.key}` : ''}.html`,
+                        outputFile: `${instanceName}/output${input.key !== undefined ? `-${input.key}` : ''}.json`,
                     });
 
                     report.info(

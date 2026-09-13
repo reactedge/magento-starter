@@ -11,6 +11,7 @@ export interface WidgetApi {
     mount(
         element: HTMLElement,
         config: unknown,
+        bootstrap: unknown,
         runtimeConfig: unknown
     ): void;
 }

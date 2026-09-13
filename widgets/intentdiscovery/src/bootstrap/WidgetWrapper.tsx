@@ -8,13 +8,14 @@ import {IntentLookup} from "../components/IntentLookup.tsx"
 
 type Props = {
     contract: unknown,
+    bootstrap: unknown,
     runtime: unknown;
 }
 
-export default function WidgetWrapper({contract, runtime}: Props) {
+export default function WidgetWrapper({contract, bootstrap, runtime}: Props) {
     const activity = useActivityContext()
     const [bootReady, setBootReady] = useState(false);
-    const config = readWidgetConfig(contract, runtime, activity);
+    const config = readWidgetConfig(contract, bootstrap, runtime, activity);
 
     useEffect(() => {
         if (!config) return;

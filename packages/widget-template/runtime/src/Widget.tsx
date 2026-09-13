@@ -5,11 +5,12 @@ import type {RuntimeWidgetOptions} from "@reactedge/public-api/WidgetOptions.ts"
 export function Widget({
    container,
    contract,
+   bootstrap,
    runtime,
    hydrate = false,
 }: RuntimeWidgetOptions) {
     const element = (
-        <WidgetRoot contract={contract} runtime={runtime} />
+        <WidgetRoot contract={contract} bootstrap={bootstrap} runtime={runtime} />
     );
 
     if (hydrate) {

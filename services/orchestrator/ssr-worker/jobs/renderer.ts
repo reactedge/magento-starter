@@ -5,6 +5,7 @@ import { ReactEdgeRoot } from "@reactedge/filesystem/reactedgeRoot"
 type ExecuteRendererInput = {
     widgetName: string;
     contract: unknown;
+    bootstrap: unknown;
     variant: string;
 };
 
@@ -85,7 +86,10 @@ export function executeRenderer(
         );
 
         child.stdin?.end(
-            JSON.stringify(input.contract)
+            JSON.stringify({
+                contract: input.contract,
+                bootstrap: input.bootstrap,
+            })
         );
     });
 }

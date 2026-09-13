@@ -1,6 +1,7 @@
 export interface StaticWidgetOptions {
     container: HTMLElement;
     contract: unknown;
+    bootstrap: unknown;
     hydrate?: boolean;
 }
 

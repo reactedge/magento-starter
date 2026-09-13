@@ -7,6 +7,7 @@ async function main() {
     const loader = new ResourceLoader();
     const activity = new WidgetActivity(WIDGET_ID)
     const contract = await loader.loadContract("default.json");
+    const bootstrap = await loader.loadContract("data.json");
     const runtime = await loader.loadRuntime();
 
     const container = document.getElementById("root")!;
@@ -16,6 +17,7 @@ async function main() {
     if (mode === "hydrate") {
         activity.debug("Hydrating existing HTML", {
             contract,
+            bootstrap,
             runtime,
             html: container.innerHTML
         });
@@ -27,6 +29,7 @@ async function main() {
         Widget({
             container,
             contract,
+            bootstrap,
             runtime,
             hydrate: true
         });
@@ -34,6 +37,7 @@ async function main() {
         Widget({
             container,
             contract,
+            bootstrap,
             runtime,
             hydrate: false
         });

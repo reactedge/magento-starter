@@ -128,6 +128,7 @@ export async function mountWidget(el: HTMLElement) {
     const mod = await loadScript(type);
 
     if (mod?.mount) {
+        const bootstrap = getBootstrap(el);
         const runtimeConfig = buildRuntimeConfig()
 
         const debugMode = getDebugMode();
@@ -156,9 +157,9 @@ export async function mountWidget(el: HTMLElement) {
 
         if (entry.contract !== null) {
             const contract = entry.contract ? stripMeta(entry.contract) : null;
-            mod.mount(el, contract, runtimeConfig);
+            mod.mount(el, contract, bootstrap, runtimeConfig);
         } else {
-            mod.mount(el, null, runtimeConfig);
+            mod.mount(el, null, bootstrap, runtimeConfig);
         }
     }
 }
@@ -220,6 +221,29 @@ function getWidgetType(el: HTMLElement): string | null {
     }
 
     return tag.slice(0, -"-widget".length);
+}
+
+function getBootstrap(
+    host: HTMLElement
+): unknown {
+    const element = host.querySelector(
+        ':scope > script[data-reactedge-bootstrap]'
+    );
+
+    if (!element?.textContent) {
+        return undefined;
+    }
+
+    try {
+        return JSON.parse(element.textContent);
+    } catch (error) {
+        activity.log('bootstrap',
+            'Invalid ReactEdge bootstrap data', {
+                error
+            });
+
+        return undefined;
+    }
 }
 
 export function scheduleWidgets() {

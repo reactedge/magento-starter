@@ -7,6 +7,7 @@ async function main() {
     const loader = new ResourceLoader();
     const activity = new WidgetActivity(WIDGET_ID)
     const contract = await loader.loadContract("default.json");
+    const bootstrap = await loader.loadContract("data.json");
     const container = document.getElementById("root")!;
 
     const mode = __REACTEDGE_MODE__;
@@ -24,12 +25,14 @@ async function main() {
         Widget({
             container,
             contract,
+            bootstrap,
             hydrate: true
         });
     } else {
         Widget({
             container,
             contract,
+            bootstrap,
             hydrate: false
         });
     }

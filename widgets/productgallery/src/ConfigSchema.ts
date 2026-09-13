@@ -34,9 +34,9 @@ const GallerySettingsSchema = z.discriminatedUnion("mode", [
 
 export const WidgetConfigSchema = z.object({
     data: z.object({
-        images: z.array(ProductGalleryImageSchema),
-        settings: GallerySettingsSchema
+        images: z.array(ProductGalleryImageSchema)
     }),
+    settings: GallerySettingsSchema,
     integration: z.object({
         requires: z.array(IntegrationSchema)
     }).optional()

@@ -8,11 +8,12 @@ import {useEffect} from "react";
 
 type Props = {
     contract?: unknown
+    bootstrap?: unknown
 }
 
-export function WidgetWrapper({contract}: Props) {
+export function WidgetWrapper({contract, bootstrap}: Props) {
     const activity = useActivityContext()
-    const config = readWidgetConfig(contract, activity);
+    const config = readWidgetConfig(contract, bootstrap, activity);
     const isMobile = useMediaQuery('(max-width: 768px)');
 
     useEffect(() => {

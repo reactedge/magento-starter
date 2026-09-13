@@ -23,17 +23,28 @@ export interface WidgetConfig {
  * runtime integrations.
  *
  * @param contract - Widget contract supplied by the host platform.
+ * @param bootstrap - Widget bootstrap supplied by the host platform.
  * @param activity - Optional activity logger used during bootstrap.
  * @returns An immutable widget configuration.
  * @throws When the widget contract is invalid.
  */
 export function readWidgetConfig(
     contract: unknown,
+    bootstrap: unknown,
     activity?: WidgetActivity
 ): WidgetConfig {
     try {
-        const parsedContract = parseConfig(contract);
-        const resolved = resolvedWidgetConfig(parsedContract)
+        const effectiveContract = {
+            ...(contract as object),
+            data: {
+                items: bootstrap
+            }
+        };
+
+        const parsedContract = parseConfig(effectiveContract);
+        const resolved = resolvedWidgetConfig(
+            parsedContract
+        );
 
         activity?.log(
             'bootstrap',

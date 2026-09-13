@@ -5,10 +5,11 @@ import type {StaticWidgetOptions} from "@reactedge/public-api/WidgetOptions.ts";
 export function Widget({
        container,
        contract,
+       bootstrap,
        hydrate = false,
    }: StaticWidgetOptions) {
     const element = (
-        <WidgetRoot contract={contract} />
+        <WidgetRoot contract={contract} bootstrap={bootstrap} />
     );
 
     if (hydrate) {

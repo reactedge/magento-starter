@@ -1,31 +1,16 @@
-import { useMagentoGalleryData } from "../infra/useMagentoGalleryData.tsx";
 import { useMagentoGalleryByAttribute } from "../infra/useMagentoGalleryByAttribute.tsx";
 import { useSelectionState } from "../../state/Selection/useSelectionState.tsx";
 import type {GalleryTile} from "../../components/Types.ts";
-import type {BootstrapData} from "../../entrypoints/ssr.tsx";
 
 export function useGalleryData(
     sku: string,
-    bootstrap?: BootstrapData
+    bootstrap: GalleryTile[]
 ) {
-    const { selection} = useSelectionState();
-    const initialData = bootstrap?.galleryData;
+    const { selection } = useSelectionState();
 
     const hasSelection =
         selection.code !== null &&
         selection.value !== null;
-
-    const shouldFetch = bootstrap === undefined;
-
-    const {
-        magentoGalleryData,
-        loading: galleryLoading,
-        error: galleryError,
-        refetch,
-    } = useMagentoGalleryData(
-        shouldFetch,
-        sku
-    );
 
     const {
         magentoGalleryData: selectedGalleryData,
@@ -38,29 +23,25 @@ export function useGalleryData(
         selection.value
     );
 
-    const baseGalleryData =
-        initialData ?? magentoGalleryData;
-
-    const galleryData = mergeGalleryData(baseGalleryData, selectionLoading ? [] : selectedGalleryData);
+    const galleryData = mergeGalleryData(
+        bootstrap,
+        selectionLoading ? [] : selectedGalleryData
+    );
 
     const ready =
-        galleryData.length > 0 &&
-        !galleryLoading;
+        galleryData.length > 0;
 
     return {
         galleryData,
 
-        galleryLoading:
-            shouldFetch && galleryLoading,
+        galleryLoading: false,
 
         galleryUpdating:
             hasSelection && selectionLoading,
 
         galleryError:
-            (shouldFetch ? galleryError : null) ??
-            (hasSelection ? selectionError : null),
+            hasSelection ? selectionError : null,
 
-        refetch,
         ready
     };
 }

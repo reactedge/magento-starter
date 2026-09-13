@@ -5,20 +5,19 @@ import {ProductGalleryWidget} from "./components/ProductGalleryWidget.tsx";
 
 type Props = {
     contract: unknown;
+    bootstrap: unknown;
     runtime: unknown;
 };
 
-export const WidgetView = ({ contract, runtime }: Props) => {
+export const WidgetView = ({ contract, bootstrap, runtime }: Props) => {
 
-    const config = readWidgetConfig(contract, runtime);
+    const config = readWidgetConfig(contract, bootstrap, runtime);
 
     if (!config) return null;
 
-    const bootstrapData = {galleryData : config.tiles}
-
     return <SystemStateProvider config={config.integrations} runtime={config.runtime} >
         <SelectionStateProvider>
-            <ProductGalleryWidget config={config} bootstrap={bootstrapData} />
+            <ProductGalleryWidget config={config} bootstrap={config.tiles} />
         </SelectionStateProvider>
     </SystemStateProvider>
 };

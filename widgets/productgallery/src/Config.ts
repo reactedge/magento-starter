@@ -19,6 +19,7 @@ export const WIDGET_ID = 'productgallery';
  * required to render the captcha.
  *
  * @param contract - Widget contract supplied by the host platform.
+ * @param bootstrap - Widget bootstrap supplied by the host platform.
  * @param runtime - Runtime services supplied by the orchestrator.
  * @param activity - Activity logger for bootstrap events.
  * @returns An immutable Contact Us configuration.
@@ -26,11 +27,19 @@ export const WIDGET_ID = 'productgallery';
  */
 export function readWidgetConfig(
     contract: unknown,
+    bootstrap: unknown,
     runtime: unknown,
     activity?: WidgetActivity
 ): WidgetConfig {
     try {
-        const parsedContract = parseConfig(contract);
+        const effectiveContract = {
+            ...(contract as object),
+            data: {
+                images: bootstrap
+            }
+        };
+
+        const parsedContract = parseConfig(effectiveContract);
         const parsedRuntime = parseRuntimeConfig(runtime)
         const resolved = resolveConfig(parsedContract, parsedRuntime);
 
@@ -60,7 +69,7 @@ export function resolveConfig(
 ): WidgetConfig {
     return {
         tiles: widget.data.images,
-        settings: widget.data.settings,
+        settings: widget.settings,
         runtime: {
             storeCode: runtime.context.storeCode,
             sku: runtime.context.sku

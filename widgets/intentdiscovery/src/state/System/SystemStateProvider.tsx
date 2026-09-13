@@ -7,14 +7,12 @@ import type { ResolvedRuntimeConfig } from "../../types/domain/intent-discovery.
 import { createGraphqlService } from "@reactedge/framework/graphql/graphql.service.ts";
 import { createIntentEngine } from "../../integration/intent/IntentEngine.ts";
 import { createIntentApiClient } from "../../integration/intent/intentApiClient.ts";
-import type { BootstrapData } from "../../entrypoints/ssr.tsx"
 
 interface SystemStateProviderProps {
     children: ReactNode;
     config: ResolvedConfigIntegrations;
     runtime: ResolvedRuntimeConfig;
     activity?: WidgetActivity;
-    bootstrap?: BootstrapData | undefined;
 }
 
 const LocalStateProvider = LocalSystemStateContext.Provider;
@@ -23,8 +21,7 @@ export const SystemStateProvider: React.FC<SystemStateProviderProps> = ({
     children,
     config,
     runtime,
-    activity,
-    bootstrap
+    activity
 }) => {
     if (!config?.magentoGraphql?.api) {
         throw new Error('GraphQL client cannot be created without API endpoint');
@@ -64,8 +61,7 @@ export const SystemStateProvider: React.FC<SystemStateProviderProps> = ({
         <LocalStateProvider
             value={{
                 graphqlClient,
-                intentEngine,
-                bootstrap
+                intentEngine
             }}
         >
             {children}

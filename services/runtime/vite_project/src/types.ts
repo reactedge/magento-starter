@@ -4,6 +4,7 @@ export interface WidgetModule {
     mount(
         container: HTMLElement,
         contract: unknown,
+        bootstrap: unknown,
         runtime: unknown
     ): void | Promise<void>;
 }

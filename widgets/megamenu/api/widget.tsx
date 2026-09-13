@@ -8,7 +8,8 @@ import {WidgetRoot} from "../src/bootstrap/widget-root.tsx";
 
 const mount = (
     el: HTMLElement,
-    contract: unknown
+    contract: unknown,
+    bootstrap: unknown
 ) => {
     const hostProvider = new ElementHostProvider(WIDGET_ID)
 
@@ -16,6 +17,7 @@ const mount = (
         <WidgetRoot
             hostElement={el}
             contract={contract}
+            bootstrap={bootstrap}
         />
     )
 };
