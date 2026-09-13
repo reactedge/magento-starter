@@ -1,20 +1,21 @@
 import {WidgetRoot} from "./bootstrap/widget-root.tsx";
-import {createRoot, hydrateRoot} from "react-dom/client";
+import {createRoot} from "react-dom/client";
 import type {RuntimeWidgetOptions} from "@reactedge/public-api/WidgetOptions.ts";
+import { styles } from "./styles/entry.ts";
+import {ShadowHostProvider} from "@reactedge/framework/host.ts";
 
 export function Widget({
    container,
    contract,
-   runtime,
-   hydrate = false,
+   runtime
 }: RuntimeWidgetOptions) {
-    const element = (
-        <WidgetRoot contract={contract} runtime={runtime} />
-    );
+    const hostProvider = new ShadowHostProvider(styles);
+    const host = hostProvider.getMountedHost(container);
 
-    if (hydrate) {
-        hydrateRoot(container, element);
-    } else {
-        createRoot(container).render(element);
-    }
+    createRoot(host).render(
+        <WidgetRoot
+            contract={contract}
+            runtime={runtime}
+        />
+    );
 }
