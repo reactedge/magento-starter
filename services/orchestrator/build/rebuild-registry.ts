@@ -6,7 +6,7 @@ import { Report } from "./report.ts";
 import { resolveWidgets } from './rebuild-registry/registry-loader.ts';
 import { processWidget } from './widget-processor.ts';
 import { runCiVerification } from "../test/playwright-verification.ts";
-import type {BuildWidgetRegistry} from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
+import type { BuildWidgetRegistry } from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
 
 export async function rebuildRegistry(
     selectedWidgets: string[],
