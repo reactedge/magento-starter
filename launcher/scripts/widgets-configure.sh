@@ -3,44 +3,6 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-CONFIG="$ROOT/.env"
-
-echo "Preparing ReactEdge workspace..."
-
-# Initialise root environment configuration.
-if [[ ! -f "$CONFIG" ]]; then
-    if [[ ! -f "$ROOT/.env.sample" ]]; then
-        echo "❌ Missing .env.sample"
-        exit 1
-    fi
-
-    cp "$ROOT/.env.sample" "$CONFIG"
-    echo "✓ Created .env from .env.sample"
-fi
-
-# Initialise workspace.
-if [[ ! -f "$ROOT/workspace/registry.json" ]]; then
-    if [[ ! -d "$ROOT/workspace.sample" ]]; then
-        echo "❌ Missing workspace.sample"
-        exit 1
-    fi
-
-    mkdir -p "$ROOT/workspace"
-    cp -R "$ROOT/workspace.sample/." "$ROOT/workspace/"
-    echo "✓ Created workspace from workspace.sample"
-fi
-
-echo
-
-if [[ -f "$CONFIG" ]]; then
-    # Load existing configuration
-    set -a
-    source "$CONFIG"
-    set +a
-fi
-
-echo "ReactEdge Configuration"
-echo
 
 prompt() {
     local label="$1"
@@ -59,6 +21,57 @@ prompt() {
         printf -v "$var" "%s" "${value:-$default}"
     fi
 }
+
+echo
+echo "========================================"
+echo "ReactEdge Configuration"
+echo "========================================"
+echo
+echo "Press ENTER to accept the default value."
+echo
+
+echo "Environment"
+echo "-----------"
+
+prompt \
+    "Store Code" \
+    STORE_CODE \
+    "default"
+
+
+CONFIG="$ROOT/.env.${STORE_CODE}"
+
+echo "Preparing ReactEdge workspace..."
+
+# Initialise root environment configuration.
+if [[ ! -f "$CONFIG" ]]; then
+    if [[ ! -f "$ROOT/.env.sample" ]]; then
+        echo "❌ Missing .env.sample"
+        exit 1
+    fi
+
+    cp "$ROOT/.env.sample" "$CONFIG"
+    echo "✓ Created .env from .env.sample"
+fi
+
+echo
+
+if [[ -f "$CONFIG" ]]; then
+    # Load existing configuration
+    set -a
+    source "$CONFIG"
+    set +a
+fi
+
+echo
+echo "Platform"
+echo "--------"
+echo "Configure the website where ReactEdge will run."
+
+prompt \
+    "Site URL" \
+    SITEURL \
+    "https://mageos-docker.magsite.co.uk"
 
 echo "========================================"
 echo "ReactEdge Configuration"
@@ -79,20 +92,20 @@ echo
 #read -rp "Category [tops-men]: " CATEGORY
 #CATEGORY=${CATEGORY:-tops-men}
 
-echo
-echo "Platform"
-echo "--------"
-echo "Configure the website where ReactEdge will run."
+# Initialise store workspace.
+STORE_WORKSPACE="$ROOT/workspace/$STORE_CODE"
 
-prompt \
-    "Site URL" \
-    SITEURL \
-    "https://mageos-docker.magsite.co.uk"
+if [[ ! -f "$STORE_WORKSPACE/registry.json" ]]; then
+    if [[ ! -d "$ROOT/workspace.sample" ]]; then
+        echo "❌ Missing workspace.sample"
+        exit 1
+    fi
 
-prompt \
-    "Store Code" \
-    STORE_CODE \
-    "default"
+    mkdir -p "$STORE_WORKSPACE"
+    cp -R "$ROOT/workspace.sample/default/." "$STORE_WORKSPACE/"
+
+    echo "✓ Created workspace for store '$STORE_CODE' from workspace.sample"
+fi
 
 prompt \
     "Platform root directory" \
@@ -195,15 +208,8 @@ prompt \
     "1"
 
 if [[ "$SSR_ENABLED" == "1" ]]; then
-    prompt \
-        "SSR port" \
-        SSR_PORT \
-        "4000"
-
-    prompt \
-        "SSR base URL" \
-        SSR_BASE_URL \
-        "https://widgets-ssr.co.uk"
+    SSR_PORT="4000"
+    SSR_BASE_URL="https://widgets-ssr.co.uk"
 fi
 
 echo
@@ -319,14 +325,21 @@ ALLOW_SELF_SIGNED_SSL=$ALLOW_SELF_SIGNED_SSL
 OTEL_HOST=$OTEL_HOST
 EOF
 
-cat > "$ROOT/services/orchestrator/.env.dev" <<EOF
+cat > "$ROOT/services/orchestrator/.env.${STORE_CODE}" <<EOF
 STORE_CODE=$STORE_CODE
 SITEURL=$SITEURL
 TARGET_ROOT=$TARGET_ROOT
 SSR_ENABLED=$SSR_ENABLED
 PHP_ENV=$PHP_ENV
+ALLOWED_HOSTS=""
 EOF
 
-cat > "$ROOT/browser-mcp/.env" <<EOF
+cat > "$ROOT/mcp/.env.${STORE_CODE}" <<EOF
+STORE_CODE=$STORE_CODE
+SITEURL=$SITEURL
+ALLOWED_HOSTS=""
+EOF
+
+cat > "$ROOT/browser-mcp/.env.${STORE_CODE}" <<EOF
 SITEURL=$SITEURL
 EOF
