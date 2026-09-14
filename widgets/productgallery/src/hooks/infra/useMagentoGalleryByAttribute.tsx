@@ -3,13 +3,11 @@ import { useSystemState } from "../../state/System/useSystemState.ts";
 import type { GalleryTile } from "../../components/Types.ts";
 import { getError } from "../../lib/error.ts";
 import { fetchMagentoGalleryByAttributeData } from "../../services/magento/fetchMagentoGalleryByAttributeData.tsx";
-import {useSelectionState} from "../../state/Selection/useSelectionState.tsx";
 
 export function useMagentoGalleryByAttribute(enabled: boolean, sku: string, attributeCode: string | null, attributeValue: string | null) {
     const [data, setData] = useState<GalleryTile[]>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
-    const {setSelectionLoading} = useSelectionState()
 
     const { graphqlClient } = useSystemState();
 
@@ -19,9 +17,7 @@ export function useMagentoGalleryByAttribute(enabled: boolean, sku: string, attr
         }
 
         setLoading(true);
-        setSelectionLoading(true)
         setError(null);
-        setData(undefined);
 
         try {
             const result = await fetchMagentoGalleryByAttributeData(graphqlClient, sku, attributeCode, attributeValue);
@@ -30,9 +26,8 @@ export function useMagentoGalleryByAttribute(enabled: boolean, sku: string, attr
             setError(getError(err));
         } finally {
             setLoading(false);
-            setSelectionLoading(false)
         }
-    }, [enabled, sku, graphqlClient,  attributeCode, attributeValue, setSelectionLoading]);
+    }, [enabled, sku, graphqlClient,  attributeCode, attributeValue]);
 
     useEffect(() => {
         void load();

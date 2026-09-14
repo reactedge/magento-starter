@@ -18,12 +18,13 @@
 
     const loader = new ResourceLoader();
     const contract = await loader.loadContract("default.json");
+    const bootstrap = await loader.loadContract("data.json");
     const runtime = await loader.loadRuntime();
 
     const element = document.querySelector('productgallery-widget');
 
     await requestAnimationFrame(() => {
-        mount(element, contract, runtime);
+        mount(element, contract, bootstrap, runtime);
     })
 </script>
 

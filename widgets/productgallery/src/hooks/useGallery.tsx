@@ -1,15 +1,15 @@
-import {useState, useEffect} from "react";
-import type {GalleryTile} from "../components/Types.ts";
+import { useState, useEffect } from "react";
+import type { GalleryTile } from "../components/Types.ts";
 
-export function useGallery(images: GalleryTile[], selection: string | null) {
+export function useGallery(images: GalleryTile[]) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [zoomed, setZoomed] = useState(false);
 
     useEffect(() => {
-        if (selection === null) return;
+        if (images.length === 0) return;
 
         setActiveIndex(images.length - 1);
-    }, [images, selection]);
+    }, [images]);
 
     const previous = () => {
         setActiveIndex((index) =>

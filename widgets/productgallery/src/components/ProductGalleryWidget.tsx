@@ -3,42 +3,47 @@ import {ProductTiledGallery} from "./ProductTiledGallery.tsx";
 import {ProductGallery} from "./ProductGallery.tsx";
 import {useGalleryData} from "../hooks/domain/useGalleryData.tsx";
 import {ProductImage} from "./ProductImage.tsx"
-import {SpinnerOverlay} from "./global/SpinnerOverlay.tsx";
-import {useEffect} from "react";
+import {mergeGalleryData} from "../lib/merge-array.ts";
+import { useMemo } from "react";
 
 type Props = {
     config: WidgetConfig;
     bootstrap: GalleryTile[];
-    onReady?: () => void;
 };
 
-export const ProductGalleryWidget = ({ config, bootstrap, onReady }: Props) => {
-    const { galleryData, galleryError, galleryLoading, ready } =
-        useGalleryData(config.runtime.sku, bootstrap);
+export const ProductGalleryWidget = ({ config, bootstrap }: Props) => {
+    const { galleryData, galleryError } =
+        useGalleryData(config.runtime.sku);
 
-    useEffect(() => {
-        if (ready) {
-            onReady?.();
-        }
-    }, [ready, onReady]);
+    const finalGalleryData = useMemo(
+        () => {
+            if (galleryData === undefined) {
+                return bootstrap;
+            }
 
-    if (galleryLoading) return <SpinnerOverlay />;
+            return mergeGalleryData(
+                bootstrap,
+                galleryData
+            );
+        },
+        [bootstrap, galleryData]
+    );
+
     if (galleryError) return null; // if the connection to Magento fails, we fail silently
-    if (!galleryData) return null;
 
-    if (galleryData.length === 1) {
+    if (finalGalleryData.length === 1) {
         return (
-            <ProductImage image={galleryData[0] as GalleryTile} />
+            <ProductImage image={finalGalleryData[0] as GalleryTile} />
         );
     }
 
     return (
         <div>
             {config.settings.mode === "tile" ? <ProductTiledGallery
-                    tiles={galleryData}
+                    tiles={finalGalleryData}
                     maxColumns={config.settings.maxColumns}
                 />
-                : <ProductGallery tiles={galleryData} />}
+                : <ProductGallery tiles={finalGalleryData} />}
         </div>
     );
 };
