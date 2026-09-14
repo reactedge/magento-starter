@@ -258,5 +258,5 @@ development tools to MCP-compatible clients.
 Start the server with:
 
 ```bash
-npx @modelcontextprotocol/inspector npx tsx mcp/server.ts
-npx @modelcontextprotocol/inspector npx tsx browser-mcp/server.ts
+npx @modelcontextprotocol/inspector npx tsx mcp/server.ts default
+npx @modelcontextprotocol/inspector npx tsx browser-mcp/server.ts default
