@@ -23,29 +23,6 @@ export async function loadContract(
         const content = fs.readFileSync(localPath, 'utf-8');
         contract = JSON.parse(content) as ContractWrapper
         contract = wrapContract(contract)
-
-        const issues = await validateContract(
-            widgetName,
-            contract,
-            manifestContract
-        );
-        report.info(
-            '✔ Loaded local contract',
-            {
-                contractFile: contractFile
-            }
-        );
-
-        for (const issue of issues) {
-            report.error(
-                'Validation issue detected',
-                {
-                    code: issue.code,
-                    path: issue.path,
-                    message: issue.message
-                }
-            );
-        }
     }
 
     if (!contract) {

@@ -2,6 +2,8 @@ import type { SsrGenerationRequest, SsrGenerationResult } from "../job-types";
 import { executeRenderer } from "./renderer.ts"
 import { getSsrArtifactPath } from "../../build/paths.ts"
 import { writeAtomicFile } from "../../build/util.ts"
+import path from "node:path";
+import { mkdir } from "node:fs/promises";
 
 type WriteSsrArtifactInput = {
     outputFile: string;
@@ -54,6 +56,10 @@ export async function writeSsrArtifact(
     const artifactPath = getSsrArtifactPath(
         input.outputFile,
     );
+
+    await mkdir(path.dirname(artifactPath), {
+        recursive: true,
+    });
 
     const content = JSON.stringify({
         html: input.html,
