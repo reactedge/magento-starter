@@ -21,7 +21,7 @@ export default function WidgetWrapper({contract, bootstrap, runtime}: Props) {
                 <ProductGalleryWidget
                     config={config}
                     bootstrap={config.tiles}
-                    onReady={() => activity.ready()}/>
+                />
             </SelectionStateProvider>
     </SystemStateProvider>
 }

@@ -2,7 +2,6 @@ import type {GalleryTile} from "./Types.ts";
 import {ZoomView} from "./ProductTiledGallery/ZoomView.tsx";
 import {useGallery} from "../hooks/useGallery.tsx";
 import {TileGrid} from "./ProductTiledGallery/TileGrid.tsx";
-import {useSelectionState} from "../state/Selection/useSelectionState.tsx";
 
 interface ProductTiledGalleryProps {
     tiles: GalleryTile[];
@@ -10,8 +9,7 @@ interface ProductTiledGalleryProps {
 }
 
 export const ProductTiledGallery = ({tiles, maxColumns}: ProductTiledGalleryProps) => {
-    const {selection} = useSelectionState();
-    const gallery = useGallery(tiles, selection.value);
+    const gallery = useGallery(tiles);
 
     if (tiles.length === 0) return null;
 

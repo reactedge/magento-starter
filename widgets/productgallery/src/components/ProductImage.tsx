@@ -4,6 +4,12 @@ interface ProductImageProps {
     image: GalleryTile;
 }
 
+/**
+ * This is the main image in the use case the gallery has only 1 image
+ *
+ * @param image
+ * @constructor
+ */
 export const ProductImage = ({ image }: ProductImageProps) => (
     <img
         src={image.src}
