@@ -7,31 +7,33 @@ type SpinnerProps = {
 export function Dummy({ size = 480 }: SpinnerProps) {
 
     return (
-        <svg
-            width={size}
-            height={size}
-            viewBox="0 0 50 50"
-            aria-hidden="true"
-        >
-            <circle
-                cx="25"
-                cy="25"
-                r="20"
-                fill="none"
-                stroke="red"
-                strokeWidth="2"
-                strokeDasharray="20 80"
-                strokeLinecap="round"
+        <div className="product-gallery__dummy">
+            <svg
+                width={size}
+                height={size}
+                viewBox="0 0 50 50"
+                aria-hidden="true"
             >
-                <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    from="0 25 25"
-                    to="360 25 25"
-                    dur="0.8s"
-                    repeatCount="indefinite"
-                />
-            </circle>
-        </svg>
+                <circle
+                    cx="25"
+                    cy="25"
+                    r="20"
+                    fill="none"
+                    stroke="red"
+                    strokeWidth="2"
+                    strokeDasharray="20 80"
+                    strokeLinecap="round"
+                >
+                    <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from="0 25 25"
+                        to="360 25 25"
+                        dur="0.8s"
+                        repeatCount="indefinite"
+                    />
+                </circle>
+            </svg>
+        </div>
     );
 }

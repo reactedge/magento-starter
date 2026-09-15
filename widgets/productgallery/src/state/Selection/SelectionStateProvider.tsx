@@ -4,6 +4,7 @@ import {
 } from "./SelectionState.tsx";
 import type { SelectionState } from "./type.ts";
 import type {WidgetActivity} from "@reactedge/framework/activity";
+import type {GalleryTile} from "../../components/Types.ts";
 
 interface SelectionStateProviderProps {
     children: ReactNode;
@@ -20,6 +21,9 @@ export const SelectionStateProvider: React.FC<SelectionStateProviderProps> = ({
 
     const [selectionLoading, setSelectionLoading] =
         useState(false);
+
+    const [selectionImage, setSelectionImage] =
+        useState<GalleryTile>();
 
     useEffect(() => {
         const handler = (event: Event) => {
@@ -54,6 +58,8 @@ export const SelectionStateProvider: React.FC<SelectionStateProviderProps> = ({
                 selection: selectionState,
                 selectionLoading,
                 setSelectionLoading,
+                selectionImage,
+                setSelectionImage
             }}
         >
             {children}
