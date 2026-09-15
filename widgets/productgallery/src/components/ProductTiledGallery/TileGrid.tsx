@@ -9,7 +9,7 @@ interface TileGridProps {
 }
 
 export const TileGrid = ({ tiles, maxColumns, onSelect }: TileGridProps) => {
-    const {selectionLoading} = useSelectionState()
+    const {selectionLoading, selectionImage} = useSelectionState()
 
     return (
         <div
@@ -32,13 +32,13 @@ export const TileGrid = ({ tiles, maxColumns, onSelect }: TileGridProps) => {
                         className="product-gallery__tile-image"
                         data-gallery-tile
                     />
+                    {selectionLoading && tile.src === selectionImage?.src && (
+                        <div className="product-gallery__loader">
+                            <StandardSpinner />
+                        </div>
+                    )}
                 </button>
             ))}
-            {selectionLoading && (
-                <div className="product-gallery__loader">
-                    <StandardSpinner />
-                </div>
-            )}
         </div>
     );
 };
