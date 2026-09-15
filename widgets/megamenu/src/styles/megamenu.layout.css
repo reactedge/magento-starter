@@ -10,12 +10,12 @@
     display: none;
     position: absolute;
     top: 100%;
-    left: 0;
     min-width: 400px;
     max-width: 800px;
-    padding: 16px 20px 16px 0;
+    padding: 23px 20px 16px 10px;
     z-index: 1000;
     background: white;
+    left: -21px;
 }
 
 .megamenu-item.is-active > .megamenu-dropdown {

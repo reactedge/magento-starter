@@ -76,3 +76,11 @@
 .product-gallery__slider-main {
     position: relative;
 }
+
+
+@media (max-width: 600px) {
+    .product-gallery__slider-thumbnail img {
+        width: 90px;
+        height: 90px;
+    }
+}

@@ -19,5 +19,10 @@ rsync -av --delete \
     "$ROOT/workspace/$STORE_CODE/" \
     "$REACTEDGE_WORKSPACE/$STORE_CODE/"
 
+rsync -av --delete \
+    --exclude='.git/' \
+    "$ROOT/workspace/release/" \
+    "$REACTEDGE_WORKSPACE/release/"
+
 echo "files copied to $REACTEDGE_WORKSPACE"
 echo "✅ Deployment orchestrator built successfully"
