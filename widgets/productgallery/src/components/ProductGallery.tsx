@@ -1,5 +1,7 @@
 import type {GalleryTile} from "./Types.ts";
 import {useGallery} from "../hooks/useGallery.tsx";
+import {SpinnerOverlay} from "./global/SpinnerOverlay.tsx";
+import {useSelectionState} from "../state/Selection/useSelectionState.tsx";
 
 interface ProductGalleryProps {
     tiles: GalleryTile[]
@@ -7,6 +9,7 @@ interface ProductGalleryProps {
 
 export const ProductGallery = ({ tiles }: ProductGalleryProps) => {
     const gallery = useGallery(tiles);
+    const {selectionLoading, selectionImage} = useSelectionState()
 
     if (tiles.length === 0 || gallery.currentImage === undefined) {
         return null;
@@ -37,11 +40,18 @@ export const ProductGallery = ({ tiles }: ProductGalleryProps) => {
                 ›
             </button>
 
-            <img src={gallery.currentImage.src}
-                alt={gallery.currentImage.alt}
-                className="product-gallery__slider-main-image"
-                data-gallery-main
-            />
+            <div className="product-gallery__slider-main">
+                <img
+                    src={gallery.currentImage.src}
+                    alt={gallery.currentImage.alt}
+                    className="product-gallery__slider-main-image"
+                    data-gallery-main
+                />
+
+                {selectionLoading && (
+                    <SpinnerOverlay />
+                )}
+            </div>
 
             <div className="product-gallery__slider-thumbnails">
                 {tiles.map((tile, index) => (
@@ -67,6 +77,11 @@ export const ProductGallery = ({ tiles }: ProductGalleryProps) => {
                             alt={tile.alt}
                             data-gallery-thumb
                         />
+
+                        {selectionLoading &&
+                            tile.src === selectionImage?.src && (
+                                <SpinnerOverlay />
+                            )}
                     </button>
                 ))}
             </div>

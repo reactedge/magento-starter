@@ -1,10 +1,10 @@
 import type {GalleryTile, WidgetConfig} from "./Types.ts";
 import {ProductTiledGallery} from "./ProductTiledGallery.tsx";
 import {ProductGallery} from "./ProductGallery.tsx";
-import {useGalleryData} from "../hooks/domain/useGalleryData.tsx";
+import {useMagentoSelectionGallery} from "../hooks/domain/useGalleryData.tsx";
 import {ProductImage} from "./ProductImage.tsx"
-import {mergeGalleryData} from "../lib/merge-array.ts";
 import { useMemo } from "react";
+import {useSelectionState} from "../state/Selection/useSelectionState.tsx";
 
 type Props = {
     config: WidgetConfig;
@@ -12,24 +12,16 @@ type Props = {
 };
 
 export const ProductGalleryWidget = ({ config, bootstrap }: Props) => {
-    const { galleryData, galleryError } =
-        useGalleryData(config.runtime.sku);
+    useMagentoSelectionGallery(config.runtime.sku);
+    const {selectionImage} = useSelectionState()
 
     const finalGalleryData = useMemo(
-        () => {
-            if (galleryData === undefined) {
-                return bootstrap;
-            }
-
-            return mergeGalleryData(
-                bootstrap,
-                galleryData
-            );
-        },
-        [bootstrap, galleryData]
+        () => [
+            ...bootstrap,
+            ...(selectionImage ? [selectionImage] : [])
+        ],
+        [bootstrap, selectionImage]
     );
-
-    if (galleryError) return null; // if the connection to Magento fails, we fail silently
 
     if (finalGalleryData.length === 1) {
         return (
