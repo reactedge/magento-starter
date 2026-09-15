@@ -22,7 +22,7 @@ export function loadConfig(
             .map(host => host.trim())
             .filter(Boolean),
         updateIntegrity: process.env.UPDATE_INTEGRITY
-            ? process.env.UPDATE_INTEGRITY === 'true'
+            ? process.env.UPDATE_INTEGRITY === '1'
             : false,
         ssrEnabled: process.env.SSR_ENABLED
             ? process.env.SSR_ENABLED === '1'

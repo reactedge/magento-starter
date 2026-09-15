@@ -4,6 +4,10 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
+if [[ "${1:-}" == "nossr" ]]; then
+    export SSR_ENABLED=0
+fi
+
 echo "🚀 Building deployment orchestrator"
 
 cd "$ROOT"
