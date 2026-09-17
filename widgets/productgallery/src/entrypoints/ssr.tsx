@@ -5,7 +5,7 @@ import { WidgetView } from "../WidgetView.tsx";
 
 export const renderHtml = (config: unknown, bootstrap: unknown, runtime: ReactEdgeRuntimeConfig): string => {
     return renderToString(
-        <div data-reactedge-ssr className={`reactedge-${WIDGET_ID}`}>
+        <div className={`reactedge-${WIDGET_ID}`}>
             <WidgetView contract={config} bootstrap={bootstrap} runtime={runtime} />
         </div>
     );
