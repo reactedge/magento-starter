@@ -4,7 +4,6 @@ import {useMediaQuery} from "../hooks/ui/useMediaQuery.tsx";
 import {ConfigStateProvider} from "../state/Config/ConfigStateProvider.tsx";
 import {MegamenuContent} from "../components/MegamenuContent.tsx";
 import {MobileMegamenu} from "../components/MobileMegamenu.tsx";
-import {useEffect} from "react";
 
 type Props = {
     contract?: unknown
@@ -15,12 +14,6 @@ export function WidgetWrapper({contract, bootstrap}: Props) {
     const activity = useActivityContext()
     const config = readWidgetConfig(contract, bootstrap, activity);
     const isMobile = useMediaQuery('(max-width: 768px)');
-
-    useEffect(() => {
-        if (config) {
-            activity.ready();
-        }
-    }, [config, activity]);
 
     if (!config) return null;
 
