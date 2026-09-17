@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import {resolve} from "node:path";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   server: {
     fs: {
       allow: ['..'] // allow parent directories
@@ -25,8 +25,8 @@ export default defineConfig({
         assetFileNames: `widget-loader.[ext]`,
       },
     },
-    minify: true,
-    sourcemap: false
+    minify: mode === 'production',
+    sourcemap: mode !== 'production',
   },
   resolve: {
     dedupe: ['react', 'react-dom'],
@@ -37,4 +37,5 @@ export default defineConfig({
       ),
     },
   }
-});
+})
+);

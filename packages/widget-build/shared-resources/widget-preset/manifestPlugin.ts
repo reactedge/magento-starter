@@ -67,6 +67,19 @@ export function manifestPlugin({
 
             output.fileName = newFileName;
 
+            const sourceMap = bundle[`${fileName}.map`];
+
+            if (sourceMap) {
+                const newSourceMapFileName = `${newFileName}.map`;
+
+                sourceMap.fileName = newSourceMapFileName;
+
+                output.code = output.code.replace(
+                    /\/\/# sourceMappingURL=.*$/m,
+                    `//# sourceMappingURL=${newSourceMapFileName}`
+                );
+            }
+
             const manifest = {
                 widget: widgetName,
                 version,

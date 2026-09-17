@@ -69,9 +69,9 @@ export class WidgetActivity
                 // eslint-disable-next-line no-console
                 console.log(prefix, payload);
             }
-
-            this.dispatchActivityEvent(payload);
         }
+
+        this.dispatchActivityEvent(payload);
     }
     public group(
         title: string,

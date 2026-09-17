@@ -43,5 +43,7 @@ export default defineConfig({
         widgetDir,
         `../../workspace/release/source/${widgetName}`
     ),
+    emitCss: false,
+    sourcemap: false
   }),
 });
