@@ -1,4 +1,4 @@
 export interface ObservabilityConfig {
-    endpoint: string;
+    collectorEndpoint: string;
     serviceName?: string;
 }

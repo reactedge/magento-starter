@@ -9,7 +9,7 @@ let tracer: Tracer;
 
 export function setupTelemetry(runtimeConfig: ObservabilityConfig) {
     const exporter = new OTLPTraceExporter({
-        url: `${runtimeConfig.endpoint}/v1/traces`
+        url: `${runtimeConfig.collectorEndpoint}/v1/traces`
     });
 
     const provider = new WebTracerProvider({
