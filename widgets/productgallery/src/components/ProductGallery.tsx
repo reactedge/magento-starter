@@ -2,6 +2,7 @@ import type {GalleryTile} from "./Types.ts";
 import {useGallery} from "../hooks/useGallery.tsx";
 import {SpinnerOverlay} from "./global/SpinnerOverlay.tsx";
 import {useSelectionState} from "../state/Selection/useSelectionState.tsx";
+import {useGalleryAvailability} from "../hooks/domain/useGalleryAvailability.tsx";
 
 interface ProductGalleryProps {
     tiles: GalleryTile[]
@@ -11,7 +12,12 @@ export const ProductGallery = ({ tiles }: ProductGalleryProps) => {
     const gallery = useGallery(tiles);
     const {selectionLoading, selectionImage} = useSelectionState()
 
-    if (tiles.length === 0 || gallery.currentImage === undefined) {
+    const currentImage = useGalleryAvailability(
+        tiles,
+        gallery.currentImage
+    );
+
+    if (!currentImage) {
         return null;
     }
 
@@ -42,8 +48,8 @@ export const ProductGallery = ({ tiles }: ProductGalleryProps) => {
 
             <div className="product-gallery__slider-main">
                 <img
-                    src={gallery.currentImage.src}
-                    alt={gallery.currentImage.alt}
+                    src={currentImage.src}
+                    alt={currentImage.alt}
                     className="product-gallery__slider-main-image"
                     data-gallery-main
                 />
