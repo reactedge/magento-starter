@@ -1,0 +1,15 @@
+{
+  "id": "sellerfinder",
+  "widget": "sellerfinder",
+  "description": "",
+  "signals": {
+    "consumes": [],
+    "emits": []
+  },
+  "runtime": {
+    "rendering": [
+      "client",
+      "ssr"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "storefinder",
+  "widget": "storefinder",
+  "description": "",
+  "signals": {
+    "consumes": [],
+    "emits": []
+  },
+  "runtime": {
+    "rendering": [
+      "client",
+      "ssr"
+    ]
+  }
+}
