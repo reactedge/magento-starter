@@ -17,7 +17,7 @@ export interface ReactEdgeRuntimeConfig {
         readonly userAgent?: "mobile" | "desktop";
     };
 
-    readonly observability: ObservabilityConfig
+    readonly observability?: ObservabilityConfig
 }
 
 export interface ReactEdgeRuntimeIntegrations {

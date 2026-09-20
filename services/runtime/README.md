@@ -6,3 +6,5 @@ refresh Magento and search for traces for the service reactedge-runtime
 ```
 
 ITE_OTEL_ENDPOINT=http://localhost:4318
+
+

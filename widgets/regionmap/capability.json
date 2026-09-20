@@ -1,0 +1,15 @@
+{
+  "id": "regionmap",
+  "widget": "regionmap",
+  "description": "",
+  "signals": {
+    "consumes": [],
+    "emits": []
+  },
+  "runtime": {
+    "rendering": [
+      "client",
+      "ssr"
+    ]
+  }
+}

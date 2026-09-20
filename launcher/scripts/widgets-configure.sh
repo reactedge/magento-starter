@@ -35,11 +35,12 @@ echo "-----------"
 
 prompt \
     "Store Code" \
-    STORE_CODE \
+    STORE_CODE_INPUT \
     "default"
 
+STORE_CODE_INPUT="${STORE_CODE_INPUT:-default}"
 
-CONFIG="$ROOT/.env.${STORE_CODE}"
+CONFIG="$ROOT/.env.${STORE_CODE_INPUT}"
 
 echo "Preparing ReactEdge workspace..."
 
@@ -60,6 +61,7 @@ if [[ -f "$CONFIG" ]]; then
     # Load existing configuration
     set -a
     source "$CONFIG"
+    STORE_CODE=$STORE_CODE_INPUT
     set +a
 fi
 
@@ -167,6 +169,15 @@ prompt \
     INTENT_DISCOVERY_ENABLED \
     "0"
 
+  prompt \
+      "Enable Cloudflare Turnstile (0 or 1)" \
+      CLOUDFLARE_TURNSTILE_ENABLED \
+      "0"
+
+  if [ "$CLOUDFLARE_TURNSTILE_ENABLED" = "1" ]; then
+    prompt "Cloudflare Turnstile Key" CLOUDFLARE_TURNSTILE_SITE_KEY ""
+  fi
+
 echo "Google Reviews"
 echo "--------------"
 echo "Display Google customer reviews."
@@ -251,6 +262,15 @@ else
     GOOGLE_API_CONFIG=""
 fi
 
+if [ "$CLOUDFLARE_TURNSTILE_ENABLED" == "1" ]; then
+    CLOUDFLARE_TURNSTILE_CONFIG=',
+    "cloudflare": {
+      "siteKey": "'"$CLOUDFLARE_TURNSTILE_SITE_KEY"'"
+    }'
+else
+    CLOUDFLARE_TURNSTILE_CONFIG=""
+fi
+
 for dir in "$ROOT"/widgets/*; do
     if [[ -d "$dir" && -d "$dir/public" ]]; then
         echo "📦 Generating runtime for $(basename "$dir")"
@@ -260,7 +280,7 @@ for dir in "$ROOT"/widgets/*; do
   "integrations": {
     "magentoGraphql": {
       "api": "$SITEURL/graphql"
-    }$INTENT_API_CONFIG$GOOGLE_API_CONFIG
+    }$INTENT_API_CONFIG$GOOGLE_API_CONFIG$CLOUDFLARE_TURNSTILE_CONFIG
   },
   "context": {
     "storeCode": "$STORE_CODE",
@@ -308,6 +328,7 @@ SSR_BASE_URL="${SSR_BASE_URL:-}"
 SKU=$SKU
 CATEGORY=$CATEGORY
 INTENT_DISCOVERY_ENABLED=$INTENT_DISCOVERY_ENABLED
+CLOUDFLARE_TURNSTILE_SITE_KEY=$CLOUDFLARE_TURNSTILE_SITE_KEY
 GOOGLE_REVIEWS_ENABLED=$GOOGLE_REVIEWS_ENABLED
 GOOGLE_MAPS_API_KEY="${GOOGLE_MAPS_API_KEY:-}"
 GOOGLE_PLACE_ID="${GOOGLE_PLACE_ID:-}"
