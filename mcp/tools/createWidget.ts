@@ -1,10 +1,19 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
-import { cp, mkdir, readFile, writeFile, access, readdir } from "node:fs/promises";
+import {
+    access,
+    cp,
+    mkdir,
+    readFile,
+    readdir,
+    rename,
+    writeFile,
+} from "node:fs/promises";
 import { constants } from "node:fs";
 import { resolve, join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { ReactEdgeRoot } from "@reactedge/filesystem/reactedgeRoot";
 
 const execFileAsync = promisify(execFile);
 
@@ -21,13 +30,6 @@ function toPascalCase(value: string): string {
         )
         .join("");
 }
-
-import {
-    readFile,
-    writeFile,
-    readdir,
-    rename,
-} from "node:fs/promises";
 
 async function replaceWidgetTokensInDirectory(
     directory: string,
@@ -110,7 +112,7 @@ export function registerCreateWidgetTool(server: McpServer) {
             },
         },
         async ({ name, type }) => {
-            const root = process.cwd();
+            const root = ReactEdgeRoot.get();
 
             const templateRoot = resolve(
                 root,

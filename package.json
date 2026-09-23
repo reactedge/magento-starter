@@ -4,8 +4,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "tsc -b",
-    "test:mcp": "tsx --test mcp/tests/*.test.ts",
+    "typecheck": "tsc -b && npm run typecheck --workspace @reactedge/mcp",
+    "test:mcp": "npm run test --workspace @reactedge/mcp",
     "verify": "npm run lint && npm run typecheck && npm run build --workspaces",
     "postinstall": "playwright install chromium",
     "whitepaper:diagrams": "for file in packages/docs/whitepaper/diagrams/*.mmd; do mmdc -i \"$file\" -o \"${file%.mmd}.png\" -w 770; done"
@@ -32,6 +32,7 @@
     "rollup-plugin-visualizer": "^7.0.1"
   },
   "workspaces": [
+    "mcp",
     "services/orchestrator",
     "packages/*",
     "widgets/*",

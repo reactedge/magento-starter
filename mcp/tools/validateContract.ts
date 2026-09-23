@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z, type ZodIssue } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -78,7 +78,7 @@ export function registerValidateContractTool(server: McpServer) {
                                     widget,
                                     valid: false,
                                     issues: result.error.issues.map(
-                                        (issue) => ({
+                                        (issue: ZodIssue) => ({
                                             path: issue.path.join('.'),
                                             message: issue.message,
                                         }),
