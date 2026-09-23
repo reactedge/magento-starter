@@ -189,17 +189,32 @@ test("validate_structure flags a missing runtime-specific schema", async () => {
     });
 });
 
-test("validate_structure flags a missing runtime-shadow API entrypoint", async () => {
+test("validate_structure flags a missing runtime-shadow runtime manifest", async () => {
+    await withTemporaryReactEdgeRoot(async root => {
+        const widget = "fixture-shadow-missing-runtime-manifest";
+        const widgetRoot = await createWidgetFixture(root, "runtime-shadow", widget);
+
+        await unlink(resolve(widgetRoot, "public/reactedge-runtime.json"));
+
+        const result = await validate(widget);
+
+        assert.equal(result.valid, false);
+        assert.equal(result.variant, "runtime-shadow");
+        assert.ok(Array.isArray(result.missing));
+        assert.ok((result.missing as string[]).includes("public/reactedge-runtime.json"));
+    });
+});
+
+test("validate_structure currently rejects a widget when its API entrypoint no longer identifies a variant", async () => {
     await withTemporaryReactEdgeRoot(async root => {
         const widget = "fixture-shadow-missing-entrypoint";
         const widgetRoot = await createWidgetFixture(root, "runtime-shadow", widget);
 
         await unlink(resolve(widgetRoot, "api/runtime-shadow-widget.tsx"));
 
-        const result = await validate(widget);
-
-        assert.equal(result.valid, false);
-        assert.ok(Array.isArray(result.missing));
-        assert.ok((result.missing as string[]).includes("api/runtime-shadow-widget.tsx"));
+        await assert.rejects(
+            () => validate(widget),
+            /Widget contains no recognised API entrypoint/,
+        );
     });
 });
