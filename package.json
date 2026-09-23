@@ -5,6 +5,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -b",
+    "test:mcp": "tsx --test mcp/tests/*.test.ts",
     "verify": "npm run lint && npm run typecheck && npm run build --workspaces",
     "postinstall": "playwright install chromium",
     "whitepaper:diagrams": "for file in packages/docs/whitepaper/diagrams/*.mmd; do mmdc -i \"$file\" -o \"${file%.mmd}.png\" -w 770; done"
