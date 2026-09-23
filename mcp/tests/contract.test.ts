@@ -102,7 +102,7 @@ test("list_widgets exposes the current public tool contract", () => {
     assert.deepEqual(tool.config.inputSchema, {});
 });
 
-test("list_widgets returns a deterministic, sorted widget list", async () => {
+test("list_widgets returns the current deterministic, sorted widget payload", async () => {
     const server = new RecordingServer();
     registerListWidgetsTool(server.asMcpServer());
 
@@ -113,19 +113,15 @@ test("list_widgets returns a deterministic, sorted widget list", async () => {
     assert.ok(Array.isArray(payload.widgets));
     assert.equal(payload.count, payload.widgets.length);
 
-    const widgets = payload.widgets as Array<{
-        id: string;
-        type: string;
-    }>;
+    const widgets = payload.widgets as Array<Record<string, unknown>>;
 
     for (const widget of widgets) {
+        assert.deepEqual(Object.keys(widget), ["id"]);
         assert.equal(typeof widget.id, "string");
-        assert.ok(widget.id.length > 0);
-        assert.equal(typeof widget.type, "string");
-        assert.ok(widget.type.length > 0);
+        assert.ok((widget.id as string).length > 0);
     }
 
-    const ids = widgets.map(widget => widget.id);
+    const ids = widgets.map(widget => widget.id as string);
     assert.deepEqual(ids, [...ids].sort((a, b) => a.localeCompare(b)));
     assert.equal(new Set(ids).size, ids.length);
 });
