@@ -20,7 +20,6 @@ export function registerListWidgetsTool(server: McpServer) {
                 .list()
                 .map((capability) => ({
                     id: capability.id,
-                    type: capability.type,
                 }))
                 .sort((a, b) => a.id.localeCompare(b.id));
 
