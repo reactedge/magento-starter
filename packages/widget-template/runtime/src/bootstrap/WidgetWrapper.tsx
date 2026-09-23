@@ -8,6 +8,7 @@ import {Widget__WIDGET_PASCAL_NAME__} from "../components/Widget__WIDGET_PASCAL_
 type Props = {
     contract: unknown,
     runtime: unknown;
+    bootstrap?: unknown
 }
 
 export default function WidgetWrapper({contract, runtime}: Props) {
