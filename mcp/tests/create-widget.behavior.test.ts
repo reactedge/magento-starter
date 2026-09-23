@@ -1,15 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-    cp,
-    mkdtemp,
-    mkdir,
     readFile,
     readdir,
     rm,
+    writeFile,
 } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { McpServer } from "@modelcontextprotocol/server";
@@ -17,6 +14,7 @@ import type { McpServer } from "@modelcontextprotocol/server";
 import { registerValidateStructureTool } from "../tools/validateStructure";
 
 const execFileAsync = promisify(execFile);
+const repositoryRoot = process.cwd();
 
 type ToolHandler = (input: Record<string, unknown>) => Promise<unknown>;
 
@@ -60,27 +58,6 @@ function jsonPayload(result: unknown): Record<string, unknown> {
     return JSON.parse(textPayload(result));
 }
 
-async function createTemporaryRepository(): Promise<string> {
-    const root = await mkdtemp(join(tmpdir(), "reactedge-mcp-create-"));
-
-    await mkdir(resolve(root, "packages"), { recursive: true });
-    await mkdir(resolve(root, "widgets"), { recursive: true });
-
-    await cp(
-        resolve(process.cwd(), "packages/widget-template"),
-        resolve(root, "packages/widget-template"),
-        { recursive: true },
-    );
-
-    await cp(
-        resolve(process.cwd(), "packages/widget-build"),
-        resolve(root, "packages/widget-build"),
-        { recursive: true },
-    );
-
-    return root;
-}
-
 async function loadCreateWidgetTool(): Promise<(
     server: McpServer,
 ) => void> {
@@ -89,36 +66,26 @@ async function loadCreateWidgetTool(): Promise<(
 }
 
 async function invokeCreateWidget(
-    root: string,
     name: string,
     type: "standard" | "runtime" | "runtime-shadow",
 ): Promise<unknown> {
-    const originalCwd = process.cwd();
+    const server = new RecordingServer();
+    const registerCreateWidgetTool = await loadCreateWidgetTool();
+    registerCreateWidgetTool(server.asMcpServer());
 
-    try {
-        process.chdir(root);
+    const tool = server.tools.get("create_widget");
+    assert.ok(tool, "Expected create_widget to be registered");
 
-        const server = new RecordingServer();
-        const registerCreateWidgetTool = await loadCreateWidgetTool();
-        registerCreateWidgetTool(server.asMcpServer());
-
-        const tool = server.tools.get("create_widget");
-        assert.ok(tool, "Expected create_widget to be registered");
-
-        return await tool.handler({ name, type });
-    } finally {
-        process.chdir(originalCwd);
-    }
+    return await tool.handler({ name, type });
 }
 
 async function validateGeneratedWidget(
-    root: string,
     widget: string,
 ): Promise<Record<string, unknown>> {
     const originalRoot = process.env.REACTEDGE_ROOT;
 
     try {
-        process.env.REACTEDGE_ROOT = root;
+        process.env.REACTEDGE_ROOT = repositoryRoot;
 
         const server = new RecordingServer();
         registerValidateStructureTool(server.asMcpServer());
@@ -163,23 +130,62 @@ async function assertNoTemplateTokens(root: string): Promise<void> {
     }
 }
 
+async function snapshotPackageLock(): Promise<string | null> {
+    try {
+        return await readFile(resolve(repositoryRoot, "package-lock.json"), "utf8");
+    } catch {
+        return null;
+    }
+}
+
+async function restorePackageLock(snapshot: string | null): Promise<void> {
+    const path = resolve(repositoryRoot, "package-lock.json");
+
+    if (snapshot === null) {
+        await rm(path, { force: true });
+        return;
+    }
+
+    await writeFile(path, snapshot, "utf8");
+}
+
+async function cleanupGeneratedWidget(name: string): Promise<void> {
+    await rm(resolve(repositoryRoot, "widgets", name), {
+        recursive: true,
+        force: true,
+    });
+
+    await rm(resolve(repositoryRoot, "node_modules", `widget-${name}`), {
+        recursive: true,
+        force: true,
+    });
+
+    await rm(resolve(repositoryRoot, "workspace", "release", "source", name), {
+        recursive: true,
+        force: true,
+    });
+}
+
 for (const variant of ["standard", "runtime", "runtime-shadow"] as const) {
     test(
-        `create_widget produces a structurally valid and buildable ${variant} widget`,
+        `create_widget produces a structurally valid and buildable ${variant} widget in the real workspace`,
         { timeout: 120_000 },
         async () => {
-            const root = await createTemporaryRepository();
-            const name = `mcp-${variant.replaceAll("-", "")}`;
+            const suffix = `${process.pid}${Date.now()}`;
+            const name = `mcptest${variant.replaceAll("-", "")}${suffix}`;
+            const packageLock = await snapshotPackageLock();
+
+            await cleanupGeneratedWidget(name);
 
             try {
-                const result = await invokeCreateWidget(root, name, variant);
+                const result = await invokeCreateWidget(name, variant);
 
                 assert.equal(
                     textPayload(result),
                     `Created ${variant} widget "${name}" in widgets/${name}.`,
                 );
 
-                const widgetRoot = resolve(root, "widgets", name);
+                const widgetRoot = resolve(repositoryRoot, "widgets", name);
                 const packageJson = JSON.parse(
                     await readFile(resolve(widgetRoot, "package.json"), "utf8"),
                 ) as { name?: string };
@@ -187,20 +193,22 @@ for (const variant of ["standard", "runtime", "runtime-shadow"] as const) {
                 assert.equal(packageJson.name, `widget-${name}`);
                 await assertNoTemplateTokens(widgetRoot);
 
-                const validation = await validateGeneratedWidget(root, name);
+                const validation = await validateGeneratedWidget(name);
                 assert.equal(validation.variant, variant);
                 assert.equal(validation.valid, true);
                 assert.deepEqual(validation.missing, []);
                 assert.deepEqual(validation.canonicalMissing, []);
                 assert.deepEqual(validation.modified, []);
 
+                // Build exactly as a developer does from the generated widget.
                 await execFileAsync("npm", ["run", "build"], {
                     cwd: widgetRoot,
                     timeout: 60_000,
                     env: process.env,
                 });
             } finally {
-                await rm(root, { recursive: true, force: true });
+                await cleanupGeneratedWidget(name);
+                await restorePackageLock(packageLock);
             }
         },
     );
@@ -210,17 +218,20 @@ test(
     "create_widget refuses to overwrite an existing widget",
     { timeout: 120_000 },
     async () => {
-        const root = await createTemporaryRepository();
-        const name = "mcp-existing";
+        const suffix = `${process.pid}${Date.now()}`;
+        const name = `mcptestexisting${suffix}`;
+        const packageLock = await snapshotPackageLock();
+
+        await cleanupGeneratedWidget(name);
 
         try {
-            const first = await invokeCreateWidget(root, name, "standard");
+            const first = await invokeCreateWidget(name, "standard");
             assert.equal(
                 textPayload(first),
                 `Created standard widget "${name}" in widgets/${name}.`,
             );
 
-            const second = await invokeCreateWidget(root, name, "standard") as {
+            const second = await invokeCreateWidget(name, "standard") as {
                 isError?: boolean;
             };
 
@@ -230,7 +241,8 @@ test(
                 `Widget "${name}" already exists.`,
             );
         } finally {
-            await rm(root, { recursive: true, force: true });
+            await cleanupGeneratedWidget(name);
+            await restorePackageLock(packageLock);
         }
     },
 );
