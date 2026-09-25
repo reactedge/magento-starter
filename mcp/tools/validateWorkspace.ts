@@ -23,7 +23,11 @@ export function registerValidateWorkspaceTool(server: McpServer) {
                 {
                     type: "text",
                     text: JSON.stringify(
-                        validator.validate(CONFIG.storeCode, CONFIG.targetSiteUrl),
+                        await validator.validate(
+                            CONFIG.storeCode,
+                            CONFIG.targetSiteUrl,
+                            CONFIG.hostEnvironment,
+                        ),
                         null,
                         2,
                     ),
