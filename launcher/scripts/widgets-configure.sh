@@ -292,17 +292,20 @@ EOF
     fi
 done
 
-RUNTIME_TEMPLATE="$ROOT/packages/widget-template/runtime"
+TEMPLATE_ROOT="$ROOT/packages/widget-template"
 
-if [[ -d "$RUNTIME_TEMPLATE/public" ]]; then
-    echo "📦 Generating runtime for runtime widget template"
+for TEMPLATE_TYPE in standard runtime runtime-shadow; do
+    TEMPLATE_DIR="$TEMPLATE_ROOT/$TEMPLATE_TYPE"
 
-    cat > "$RUNTIME_TEMPLATE/public/reactedge-runtime.json" <<EOF
+    if [[ -d "$TEMPLATE_DIR/public" ]]; then
+        echo "📦 Generating runtime config for $TEMPLATE_TYPE widget template"
+
+        cat > "$TEMPLATE_DIR/public/reactedge-runtime.json" <<EOF
 {
   "integrations": {
     "magentoGraphql": {
       "api": "$SITEURL/graphql"
-    }$INTENT_API_CONFIG$GOOGLE_API_CONFIG
+    }$INTENT_API_CONFIG$GOOGLE_API_CONFIG$CLOUDFLARE_TURNSTILE_CONFIG
   },
   "context": {
     "storeCode": "$STORE_CODE",
@@ -311,7 +314,8 @@ if [[ -d "$RUNTIME_TEMPLATE/public" ]]; then
   }
 }
 EOF
-fi
+    fi
+done
 
 echo
 echo "✅ Runtime configuration generated."
@@ -328,6 +332,7 @@ SSR_BASE_URL="${SSR_BASE_URL:-}"
 SKU=$SKU
 CATEGORY=$CATEGORY
 INTENT_DISCOVERY_ENABLED=$INTENT_DISCOVERY_ENABLED
+CLOUDFLARE_TURNSTILE_ENABLED=$CLOUDFLARE_TURNSTILE_ENABLED
 CLOUDFLARE_TURNSTILE_SITE_KEY=$CLOUDFLARE_TURNSTILE_SITE_KEY
 GOOGLE_REVIEWS_ENABLED=$GOOGLE_REVIEWS_ENABLED
 GOOGLE_MAPS_API_KEY="${GOOGLE_MAPS_API_KEY:-}"

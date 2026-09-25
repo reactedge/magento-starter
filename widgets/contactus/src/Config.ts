@@ -27,17 +27,37 @@ export const WIDGET_ID = 'contactus';
 export function readWidgetConfig(
     contract: unknown,
     runtime: unknown,
-    activity: WidgetActivity
+    bootstrap: unknown,
+    activity?: WidgetActivity
 ): WidgetConfig {
-    activity.log('bootstrap', 'Config Sent', contract);
-    const parsedContract = parseConfig(contract);
-    activity.log('bootstrap', 'Config RuntimeConfig Sent', runtime);
-    const parsedRuntime = parseRuntimeConfig(runtime)
-    const resolved = resolveConfig(parsedContract, parsedRuntime);
+    try {
+        activity?.log(
+            'bootstrap',
+            'Config sent',
+            {contract, bootstrap}
+        );
+        const parsedContract = parseConfig(contract);
+        const parsedRuntime = parseRuntimeConfig(runtime);
+        const resolved = resolveConfig(parsedContract, parsedRuntime);
 
-    activity.log('bootstrap', 'Config resolved', resolved);
+        activity?.log(
+            'bootstrap',
+            'Config resolved',
+            {resolved, bootstrap}
+        );
 
-    return Object.freeze(resolved);
+        return Object.freeze(resolved);
+
+    } catch (e) {
+        activity?.log(
+            'bootstrap',
+            'Invalid widget contract',
+            e instanceof Error? e.message: e,
+            'error'
+        );
+
+        throw e;
+    }
 }
 
 export function resolveConfig(

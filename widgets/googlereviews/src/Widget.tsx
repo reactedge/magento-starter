@@ -1,8 +1,8 @@
 import {WidgetRoot} from "./bootstrap/widget-root.tsx";
 import {createRoot} from "react-dom/client";
 import type {RuntimeWidgetOptions} from "@reactedge/public-api/WidgetOptions.ts";
-import { styles } from "./styles/entry.ts";
 import {ShadowHostProvider} from "@reactedge/framework/host.ts";
+import { styles } from "./styles/entry.ts";
 
 export function Widget({
    container,
