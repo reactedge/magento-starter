@@ -102,6 +102,12 @@ export class RegistryValidator {
                 continue;
             }
 
+            widgets.push({
+                instance,
+                widget,
+                contractFile: entry.contract,
+            });
+
             const contractDirectory = resolve(
                 storeRoot,
                 "contracts",
@@ -136,14 +142,7 @@ export class RegistryValidator {
                         `Contract "${entry.contract}" referenced by ` +
                         `registry entry "${instance}" does not exist.`,
                 });
-                continue;
             }
-
-            widgets.push({
-                instance,
-                widget,
-                contractFile: entry.contract,
-            });
         }
 
         return {
