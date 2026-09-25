@@ -31,6 +31,10 @@ export function loadConfig(
             .split(",")
             .map(host => host.trim())
             .filter(Boolean),
+        hostEnvironment:
+            process.env.PHP_ENV === "0"
+                ? "javascript"
+                : "php",
     };
 }
 
