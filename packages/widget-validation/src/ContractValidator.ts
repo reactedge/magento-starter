@@ -41,6 +41,11 @@ export class ContractValidator {
             entry.contractFile,
         );
 
+        if (!existsSync(contractPath)) {
+            // RegistryValidator owns missing contract/directory reporting.
+            return [];
+        }
+
         let contract: unknown;
 
         try {
