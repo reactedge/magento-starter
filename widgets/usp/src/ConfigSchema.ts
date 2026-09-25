@@ -5,7 +5,7 @@ export const WidgetConfigSchema = z.object({
         slides: z.array(
             z.object({
                 heading: z.string().min(1).max(30).optional(),
-                text: z.string().min(1).max(30)
+                text: z.string().min(1).max(50)
             }).strict()
         ).min(1).max(3)
     }).strict(),

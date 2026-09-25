@@ -10,6 +10,7 @@ type TurnstileApi = {
             "expired-callback"?: () => void;
         }
     ) => string;
+    remove(widgetId?: string): void;
 };
 
 declare global {

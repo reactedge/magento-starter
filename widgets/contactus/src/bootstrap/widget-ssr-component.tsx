@@ -14,13 +14,11 @@ export function WidgetComponent({
             userAgent: 'desktop'
         }}
 
-    const bootstrapData = {
-        productData: undefined
-    }
+    const bootstrap = {}
 
     return (
         <div className={`reactedge-${WIDGET_ID}`}>
-            <WidgetView contract={contract} runtime={runtime} bootstrapData={bootstrapData}/>
+            <WidgetView contract={contract} runtime={runtime} bootstrap={bootstrap}/>
         </div>
     );
 }

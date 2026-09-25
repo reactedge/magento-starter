@@ -10,6 +10,7 @@ import {useActivityContext} from "../activity/Context/useActivityContext.ts";
 
 type Props = {
     config: WidgetConfig;
+    bootstrap?: unknown;
 };
 
 export function WidgetContactus({ config }: Props) {

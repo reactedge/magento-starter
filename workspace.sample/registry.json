@@ -37,5 +37,41 @@
     "ssr": {
       "strategy": "disabled"
     }
+  },
+  "banner": {
+    "active": true,
+    "contract": "default.json",
+    "ssr": {
+      "strategy": "static"
+    }
+  },
+  "contactus": {
+    "active": true,
+    "contract": "default.json",
+    "ssr": {
+      "strategy": "static"
+    }
+  },
+  "quote_form": {
+    "widget": "contactus",
+    "active": true,
+    "contract": "quote_form.json",
+    "ssr": {
+      "strategy": "static"
+    }
+  },
+  "googlereviews": {
+    "active": true,
+    "contract": "default.json",
+    "ssr": {
+      "strategy": "static"
+    }
+  },
+  "regionmap": {
+    "active": true,
+    "contract": "default.json",
+    "ssr": {
+      "strategy": "static"
+    }
   }
 }
