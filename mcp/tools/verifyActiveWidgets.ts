@@ -6,15 +6,10 @@ import {
     statSync,
 } from 'node:fs';
 import { resolve } from 'node:path';
-import {
-    spawn,
-    type ChildProcessWithoutNullStreams,
-} from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { ReactEdgeRoot } from '@reactedge/filesystem/reactedgeRoot';
 import { getConfig } from '../config';
 
-const DEV_URL = 'http://localhost:5173/?reactedge_debug=eager';
-const DEV_TIMEOUT_MS = 20_000;
 const COMMAND_TIMEOUT_MS = 50_000;
 const MAX_OUTPUT_LENGTH = 6_000;
 
@@ -37,10 +32,10 @@ export function registerVerifyActiveWidgetTool(server: McpServer) {
         {
             title: 'Verify an active ReactEdge widget',
             description:
-                'Runs one bounded verification check for one active widget instance. Use list_active_widgets first, then call this tool for dev, test, and build checks.',
+                'Runs one bounded build or E2E test check for one active widget instance. Use list_active_widgets first, then verify one check at a time.',
             inputSchema: {
                 instance: z.string().min(1),
-                check: z.enum(['dev', 'test', 'build']),
+                check: z.enum(['build', 'test']),
             },
         },
         async ({ instance, check }) => {
@@ -100,15 +95,13 @@ export function registerVerifyActiveWidgetTool(server: McpServer) {
                 }, true);
             }
 
-            const verification = check === 'dev'
-                ? await verifyDevelopment(repositoryRoot, widget)
-                : check === 'test'
-                    ? await verifyTest(repositoryRoot, widget)
-                    : await verifyBuild(
-                        repositoryRoot,
-                        widget,
-                        packagePath,
-                    );
+            const verification = check === 'build'
+                ? await verifyBuild(
+                    repositoryRoot,
+                    widget,
+                    packagePath,
+                )
+                : await verifyTest(repositoryRoot, widget);
 
             return result({
                 store: storeCode,
@@ -149,86 +142,6 @@ function readRegistry(repositoryRoot: string): Registry {
     return parsed as Registry;
 }
 
-async function verifyDevelopment(
-    repositoryRoot: string,
-    widget: string,
-) {
-    const expectedElement = `${widget}-widget`;
-    const child = spawn(
-        'mise',
-        ['run', 'widget-dev', '--', widget],
-        {
-            cwd: repositoryRoot,
-            env: process.env,
-            detached: process.platform !== 'win32',
-            stdio: ['ignore', 'pipe', 'pipe'],
-        },
-    );
-
-    let stdout = '';
-    let stderr = '';
-
-    child.stdout.on('data', chunk => {
-        stdout = appendOutput(stdout, chunk.toString());
-    });
-
-    child.stderr.on('data', chunk => {
-        stderr = appendOutput(stderr, chunk.toString());
-    });
-
-    try {
-        await waitForDevelopmentServer(child);
-
-        const smoke = await runCommand(
-            'node',
-            [
-                '--input-type=module',
-                '-e',
-                browserSmokeScript(),
-                expectedElement,
-            ],
-            repositoryRoot,
-            DEV_TIMEOUT_MS,
-        );
-
-        return smoke.passed
-            ? {
-                passed: true,
-                element: expectedElement,
-            }
-            : {
-                passed: false,
-                element: expectedElement,
-                error: smoke.error ??
-                    `Expected DOM element <${expectedElement}> was not found.`,
-                output: commandOutput(smoke),
-            };
-    } catch (error) {
-        return {
-            passed: false,
-            element: expectedElement,
-            error: error instanceof Error
-                ? error.message
-                : String(error),
-            output: trimOutput(`${stdout}\n${stderr}`),
-        };
-    } finally {
-        terminateProcess(child);
-
-        await runCommand(
-            resolve(
-                repositoryRoot,
-                'launcher',
-                'scripts',
-                'widgets-clean.sh',
-            ),
-            [],
-            repositoryRoot,
-            10_000,
-        );
-    }
-}
-
 async function verifyTest(
     repositoryRoot: string,
     widget: string,
@@ -247,36 +160,6 @@ async function verifyTest(
             error: command.error ?? 'Widget E2E tests failed.',
             output: commandOutput(command),
         };
-}
-
-async function waitForDevelopmentServer(
-    child: ChildProcessWithoutNullStreams,
-): Promise<void> {
-    const startedAt = Date.now();
-
-    while (Date.now() - startedAt < DEV_TIMEOUT_MS) {
-        if (child.exitCode !== null) {
-            throw new Error(
-                `widget-dev exited before ${DEV_URL} became available.`,
-            );
-        }
-
-        try {
-            const response = await fetch(DEV_URL);
-
-            if (response.ok) {
-                return;
-            }
-        } catch {
-            // Vite has not started listening yet.
-        }
-
-        await delay(500);
-    }
-
-    throw new Error(
-        `Timed out waiting for widget-dev at ${DEV_URL}.`,
-    );
 }
 
 async function verifyBuild(
@@ -357,35 +240,6 @@ async function verifyBuild(
     };
 }
 
-function browserSmokeScript(): string {
-    return `
-import { chromium } from 'playwright';
-
-const selector = process.argv[1];
-const browser = await chromium.launch({ headless: true });
-
-try {
-    const page = await browser.newPage();
-    await page.goto('${DEV_URL}', {
-        waitUntil: 'domcontentloaded',
-        timeout: 15000,
-    });
-
-    const element = page.locator(selector);
-    await element.waitFor({
-        state: 'attached',
-        timeout: 10000,
-    });
-
-    if (await element.count() < 1) {
-        throw new Error('DOM element not found: ' + selector);
-    }
-} finally {
-    await browser.close();
-}
-`;
-}
-
 function runCommand(
     command: string,
     args: string[],
@@ -446,7 +300,7 @@ function runCommand(
 }
 
 function terminateProcess(
-    child: ChildProcessWithoutNullStreams,
+    child: ReturnType<typeof spawn>,
 ) {
     if (!child.pid || child.exitCode !== null) {
         return;
@@ -484,12 +338,6 @@ function commandOutput(command: CommandResult): string | undefined {
     return output.length > 0
         ? output
         : undefined;
-}
-
-function delay(milliseconds: number): Promise<void> {
-    return new Promise(resolveDelay => {
-        setTimeout(resolveDelay, milliseconds);
-    });
 }
 
 function result(data: unknown, isError = false) {
