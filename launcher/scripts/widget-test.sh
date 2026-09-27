@@ -32,12 +32,12 @@ fi
 
 cd "$ROOT/widgets/$WIDGET"
 
-npm run dev &
+setsid npm run dev &
 DEV_PID=$!
 
 cleanup() {
     if kill -0 "$DEV_PID" 2>/dev/null; then
-        kill "$DEV_PID" 2>/dev/null || true
+        kill -- -"$DEV_PID" 2>/dev/null || true
         wait "$DEV_PID" 2>/dev/null || true
     fi
 }
@@ -45,7 +45,6 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 cd "$ROOT"
-
 
 PWDEBUG=0
 
