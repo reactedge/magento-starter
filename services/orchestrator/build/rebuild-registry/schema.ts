@@ -31,7 +31,6 @@ export const WidgetImageOptimisationSchema = z.object({
 });
 
 export const WidgetRegistryEntrySchema = z.object({
-    active: z.boolean(),
     widget: z.string().optional(),
     contract: z.string(),
     css: z.string().optional(),
