@@ -8,6 +8,10 @@ python = "3.13"
 description = "Configure ReactEdge integrations"
 run = "./launcher/scripts/widgets-configure.sh"
 
+[tasks."configure-ui"]
+description = "Try the local configuration control panel"
+run = "node --experimental-strip-types launcher/control-panel/server.ts"
+
 [tasks."serve"]
 description = "Expose the ReactEdge workspace over HTTP"
 run = "./launcher/scripts/widgets-serve.sh"

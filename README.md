@@ -55,17 +55,54 @@ npm ci
 
 ## 4. Configure ReactEdge
 
-Generate the local configuration:
+### Browser setup
+
+From the repository root, start the local configuration UI:
+
+```bash
+mise run configure-ui
+```
+
+Or use `npm run configure:ui` if Node is already available. The UI itself needs
+no installed project dependencies. Open <http://127.0.0.1:4173> in your browser.
+
+1. On a fresh clone, select **Create new environment** and enter a store code.
+   To edit an existing configuration, select it from the list and click
+   **Load selected environment**.
+2. Enter the Site URL and the absolute path to the platform root (for example,
+   your Magento installation), then choose the environment and capabilities.
+   If the site has a product catalog, provide an example SKU and category.
+   Maps and reviews share one Google API key; reviews also need a Place ID.
+3. Click **Review changes** to inspect the workspace setup, allowed URL hosts,
+   and files to change. The Site URL host is included automatically; local
+   hosts are included in development. Add other domains only for absolute URLs
+   used in widget contracts.
+4. Click **Save configuration** to write the files. This creates
+   `.env.<store-code>`, the store workspace from `workspace.sample`, the global
+   registry and release directory if missing, service environment files, and
+   widget runtime JSON. The target workspace is created alongside the platform
+   root.
+
+Saving another store replaces the shared widget runtime JSON and
+`services/ssr/.env`. For a site without a catalog, disable widgets that require
+SKU and catalog services in the store registry before building. SSR port and
+public URL settings are retained in the configuration but hidden in this basic
+form while unused.
+
+To run the configuration tests:
+
+```bash
+node --experimental-strip-types --test launcher/control-panel/configuration.test.ts
+```
+
+### Existing script fallback
+
+Keep using the existing interactive Bash setup while the browser workflow is
+being validated:
 
 ```bash
 mise run configure
 ```
-
-The configuration wizard will create:
-
-- `.env`
-- `services/orchestrator/.env.dev`
-- `widgets/*/public/reactedge-runtime.json`
 
 ---
 
