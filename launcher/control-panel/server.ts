@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { applyConfiguration, listEnvironments, previewConfiguration, readConfiguration, readConfigurationTemplate, repositoryRoot, retainAdvancedSsrSettings } from './configuration.ts';
 
 const ui = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'index.html'), 'utf8');
+const stylesheet = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'style.css'), 'utf8');
 const host = '127.0.0.1';
 const port = Number(process.env.REACTEDGE_UI_PORT || '4173');
 
@@ -19,6 +20,10 @@ const server = createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/') {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
         return res.end(ui);
+    }
+    if (req.method === 'GET' && url.pathname === '/style.css') {
+        res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8', 'Cache-Control': 'no-store' });
+        return res.end(stylesheet);
     }
     try {
         if (req.method === 'GET' && url.pathname === '/api/environments') {

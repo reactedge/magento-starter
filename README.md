@@ -55,42 +55,54 @@ npm ci
 
 ## 4. Configure ReactEdge
 
-Generate the local configuration:
+### Browser setup
+
+From the repository root, start the local configuration UI:
+
+```bash
+mise run configure-ui
+```
+
+Or use `npm run configure:ui` if Node is already available. The UI itself needs
+no installed project dependencies. Open <http://127.0.0.1:4173> in your browser.
+
+1. On a fresh clone, select **Create new environment** and enter a store code.
+   To edit an existing configuration, select it from the list and click
+   **Load selected environment**.
+2. Enter the Site URL and the absolute path to the platform root (for example,
+   your Magento installation), then choose the environment and capabilities.
+   If the site has a product catalog, provide an example SKU and category.
+   Maps and reviews share one Google API key; reviews also need a Place ID.
+3. Click **Review changes** to inspect the workspace setup, allowed URL hosts,
+   and files to change. The Site URL host is included automatically; local
+   hosts are included in development. Add other domains only for absolute URLs
+   used in widget contracts.
+4. Click **Save configuration** to write the files. This creates
+   `.env.<store-code>`, the store workspace from `workspace.sample`, the global
+   registry and release directory if missing, service environment files, and
+   widget runtime JSON. The target workspace is created alongside the platform
+   root.
+
+Saving another store replaces the shared widget runtime JSON and
+`services/ssr/.env`. For a site without a catalog, disable widgets that require
+SKU and catalog services in the store registry before building. SSR port and
+public URL settings are retained in the configuration but hidden in this basic
+form while unused.
+
+To run the configuration tests:
+
+```bash
+node --experimental-strip-types --test launcher/control-panel/configuration.test.ts
+```
+
+### Existing script fallback
+
+Keep using the existing interactive Bash setup while the browser workflow is
+being validated:
 
 ```bash
 mise run configure
 ```
-
-To try the local browser configuration spike instead:
-
-```bash
-node --experimental-strip-types launcher/control-panel/server.ts
-# Open http://127.0.0.1:4173
-```
-
-It also has `mise run configure-ui` and `npm run configure:ui` entry points.
-The UI shows the files it will change before saving. It currently writes the same
-shared widget runtime files and SSR service env file for all stores, so saving a
-second store changes the active runtime configuration. Keep the Bash command for
-existing workflows while evaluating the UI.
-When the site has no product catalog, the UI omits demo SKU and category values;
-catalog widgets must be disabled in the store registry before building.
-The SSR port and public URL are retained in configuration but hidden from the
-basic form while those settings are unused.
-Maps for Store Finder or Seller Finder and Google Reviews are separate choices;
-either one uses the same Google API key, and Reviews also needs a Place ID.
-The allowed URL hosts come from the Site URL and, in development, local hosts;
-only external domains referenced by widget contracts need to be added.
-On a fresh clone, choose **Create new environment** and supply its store code.
-After saving, **Load selected environment** lists the configurations found in
-root `.env.<store-code>` files. A new environment also initialises the store
-workspace, global registry and release directory from `workspace.sample`.
-
-The configuration wizard will create:
-
-- `.env`
-- `services/orchestrator/.env.dev`
-- `widgets/*/public/reactedge-runtime.json`
 
 ---
 
