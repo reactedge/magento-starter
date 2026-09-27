@@ -79,6 +79,8 @@ The SSR port and public URL are retained in configuration but hidden from the
 basic form while those settings are unused.
 Maps for Store Finder or Seller Finder and Google Reviews are separate choices;
 either one uses the same Google API key, and Reviews also needs a Place ID.
+The allowed URL hosts come from the Site URL and, in development, local hosts;
+only external domains referenced by widget contracts need to be added.
 
 The configuration wizard will create:
 

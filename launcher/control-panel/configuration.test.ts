@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { applyConfiguration, previewConfiguration, readConfiguration, retainAdvancedSsrSettings } from './configuration.ts';
+import { allowedHostDetails, applyConfiguration, previewConfiguration, readConfiguration, retainAdvancedSsrSettings } from './configuration.ts';
 
 test('preview and save cover all configuration outputs without touching a real host', () => {
     const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
@@ -121,6 +121,38 @@ test('maps and reviews independently require the shared Google API key', () => {
         assert.deepEqual(reviewsRuntime.integrations.googleMaps, { apiKey: 'shared-key', placeId: 'place-123' });
         assert.equal(readConfiguration(root, 'reviews').googleMapsEnabled, false);
         assert.equal(readConfiguration(root, 'reviews').googleReviewsEnabled, true);
+    } finally {
+        rmSync(root, { recursive: true, force: true });
+        rmSync(targetParent, { recursive: true, force: true });
+    }
+});
+
+test('site and development hosts are explained and external contract hosts are explicit', () => {
+    const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
+    const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
+    try {
+        mkdirSync(join(root, 'workspace.sample'));
+        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+        writeFileSync(join(root, '.env.sample'), 'SITEURL=https://old.example\nALLOWED_HOSTS=localhost,127.0.0.1,old.example\n');
+        const config = {
+            ...readConfiguration(root, 'site'), siteUrl: 'https://new.example/path',
+            additionalHosts: 'cdn.example, NEW.EXAMPLE, cdn.example', targetRoot: join(targetParent, 'site'),
+        };
+        assert.equal(readConfiguration(root, 'site').additionalHosts, '');
+        const preview = previewConfiguration(root, config);
+        assert.deepEqual(preview.allowedHosts, [
+            { host: 'new.example', reason: 'Site URL (always allowed)' },
+            { host: 'localhost', reason: 'Local development' },
+            { host: '127.0.0.1', reason: 'Local development' },
+            { host: 'cdn.example', reason: 'Additional contract URL' },
+        ]);
+        applyConfiguration(root, config);
+        const env = readFileSync(join(root, '.env.site'), 'utf8');
+        assert.match(env, /ALLOWED_HOSTS='new.example,localhost,127.0.0.1,cdn.example'/);
+        assert.equal(readConfiguration(root, 'site').additionalHosts, 'cdn.example');
+        const production = { ...config, environment: 'production', additionalHosts: '' };
+        assert.deepEqual(allowedHostDetails(production).map(entry => entry.host), ['new.example']);
+        assert.throws(() => previewConfiguration(root, { ...config, additionalHosts: 'https://cdn.example' }), /hostname/);
     } finally {
         rmSync(root, { recursive: true, force: true });
         rmSync(targetParent, { recursive: true, force: true });
