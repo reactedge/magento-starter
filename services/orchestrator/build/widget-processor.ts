@@ -17,6 +17,8 @@ import { enqueueSsrGeneration } from "../ssr-worker/queue.ts"
 import { getConfig } from "../config.ts";
 import { resolveGenerationInputs } from "../ssr-worker/queue-input-resolver";
 import {getFilename} from "./util";
+import {readFileSync} from "node:fs";
+import {join} from "node:path";
 
 export async function processWidget(
     instanceName: string,
@@ -45,6 +47,14 @@ export async function processWidget(
 
     try {
         const widgetPath = getWidgetPath(widgetName);
+        const widgetPackage = JSON.parse(readFileSync(join(widgetPath, 'package.json'), 'utf-8'));
+        const capability = JSON.parse(readFileSync(join(widgetPath, 'capability.json'), 'utf-8'));
+        if (typeof widgetPackage.version !== 'string' || !widgetPackage.version) {
+            throw new Error(`Missing widget version for ${widgetName}`);
+        }
+        if (!Number.isInteger(capability.contractVersion) || capability.contractVersion < 1) {
+            throw new Error(`Missing contract version for ${widgetName}`);
+        }
         buildWidget(widgetName, widgetPath, report);
 
         const registryResult = updateAssetRegistry(widgetName, instanceName, report);
@@ -131,6 +141,8 @@ export async function processWidget(
         const manifest = {
             id: instanceName,
             widget: widgetName,
+            widgetVersion: widgetPackage.version,
+            contractVersion: capability.contractVersion,
             src: registryResult.src,
             css: registryResult.cssFilename,
             ssr: {
