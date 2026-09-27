@@ -29,19 +29,30 @@ export function readWidgetConfig(
     runtime: unknown,
     activity: WidgetActivity
 ): WidgetConfig {
-    const parseContract = parseConfig(contract);
-    const parseRuntime = parseRuntimeConfig(runtime)
-    const resolved = resolveWidgetConfig(parseContract, parseRuntime);
+    try {
+        const parseContract = parseConfig(contract);
+        const parseRuntime = parseRuntimeConfig(runtime)
+        const resolved = resolveWidgetConfig(parseContract, parseRuntime);
 
-    activity.log('bootstrap', 'Config resolved', {
-        data: resolved.data,
-        integrations: resolved.integrations,
-        translations: resolved.translations
-    });
+        activity.log('bootstrap', 'Config resolved', {
+            data: resolved.data,
+            integrations: resolved.integrations,
+            translations: resolved.translations
+        });
 
-    return Object.freeze(resolved);
+        return Object.freeze(resolved);
+
+    } catch (e) {
+        activity?.log(
+            'bootstrap',
+            'Invalid widget contract',
+            e instanceof Error? e.message: e,
+            'error'
+        );
+
+        throw e;
+    }
 }
-
 
 export function resolveWidgetConfig(
     widget: SchemaWidgetConfig,
