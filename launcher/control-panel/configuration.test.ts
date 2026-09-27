@@ -17,7 +17,7 @@ test('preview and save cover all configuration outputs without touching a real h
         const config = {
             ...readConfiguration(root, 'fr'), targetRoot: join(targetParent, 'magento'),
             siteUrl: 'https://example.org/', observabilityEnabled: true, turnstileEnabled: true,
-            turnstileSiteKey: 'site-key', googleReviewsEnabled: true,
+            turnstileSiteKey: 'site-key', googleMapsEnabled: true, googleReviewsEnabled: true,
             googleMapsApiKey: 'a"b\\c', googlePlaceId: 'place-123',
         };
         const preview = previewConfiguration(root, config);
@@ -92,6 +92,35 @@ test('hidden SSR settings survive saving other fields and disabling SSR', () => 
         assert.match(env, /SSR_PORT='4501'/);
         assert.match(env, /SSR_BASE_URL='https:\/\/legacy.example\/ssr'/);
         assert.match(readFileSync(join(root, 'services/ssr/.env'), 'utf8'), /SSR_PORT='4501'/);
+    } finally {
+        rmSync(root, { recursive: true, force: true });
+        rmSync(targetParent, { recursive: true, force: true });
+    }
+});
+
+test('maps and reviews independently require the shared Google API key', () => {
+    const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
+    const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
+    try {
+        mkdirSync(join(root, 'workspace.sample'));
+        mkdirSync(join(root, 'widgets/storefinder/public'), { recursive: true });
+        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+        const defaults = { ...readConfiguration(root, 'maps'), targetRoot: join(targetParent, 'site') };
+        assert.throws(() => previewConfiguration(root, { ...defaults, googleMapsEnabled: true }), /API key/);
+        const maps = { ...defaults, googleMapsEnabled: true, googleMapsApiKey: 'shared-key' };
+        applyConfiguration(root, maps);
+        const mapRuntime = JSON.parse(readFileSync(join(root, 'widgets/storefinder/public/reactedge-runtime.json'), 'utf8'));
+        assert.deepEqual(mapRuntime.integrations.googleMaps, { apiKey: 'shared-key' });
+        assert.equal(readConfiguration(root, 'maps').googleMapsEnabled, true);
+        assert.match(readFileSync(join(root, '.env.maps'), 'utf8'), /GOOGLE_MAPS_API_KEY='shared-key'/);
+
+        const reviews = { ...maps, storeCode: 'reviews', googleMapsEnabled: false, googleReviewsEnabled: true };
+        assert.throws(() => previewConfiguration(root, reviews), /Place ID/);
+        applyConfiguration(root, { ...reviews, googlePlaceId: 'place-123' });
+        const reviewsRuntime = JSON.parse(readFileSync(join(root, 'widgets/storefinder/public/reactedge-runtime.json'), 'utf8'));
+        assert.deepEqual(reviewsRuntime.integrations.googleMaps, { apiKey: 'shared-key', placeId: 'place-123' });
+        assert.equal(readConfiguration(root, 'reviews').googleMapsEnabled, false);
+        assert.equal(readConfiguration(root, 'reviews').googleReviewsEnabled, true);
     } finally {
         rmSync(root, { recursive: true, force: true });
         rmSync(targetParent, { recursive: true, force: true });

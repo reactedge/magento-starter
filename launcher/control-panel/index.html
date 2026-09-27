@@ -47,12 +47,13 @@
       <label class="inline"><input type="checkbox" name="intentDiscoveryEnabled">Intent Discovery</label>
       <label class="inline"><input type="checkbox" name="turnstileEnabled">Cloudflare Turnstile</label>
       <div class="dependent" data-for="turnstileEnabled"><label><span>Turnstile site key</span><input name="turnstileSiteKey"></label></div>
+      <label class="inline"><input type="checkbox" name="googleMapsEnabled">Google Maps for Store Finder or Seller Finder</label>
       <label class="inline"><input type="checkbox" name="googleReviewsEnabled">Google Reviews</label>
-      <div class="dependent" data-for="googleReviewsEnabled">
-        <label><span>Google Maps API key</span><input name="googleMapsApiKey"></label>
-        <label><span>Google Place ID</span><input name="googlePlaceId"></label>
-        <small>The Google Maps key is written into public widget runtime JSON. Restrict its use to your site.</small>
+      <div class="dependent" data-for-any="googleMapsEnabled googleReviewsEnabled">
+        <label><span>Google API key (shared by maps and reviews)</span><input name="googleMapsApiKey"></label>
+        <small>This key is written into public widget runtime JSON. Restrict its use to your site.</small>
       </div>
+      <div class="dependent" data-for="googleReviewsEnabled"><label><span>Google Place ID</span><input name="googlePlaceId"></label></div>
     </fieldset>
     <fieldset data-for="hasCatalog"><legend>Example catalog data</legend>
       <label><span>Product SKU</span><input name="sku"></label>
@@ -69,7 +70,11 @@
     const fields = [...form.elements].filter(el => el.name);
     let reviewed = '';
     function values() { return Object.fromEntries(fields.map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value])); }
-    function dependencies() { document.querySelectorAll('[data-for]').forEach(el => el.hidden = !form.elements[el.dataset.for].checked); }
+    function dependencies() {
+      document.querySelectorAll('[data-for]').forEach(el => el.hidden = !form.elements[el.dataset.for].checked);
+      document.querySelectorAll('[data-for-any]').forEach(el =>
+        el.hidden = !el.dataset.forAny.split(' ').some(name => form.elements[name].checked));
+    }
     function invalidate() { reviewed = ''; apply.style.display = 'none'; result.textContent = ''; dependencies(); }
     form.addEventListener('input', invalidate);
     form.addEventListener('change', invalidate);

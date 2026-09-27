@@ -15,6 +15,7 @@ const defaults = {
     intentDiscoveryEnabled: false,
     turnstileEnabled: false,
     turnstileSiteKey: '',
+    googleMapsEnabled: false,
     googleReviewsEnabled: false,
     googleMapsApiKey: '',
     googlePlaceId: '',
@@ -60,6 +61,7 @@ export function readConfiguration(root: string, storeCode: string): Configuratio
         intentDiscoveryEnabled: enabled('INTENT_DISCOVERY_ENABLED', false),
         turnstileEnabled: enabled('CLOUDFLARE_TURNSTILE_ENABLED', false),
         turnstileSiteKey: env.CLOUDFLARE_TURNSTILE_SITE_KEY || '',
+        googleMapsEnabled: enabled('GOOGLE_MAPS_ENABLED', Boolean(env.GOOGLE_MAPS_API_KEY) && !enabled('GOOGLE_REVIEWS_ENABLED', false)),
         googleReviewsEnabled: enabled('GOOGLE_REVIEWS_ENABLED', false),
         googleMapsApiKey: env.GOOGLE_MAPS_API_KEY || '',
         googlePlaceId: env.GOOGLE_PLACE_ID || '',
@@ -103,7 +105,10 @@ export function validateConfiguration(input: unknown): Configuration {
         } catch { throw new Error(`${name} must be an http(s) URL.`); }
     }
     if (config.turnstileEnabled && !config.turnstileSiteKey) throw new Error('Turnstile site key is required when enabled.');
-    if (config.googleReviewsEnabled && (!config.googleMapsApiKey || !config.googlePlaceId)) throw new Error('Google Maps API key and Place ID are required when reviews are enabled.');
+    if ((config.googleMapsEnabled || config.googleReviewsEnabled) && !config.googleMapsApiKey) {
+        throw new Error('Google Maps API key is required for maps or reviews.');
+    }
+    if (config.googleReviewsEnabled && !config.googlePlaceId) throw new Error('Google Place ID is required when reviews are enabled.');
     return config;
 }
 
@@ -121,7 +126,12 @@ export function planConfiguration(root: string, input: unknown) {
     const siteUrl = c.siteUrl.replace(/\/+$/, '');
     const integrations: Record<string, object> = { magentoGraphql: { api: `${siteUrl}/graphql` } };
     if (c.intentDiscoveryEnabled) integrations.intentApi = { baseUrl: 'http://localhost:3001' };
-    if (c.googleReviewsEnabled) integrations.googleMaps = { apiKey: c.googleMapsApiKey, placeId: c.googlePlaceId };
+    if (c.googleMapsEnabled || c.googleReviewsEnabled) {
+        integrations.googleMaps = {
+            apiKey: c.googleMapsApiKey,
+            ...(c.googleReviewsEnabled ? { placeId: c.googlePlaceId } : {}),
+        };
+    }
     if (c.turnstileEnabled) integrations.cloudflare = { siteKey: c.turnstileSiteKey };
     const context = { storeCode: c.storeCode, ...(c.hasCatalog ? { sku: c.sku, category: c.category } : {}) };
     const runtime = JSON.stringify({ integrations, context }, null, 2) + '\n';
@@ -134,8 +144,10 @@ export function planConfiguration(root: string, input: unknown) {
         ...(c.hasCatalog ? { SKU: c.sku, CATEGORY: c.category } : {}),
         OBSERVABILITY_ENABLED: bool(c.observabilityEnabled),
         INTENT_DISCOVERY_ENABLED: bool(c.intentDiscoveryEnabled), CLOUDFLARE_TURNSTILE_ENABLED: bool(c.turnstileEnabled),
-        CLOUDFLARE_TURNSTILE_SITE_KEY: c.turnstileEnabled ? c.turnstileSiteKey : '', GOOGLE_REVIEWS_ENABLED: bool(c.googleReviewsEnabled),
-        GOOGLE_MAPS_API_KEY: c.googleReviewsEnabled ? c.googleMapsApiKey : '', GOOGLE_PLACE_ID: c.googleReviewsEnabled ? c.googlePlaceId : '',
+        CLOUDFLARE_TURNSTILE_SITE_KEY: c.turnstileEnabled ? c.turnstileSiteKey : '',
+        GOOGLE_MAPS_ENABLED: bool(c.googleMapsEnabled), GOOGLE_REVIEWS_ENABLED: bool(c.googleReviewsEnabled),
+        GOOGLE_MAPS_API_KEY: c.googleMapsEnabled || c.googleReviewsEnabled ? c.googleMapsApiKey : '',
+        GOOGLE_PLACE_ID: c.googleReviewsEnabled ? c.googlePlaceId : '',
         REACTEDGE_ENV: c.environment, OTEL_HOST: c.observabilityEnabled ? c.otelHost : '', ALLOWED_HOSTS: c.allowedHosts,
     }));
     files.set(join(root, 'services/ssr/.env'), envFile({

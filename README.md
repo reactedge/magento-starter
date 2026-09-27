@@ -77,6 +77,8 @@ When the site has no product catalog, the UI omits demo SKU and category values;
 catalog widgets must be disabled in the store registry before building.
 The SSR port and public URL are retained in configuration but hidden from the
 basic form while those settings are unused.
+Maps for Store Finder or Seller Finder and Google Reviews are separate choices;
+either one uses the same Google API key, and Reviews also needs a Place ID.
 
 The configuration wizard will create:
 
