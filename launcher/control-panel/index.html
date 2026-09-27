@@ -34,6 +34,7 @@
       <label><span>Store code</span><input name="storeCode" required pattern="[A-Za-z0-9_-]+"></label>
       <button type="button" class="secondary" id="load">Load this store</button>
       <label><span>Site URL</span><input name="siteUrl" type="url" required></label>
+      <label class="inline"><input type="checkbox" name="hasCatalog">This website has a product catalog</label>
       <label><span>Platform root directory</span><input name="targetRoot" required></label>
       <label class="inline"><input type="checkbox" name="phpEnv">PHP host (for example Magento)</label>
       <label><span>Environment</span><select name="environment"><option>development</option><option>production</option></select></label>
@@ -57,7 +58,7 @@
         <small>The Google Maps key is written into public widget runtime JSON. Restrict its use to your site.</small>
       </div>
     </fieldset>
-    <fieldset><legend>Example widget data</legend>
+    <fieldset data-for="hasCatalog"><legend>Example catalog data</legend>
       <label><span>Product SKU</span><input name="sku"></label>
       <label><span>Category</span><input name="category"></label>
     </fieldset>

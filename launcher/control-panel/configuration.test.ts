@@ -49,3 +49,27 @@ test('rejects unsafe store paths and incomplete optional services before writing
         assert.throws(() => previewConfiguration(root, { ...defaults, category: "one' two" }), /apostrophe/);
     } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test('sites without a catalog do not require or write demo SKU and category', () => {
+    const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
+    const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
+    try {
+        mkdirSync(join(root, 'workspace.sample'));
+        mkdirSync(join(root, 'widgets/usp/public'), { recursive: true });
+        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+        const defaults = readConfiguration(root, 'site');
+        assert.throws(() => previewConfiguration(root, { ...defaults, sku: '', category: '' }), /catalog/);
+        const config = { ...defaults, hasCatalog: false, sku: '', category: '', targetRoot: join(targetParent, 'site') };
+        assert.match(previewConfiguration(root, config).note, /Catalog widgets/);
+        applyConfiguration(root, config);
+        const env = readFileSync(join(root, '.env.site'), 'utf8');
+        assert.match(env, /CATALOG_ENABLED='0'/);
+        assert.doesNotMatch(env, /^SKU=|^CATEGORY=/m);
+        const runtime = JSON.parse(readFileSync(join(root, 'widgets/usp/public/reactedge-runtime.json'), 'utf8'));
+        assert.deepEqual(runtime.context, { storeCode: 'site' });
+        assert.equal(readConfiguration(root, 'site').hasCatalog, false);
+    } finally {
+        rmSync(root, { recursive: true, force: true });
+        rmSync(targetParent, { recursive: true, force: true });
+    }
+});

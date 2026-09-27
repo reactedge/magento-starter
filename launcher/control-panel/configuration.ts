@@ -9,6 +9,7 @@ const defaults = {
     siteUrl: 'https://mageos-docker.magsite.co.uk',
     targetRoot: '/var/www/docker_mageos/magento',
     phpEnv: true,
+    hasCatalog: true,
     observabilityEnabled: false,
     otelHost: 'https://otel.reactedge.net/v1/traces',
     intentDiscoveryEnabled: false,
@@ -53,6 +54,7 @@ export function readConfiguration(root: string, storeCode: string): Configuratio
         siteUrl: env.SITEURL || defaults.siteUrl,
         targetRoot: env.TARGET_ROOT || defaults.targetRoot,
         phpEnv: enabled('PHP_ENV', true),
+        hasCatalog: enabled('CATALOG_ENABLED', true),
         observabilityEnabled: enabled('OBSERVABILITY_ENABLED', Boolean(env.OTEL_HOST)),
         otelHost: env.OTEL_HOST || defaults.otelHost,
         intentDiscoveryEnabled: enabled('INTENT_DISCOVERY_ENABLED', false),
@@ -83,7 +85,7 @@ export function validateConfiguration(input: unknown): Configuration {
     }
     const config = source as Configuration;
     if (!/^[a-zA-Z0-9_-]+$/.test(config.storeCode)) throw new Error('Store code may contain letters, numbers, underscores and hyphens only.');
-    if (!config.sku || !config.category) throw new Error('Demo SKU and category are required.');
+    if (config.hasCatalog && (!config.sku || !config.category)) throw new Error('Demo SKU and category are required when the site has a catalog.');
     if (!isAbsolute(config.targetRoot)) throw new Error('Platform root must be an absolute path.');
     if (!['development', 'production'].includes(config.environment)) throw new Error('Environment must be development or production.');
     if (!/^\d{1,5}$/.test(config.ssrPort) || +config.ssrPort < 1 || +config.ssrPort > 65535) throw new Error('SSR port must be between 1 and 65535.');
@@ -115,13 +117,16 @@ export function planConfiguration(root: string, input: unknown) {
     if (c.intentDiscoveryEnabled) integrations.intentApi = { baseUrl: 'http://localhost:3001' };
     if (c.googleReviewsEnabled) integrations.googleMaps = { apiKey: c.googleMapsApiKey, placeId: c.googlePlaceId };
     if (c.turnstileEnabled) integrations.cloudflare = { siteKey: c.turnstileSiteKey };
-    const runtime = JSON.stringify({ integrations, context: { storeCode: c.storeCode, sku: c.sku, category: c.category } }, null, 2) + '\n';
+    const context = { storeCode: c.storeCode, ...(c.hasCatalog ? { sku: c.sku, category: c.category } : {}) };
+    const runtime = JSON.stringify({ integrations, context }, null, 2) + '\n';
     const bool = (value: boolean) => value ? '1' : '0';
     const files = new Map<string, string>();
     files.set(join(root, `.env.${c.storeCode}`), envFile({
         STORE_CODE: c.storeCode, SITEURL: siteUrl, PHP_ENV: bool(c.phpEnv), TARGET_ROOT: c.targetRoot,
+        CATALOG_ENABLED: bool(c.hasCatalog),
         SSR_ENABLED: bool(c.ssrEnabled), SSR_PORT: c.ssrEnabled ? c.ssrPort : '', SSR_BASE_URL: c.ssrEnabled ? c.ssrBaseUrl : '',
-        SKU: c.sku, CATEGORY: c.category, OBSERVABILITY_ENABLED: bool(c.observabilityEnabled),
+        ...(c.hasCatalog ? { SKU: c.sku, CATEGORY: c.category } : {}),
+        OBSERVABILITY_ENABLED: bool(c.observabilityEnabled),
         INTENT_DISCOVERY_ENABLED: bool(c.intentDiscoveryEnabled), CLOUDFLARE_TURNSTILE_ENABLED: bool(c.turnstileEnabled),
         CLOUDFLARE_TURNSTILE_SITE_KEY: c.turnstileEnabled ? c.turnstileSiteKey : '', GOOGLE_REVIEWS_ENABLED: bool(c.googleReviewsEnabled),
         GOOGLE_MAPS_API_KEY: c.googleReviewsEnabled ? c.googleMapsApiKey : '', GOOGLE_PLACE_ID: c.googleReviewsEnabled ? c.googlePlaceId : '',
@@ -158,7 +163,10 @@ export function previewConfiguration(root: string, input: unknown) {
         changed,
         workspace: existsSync(join(plan.storePath, 'registry.json')) ? 'existing' : 'create from sample',
         targetWorkspace: plan.targetWorkspace,
-        note: 'Runtime JSON and services/ssr/.env are shared across stores; saving another store replaces them.',
+        note: [
+            'Runtime JSON and services/ssr/.env are shared across stores; saving another store replaces them.',
+            ...(!plan.config.hasCatalog ? ['Catalog widgets still require SKU and catalog services. Disable them in the registry before building.'] : []),
+        ].join('\n'),
     };
 }
 

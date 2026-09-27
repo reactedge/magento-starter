@@ -73,6 +73,8 @@ The UI shows the files it will change before saving. It currently writes the sam
 shared widget runtime files and SSR service env file for all stores, so saving a
 second store changes the active runtime configuration. Keep the Bash command for
 existing workflows while evaluating the UI.
+When the site has no product catalog, the UI omits demo SKU and category values;
+catalog widgets must be disabled in the store registry before building.
 
 The configuration wizard will create:
 
