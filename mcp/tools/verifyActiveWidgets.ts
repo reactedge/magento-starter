@@ -1,21 +1,21 @@
+import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import {
     existsSync,
     readFileSync,
-    readdirSync,
     statSync,
 } from 'node:fs';
-import { basename, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import {
     spawn,
-    type ChildProcess,
+    type ChildProcessWithoutNullStreams,
 } from 'node:child_process';
 import { ReactEdgeRoot } from '@reactedge/filesystem/reactedgeRoot';
 import { getConfig } from '../config';
 
 const DEV_URL = 'http://localhost:5173/?reactedge_debug=eager';
-const DEV_TIMEOUT_MS = 30_000;
-const COMMAND_TIMEOUT_MS = 180_000;
+const DEV_TIMEOUT_MS = 20_000;
+const COMMAND_TIMEOUT_MS = 50_000;
 const MAX_OUTPUT_LENGTH = 6_000;
 
 type RegistryEntry = {
@@ -31,109 +31,94 @@ type CommandResult = {
     error?: string;
 };
 
-type DevResult = {
-    passed: boolean;
-    element: string;
-    error?: string;
-    output?: string;
-};
+export function registerVerifyActiveWidgetTool(server: McpServer) {
+    server.registerTool(
+        'verify_active_widget',
+        {
+            title: 'Verify an active ReactEdge widget',
+            description:
+                'Runs one bounded verification check for one active widget instance. Use list_active_widgets first, then call this tool for dev, test, and build checks.',
+            inputSchema: {
+                instance: z.string().min(1),
+                check: z.enum(['dev', 'test', 'build']),
+            },
+        },
+        async ({ instance, check }) => {
+            const repositoryRoot = ReactEdgeRoot.get();
+            const { storeCode } = getConfig();
 
-type BuildResult = {
-    passed: boolean;
-    packageVersion?: string;
-    manifestVersion?: string;
-    manifestCreated: boolean;
-    versionMatches: boolean;
-    error?: string;
-    output?: string;
-};
+            const manifestPath = resolve(
+                repositoryRoot,
+                'workspace',
+                storeCode,
+                'manifests',
+                `${instance}.json`,
+            );
 
-export function registerVerifyActiveWidgetsTool(server: McpServer) {
-    server.registerTool('verify_active_widgets', {
-        title: 'Verify active ReactEdge widgets',
-        description:
-            'Runs development, E2E test, and build checks for every active widget in the current environment.',
-        inputSchema: {},
-    }, async () => {
-        const repositoryRoot = ReactEdgeRoot.get();
-        const { storeCode } = getConfig();
-        const activeInstances = listActiveInstances(
-            repositoryRoot,
-            storeCode,
-        );
-        const registry = readRegistry(repositoryRoot);
-        const unresolved: Array<{
-            instance: string;
-            error: string;
-        }> = [];
-        const targets = new Map<string, string[]>();
+            if (!existsSync(manifestPath)) {
+                return result({
+                    store: storeCode,
+                    instance,
+                    check,
+                    passed: false,
+                    error: `Widget instance "${instance}" is not active in store "${storeCode}".`,
+                }, true);
+            }
 
-        for (const instance of activeInstances) {
+            const registry = readRegistry(repositoryRoot);
             const entry = registry[instance];
 
             if (!entry) {
-                unresolved.push({
+                return result({
+                    store: storeCode,
                     instance,
+                    check,
+                    passed: false,
                     error: `Active instance "${instance}" has no registry entry.`,
-                });
-                continue;
+                }, true);
             }
 
             const widget = typeof entry.widget === 'string'
                 ? entry.widget
                 : instance;
-            const instances = targets.get(widget) ?? [];
 
-            instances.push(instance);
-            targets.set(widget, instances);
-        }
-
-        const widgets = [];
-
-        for (const [widget, instances] of targets) {
-            widgets.push(
-                await verifyWidget(
-                    repositoryRoot,
-                    widget,
-                    instances,
-                ),
+            const packagePath = resolve(
+                repositoryRoot,
+                'widgets',
+                widget,
+                'package.json',
             );
-        }
 
-        const valid =
-            unresolved.length === 0 &&
-            widgets.every(widget => widget.valid);
+            if (!existsSync(packagePath)) {
+                return result({
+                    store: storeCode,
+                    instance,
+                    widget,
+                    check,
+                    passed: false,
+                    error: `Widget package does not exist: ${packagePath}`,
+                }, true);
+            }
 
-        return result({
-            store: storeCode,
-            activeInstances: activeInstances.length,
-            widgetsChecked: widgets.length,
-            valid,
-            unresolved,
-            widgets,
-        });
-    });
-}
+            const verification = check === 'dev'
+                ? await verifyDevelopment(repositoryRoot, widget)
+                : check === 'test'
+                    ? await verifyTest(repositoryRoot, widget)
+                    : await verifyBuild(
+                        repositoryRoot,
+                        widget,
+                        packagePath,
+                    );
 
-function listActiveInstances(
-    repositoryRoot: string,
-    storeCode: string,
-): string[] {
-    const manifestsDirectory = resolve(
-        repositoryRoot,
-        'workspace',
-        storeCode,
-        'manifests',
+            return result({
+                store: storeCode,
+                instance,
+                widget,
+                check,
+                ...verification,
+            }, !verification.passed);
+        },
     );
-
-    if (!existsSync(manifestsDirectory)) {
-        return [];
-    }
-
-    return readdirSync(manifestsDirectory)
-        .filter(file => file.endsWith('.json'))
-        .map(file => basename(file, '.json'))
-        .sort((a, b) => a.localeCompare(b));
 }
 
 function readRegistry(repositoryRoot: string): Registry {
@@ -164,75 +149,10 @@ function readRegistry(repositoryRoot: string): Registry {
     return parsed as Registry;
 }
 
-async function verifyWidget(
-    repositoryRoot: string,
-    widget: string,
-    instances: string[],
-) {
-    const packagePath = resolve(
-        repositoryRoot,
-        'widgets',
-        widget,
-        'package.json',
-    );
-
-    if (!existsSync(packagePath)) {
-        return {
-            widget,
-            instances,
-            valid: false,
-            dev: {
-                passed: false,
-                element: `${widget}-widget`,
-                error: `Widget package does not exist: ${packagePath}`,
-            },
-            test: {
-                passed: false,
-                error: 'Widget package is unavailable.',
-            },
-            build: {
-                passed: false,
-                manifestCreated: false,
-                versionMatches: false,
-                error: 'Widget package is unavailable.',
-            },
-        };
-    }
-
-    const dev = await verifyDevelopment(repositoryRoot, widget);
-    const testCommand = await runCommand(
-        'mise',
-        ['run', 'widget-test', '--', widget],
-        repositoryRoot,
-        COMMAND_TIMEOUT_MS,
-    );
-    const test = {
-        passed: testCommand.passed,
-        ...(!testCommand.passed && {
-            error: testCommand.error ?? 'Widget E2E tests failed.',
-            output: commandOutput(testCommand),
-        }),
-    };
-    const build = await verifyBuild(
-        repositoryRoot,
-        widget,
-        packagePath,
-    );
-
-    return {
-        widget,
-        instances,
-        valid: dev.passed && test.passed && build.passed,
-        dev,
-        test,
-        build,
-    };
-}
-
 async function verifyDevelopment(
     repositoryRoot: string,
     widget: string,
-): Promise<DevResult> {
+) {
     const expectedElement = `${widget}-widget`;
     const child = spawn(
         'mise',
@@ -244,13 +164,15 @@ async function verifyDevelopment(
             stdio: ['ignore', 'pipe', 'pipe'],
         },
     );
+
     let stdout = '';
     let stderr = '';
 
-    child.stdout?.on('data', chunk => {
+    child.stdout.on('data', chunk => {
         stdout = appendOutput(stdout, chunk.toString());
     });
-    child.stderr?.on('data', chunk => {
+
+    child.stderr.on('data', chunk => {
         stderr = appendOutput(stderr, chunk.toString());
     });
 
@@ -269,20 +191,18 @@ async function verifyDevelopment(
             DEV_TIMEOUT_MS,
         );
 
-        if (!smoke.passed) {
-            return {
+        return smoke.passed
+            ? {
+                passed: true,
+                element: expectedElement,
+            }
+            : {
                 passed: false,
                 element: expectedElement,
                 error: smoke.error ??
                     `Expected DOM element <${expectedElement}> was not found.`,
                 output: commandOutput(smoke),
             };
-        }
-
-        return {
-            passed: true,
-            element: expectedElement,
-        };
     } catch (error) {
         return {
             passed: false,
@@ -309,8 +229,28 @@ async function verifyDevelopment(
     }
 }
 
+async function verifyTest(
+    repositoryRoot: string,
+    widget: string,
+) {
+    const command = await runCommand(
+        'mise',
+        ['run', 'widget-test', '--', widget],
+        repositoryRoot,
+        COMMAND_TIMEOUT_MS,
+    );
+
+    return command.passed
+        ? { passed: true }
+        : {
+            passed: false,
+            error: command.error ?? 'Widget E2E tests failed.',
+            output: commandOutput(command),
+        };
+}
+
 async function waitForDevelopmentServer(
-    child: ChildProcess,
+    child: ChildProcessWithoutNullStreams,
 ): Promise<void> {
     const startedAt = Date.now();
 
@@ -343,7 +283,7 @@ async function verifyBuild(
     repositoryRoot: string,
     widget: string,
     packagePath: string,
-): Promise<BuildResult> {
+) {
     const manifestPath = resolve(
         repositoryRoot,
         'workspace',
@@ -352,9 +292,8 @@ async function verifyBuild(
         widget,
         `widget-${widget}.manifest.json`,
     );
-    const previousManifestMtime = existsSync(manifestPath)
-        ? statSync(manifestPath).mtimeMs
-        : undefined;
+    const buildStartedAt = Date.now();
+
     const command = await runCommand(
         'mise',
         ['run', 'widget-build', '--', widget],
@@ -388,6 +327,7 @@ async function verifyBuild(
     const manifest = JSON.parse(
         readFileSync(manifestPath, 'utf8'),
     ) as { version?: unknown };
+
     const packageVersion =
         typeof packageJson.version === 'string'
             ? packageJson.version
@@ -396,9 +336,8 @@ async function verifyBuild(
         typeof manifest.version === 'string'
             ? manifest.version
             : undefined;
-    const currentManifestMtime = statSync(manifestPath).mtimeMs;
-    const manifestCreated = previousManifestMtime === undefined ||
-        currentManifestMtime > previousManifestMtime;
+    const manifestCreated =
+        statSync(manifestPath).mtimeMs >= buildStartedAt;
     const versionMatches =
         packageVersion !== undefined &&
         packageVersion === manifestVersion;
@@ -431,11 +370,16 @@ try {
         waitUntil: 'domcontentloaded',
         timeout: 15000,
     });
+
     const element = page.locator(selector);
     await element.waitFor({
         state: 'attached',
         timeout: 10000,
     });
+
+    if (await element.count() < 1) {
+        throw new Error('DOM element not found: ' + selector);
+    }
 } finally {
     await browser.close();
 }
@@ -455,17 +399,20 @@ function runCommand(
             detached: process.platform !== 'win32',
             stdio: ['ignore', 'pipe', 'pipe'],
         });
+
         let stdout = '';
         let stderr = '';
         let spawnError: string | undefined;
         let timedOut = false;
 
-        child.stdout?.on('data', chunk => {
+        child.stdout.on('data', chunk => {
             stdout = appendOutput(stdout, chunk.toString());
         });
-        child.stderr?.on('data', chunk => {
+
+        child.stderr.on('data', chunk => {
             stderr = appendOutput(stderr, chunk.toString());
         });
+
         child.on('error', error => {
             spawnError = error.message;
         });
@@ -498,7 +445,9 @@ function runCommand(
     });
 }
 
-function terminateProcess(child: ChildProcess) {
+function terminateProcess(
+    child: ChildProcessWithoutNullStreams,
+) {
     if (!child.pid || child.exitCode !== null) {
         return;
     }
@@ -543,11 +492,12 @@ function delay(milliseconds: number): Promise<void> {
     });
 }
 
-function result(data: unknown) {
+function result(data: unknown, isError = false) {
     return {
         content: [{
             type: 'text' as const,
             text: JSON.stringify(data, null, 2),
         }],
+        ...(isError && { isError: true }),
     };
 }
