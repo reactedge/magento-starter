@@ -36,5 +36,6 @@
       "client",
       "ssr"
     ]
-  }
+  },
+  "contractVersion": 1
 }
