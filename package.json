@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "configure:ui": "node --experimental-strip-types launcher/control-panel/server.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -b && npm run typecheck --workspace @reactedge/mcp",

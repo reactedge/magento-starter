@@ -1,0 +1,183 @@
+import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+export const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+
+const defaults = {
+    storeCode: 'default',
+    siteUrl: 'https://mageos-docker.magsite.co.uk',
+    targetRoot: '/var/www/docker_mageos/magento',
+    phpEnv: true,
+    observabilityEnabled: false,
+    otelHost: 'https://otel.reactedge.net/v1/traces',
+    intentDiscoveryEnabled: false,
+    turnstileEnabled: false,
+    turnstileSiteKey: '',
+    googleReviewsEnabled: false,
+    googleMapsApiKey: '',
+    googlePlaceId: '',
+    sku: 'WJ12',
+    category: 'tops-men',
+    ssrEnabled: true,
+    ssrPort: '4000',
+    ssrBaseUrl: 'https://widgets-ssr.co.uk',
+    environment: 'development',
+    allowedHosts: 'localhost,127.0.0.1,mageos-docker.magsite.co.uk',
+};
+
+export type Configuration = typeof defaults;
+
+function parseEnv(file: string): Record<string, string> {
+    if (!existsSync(file)) return {};
+    const result: Record<string, string> = {};
+    for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
+        const match = /^([A-Z][A-Z0-9_]*)=(.*)$/.exec(line);
+        if (!match) continue;
+        const value = match[2];
+        result[match[1]] = value.length >= 2 && ((value[0] === "'" && value.at(-1) === "'") || (value[0] === '"' && value.at(-1) === '"'))
+            ? value.slice(1, -1)
+            : value;
+    }
+    return result;
+}
+
+export function readConfiguration(root: string, storeCode: string): Configuration {
+    if (!/^[a-zA-Z0-9_-]+$/.test(storeCode)) throw new Error('Store code may contain letters, numbers, underscores and hyphens only.');
+    const sample = parseEnv(join(root, '.env.sample'));
+    const env = { ...sample, ...parseEnv(join(root, `.env.${storeCode}`)) };
+    const enabled = (key: string, fallback: boolean) => env[key] === undefined ? fallback : env[key] === '1';
+    return {
+        ...defaults,
+        storeCode,
+        siteUrl: env.SITEURL || defaults.siteUrl,
+        targetRoot: env.TARGET_ROOT || defaults.targetRoot,
+        phpEnv: enabled('PHP_ENV', true),
+        observabilityEnabled: enabled('OBSERVABILITY_ENABLED', Boolean(env.OTEL_HOST)),
+        otelHost: env.OTEL_HOST || defaults.otelHost,
+        intentDiscoveryEnabled: enabled('INTENT_DISCOVERY_ENABLED', false),
+        turnstileEnabled: enabled('CLOUDFLARE_TURNSTILE_ENABLED', false),
+        turnstileSiteKey: env.CLOUDFLARE_TURNSTILE_SITE_KEY || '',
+        googleReviewsEnabled: enabled('GOOGLE_REVIEWS_ENABLED', false),
+        googleMapsApiKey: env.GOOGLE_MAPS_API_KEY || '',
+        googlePlaceId: env.GOOGLE_PLACE_ID || '',
+        sku: env.SKU || defaults.sku,
+        category: env.CATEGORY || defaults.category,
+        ssrEnabled: enabled('SSR_ENABLED', true),
+        ssrPort: env.SSR_PORT || defaults.ssrPort,
+        ssrBaseUrl: env.SSR_BASE_URL || defaults.ssrBaseUrl,
+        environment: env.REACTEDGE_ENV || defaults.environment,
+        allowedHosts: env.ALLOWED_HOSTS || defaults.allowedHosts,
+    };
+}
+
+export function validateConfiguration(input: unknown): Configuration {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Expected a configuration object.');
+    const source = input as Record<string, unknown>;
+    for (const key of Object.keys(defaults)) {
+        const value = source[key];
+        if (typeof value !== typeof defaults[key as keyof Configuration]) throw new Error(`Invalid ${key}.`);
+        if (typeof value === 'string' && /[\r\n\0']/.test(value)) {
+            throw new Error(`${key} cannot contain a newline or apostrophe (environment files are shell sourced).`);
+        }
+    }
+    const config = source as Configuration;
+    if (!/^[a-zA-Z0-9_-]+$/.test(config.storeCode)) throw new Error('Store code may contain letters, numbers, underscores and hyphens only.');
+    if (!config.sku || !config.category) throw new Error('Demo SKU and category are required.');
+    if (!isAbsolute(config.targetRoot)) throw new Error('Platform root must be an absolute path.');
+    if (!['development', 'production'].includes(config.environment)) throw new Error('Environment must be development or production.');
+    if (!/^\d{1,5}$/.test(config.ssrPort) || +config.ssrPort < 1 || +config.ssrPort > 65535) throw new Error('SSR port must be between 1 and 65535.');
+    for (const [name, value] of [['Site URL', config.siteUrl], ['SSR URL', config.ssrBaseUrl], ['OpenTelemetry URL', config.otelHost]]) {
+        if (name !== 'Site URL' && ((name === 'SSR URL' && !config.ssrEnabled) || (name === 'OpenTelemetry URL' && !config.observabilityEnabled))) continue;
+        try {
+            const url = new URL(value);
+            if (!['http:', 'https:'].includes(url.protocol) || !url.hostname) throw new Error();
+        } catch { throw new Error(`${name} must be an http(s) URL.`); }
+    }
+    if (config.turnstileEnabled && !config.turnstileSiteKey) throw new Error('Turnstile site key is required when enabled.');
+    if (config.googleReviewsEnabled && (!config.googleMapsApiKey || !config.googlePlaceId)) throw new Error('Google Maps API key and Place ID are required when reviews are enabled.');
+    return config;
+}
+
+function envFile(values: Record<string, string>): string {
+    return Object.entries(values).map(([key, value]) => `${key}='${value}'`).join('\n') + '\n';
+}
+
+export function planConfiguration(root: string, input: unknown) {
+    const c = validateConfiguration(input);
+    const storePath = join(root, 'workspace', c.storeCode);
+    const samplePath = join(root, 'workspace.sample');
+    if (!existsSync(join(samplePath, 'registry.json')) && !existsSync(join(storePath, 'registry.json'))) {
+        throw new Error('Missing workspace.sample/registry.json.');
+    }
+    const siteUrl = c.siteUrl.replace(/\/+$/, '');
+    const integrations: Record<string, object> = { magentoGraphql: { api: `${siteUrl}/graphql` } };
+    if (c.intentDiscoveryEnabled) integrations.intentApi = { baseUrl: 'http://localhost:3001' };
+    if (c.googleReviewsEnabled) integrations.googleMaps = { apiKey: c.googleMapsApiKey, placeId: c.googlePlaceId };
+    if (c.turnstileEnabled) integrations.cloudflare = { siteKey: c.turnstileSiteKey };
+    const runtime = JSON.stringify({ integrations, context: { storeCode: c.storeCode, sku: c.sku, category: c.category } }, null, 2) + '\n';
+    const bool = (value: boolean) => value ? '1' : '0';
+    const files = new Map<string, string>();
+    files.set(join(root, `.env.${c.storeCode}`), envFile({
+        STORE_CODE: c.storeCode, SITEURL: siteUrl, PHP_ENV: bool(c.phpEnv), TARGET_ROOT: c.targetRoot,
+        SSR_ENABLED: bool(c.ssrEnabled), SSR_PORT: c.ssrEnabled ? c.ssrPort : '', SSR_BASE_URL: c.ssrEnabled ? c.ssrBaseUrl : '',
+        SKU: c.sku, CATEGORY: c.category, OBSERVABILITY_ENABLED: bool(c.observabilityEnabled),
+        INTENT_DISCOVERY_ENABLED: bool(c.intentDiscoveryEnabled), CLOUDFLARE_TURNSTILE_ENABLED: bool(c.turnstileEnabled),
+        CLOUDFLARE_TURNSTILE_SITE_KEY: c.turnstileEnabled ? c.turnstileSiteKey : '', GOOGLE_REVIEWS_ENABLED: bool(c.googleReviewsEnabled),
+        GOOGLE_MAPS_API_KEY: c.googleReviewsEnabled ? c.googleMapsApiKey : '', GOOGLE_PLACE_ID: c.googleReviewsEnabled ? c.googlePlaceId : '',
+        REACTEDGE_ENV: c.environment, OTEL_HOST: c.observabilityEnabled ? c.otelHost : '', ALLOWED_HOSTS: c.allowedHosts,
+    }));
+    files.set(join(root, 'services/ssr/.env'), envFile({
+        SSR_PORT: c.ssrEnabled ? c.ssrPort : '', ALLOW_SELF_SIGNED_SSL: c.environment === 'development' ? 'true' : 'false',
+        OTEL_HOST: c.observabilityEnabled ? c.otelHost : '',
+    }));
+    files.set(join(root, `services/orchestrator/.env.${c.storeCode}`), envFile({
+        STORE_CODE: c.storeCode, SITEURL: siteUrl, TARGET_ROOT: c.targetRoot, SSR_ENABLED: bool(c.ssrEnabled),
+        PHP_ENV: bool(c.phpEnv), ALLOWED_HOSTS: c.allowedHosts,
+    }));
+    files.set(join(root, `mcp/.env.${c.storeCode}`), envFile({
+        STORE_CODE: c.storeCode, SITEURL: siteUrl, PHP_ENV: bool(c.phpEnv), ALLOWED_HOSTS: c.allowedHosts,
+    }));
+    files.set(join(root, `browser-mcp/.env.${c.storeCode}`), envFile({ SITEURL: siteUrl }));
+    for (const parent of ['widgets', 'packages/widget-template']) {
+        const dir = join(root, parent);
+        if (!existsSync(dir)) continue;
+        for (const entry of readdirSync(dir, { withFileTypes: true }).filter(entry => entry.isDirectory())) {
+            const publicPath = join(dir, entry.name, 'public');
+            if (existsSync(publicPath)) files.set(join(publicPath, 'reactedge-runtime.json'), runtime);
+        }
+    }
+    return { config: c, files, storePath, samplePath, targetWorkspace: join(dirname(c.targetRoot), 'reactedge') };
+}
+
+export function previewConfiguration(root: string, input: unknown) {
+    const plan = planConfiguration(root, input);
+    const changed = [...plan.files].filter(([path, content]) => !existsSync(path) || readFileSync(path, 'utf8') !== content)
+        .map(([path]) => path.slice(root.length + 1));
+    return {
+        changed,
+        workspace: existsSync(join(plan.storePath, 'registry.json')) ? 'existing' : 'create from sample',
+        targetWorkspace: plan.targetWorkspace,
+        note: 'Runtime JSON and services/ssr/.env are shared across stores; saving another store replaces them.',
+    };
+}
+
+export function applyConfiguration(root: string, input: unknown) {
+    const plan = planConfiguration(root, input);
+    const preview = previewConfiguration(root, input);
+    // Check the external target before writing configuration files.
+    mkdirSync(plan.targetWorkspace, { recursive: true });
+    const probe = join(plan.targetWorkspace, `.reactedge-write-test-${process.pid}`);
+    writeFileSync(probe, '');
+    rmSync(probe);
+    if (!existsSync(join(plan.storePath, 'registry.json'))) {
+        mkdirSync(plan.storePath, { recursive: true });
+        cpSync(plan.samplePath, plan.storePath, { recursive: true, force: false, errorOnExist: false });
+    }
+    for (const [path, content] of plan.files) {
+        mkdirSync(dirname(path), { recursive: true });
+        writeFileSync(path, content, { mode: path.endsWith('.json') ? 0o644 : 0o600 });
+        if (!path.endsWith('.json')) chmodSync(path, 0o600);
+    }
+    return preview;
+}

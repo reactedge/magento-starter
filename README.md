@@ -61,6 +61,19 @@ Generate the local configuration:
 mise run configure
 ```
 
+To try the local browser configuration spike instead:
+
+```bash
+node --experimental-strip-types launcher/control-panel/server.ts
+# Open http://127.0.0.1:4173
+```
+
+It also has `mise run configure-ui` and `npm run configure:ui` entry points.
+The UI shows the files it will change before saving. It currently writes the same
+shared widget runtime files and SSR service env file for all stores, so saving a
+second store changes the active runtime configuration. Keep the Bash command for
+existing workflows while evaluating the UI.
+
 The configuration wizard will create:
 
 - `.env`
