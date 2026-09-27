@@ -3,6 +3,8 @@ import type {SsrViewMap} from "@reactedge/framework/contracts/buiild/WidgetSsrCo
 export interface WidgetManifest {
     id: string;
     widget: string;
+    widgetVersion?: string;
+    contractVersion?: number | null;
     src: string;
     css?: string | null,
     ssr: {
