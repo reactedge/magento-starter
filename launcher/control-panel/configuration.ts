@@ -66,11 +66,18 @@ export function readConfiguration(root: string, storeCode: string): Configuratio
         sku: env.SKU || defaults.sku,
         category: env.CATEGORY || defaults.category,
         ssrEnabled: enabled('SSR_ENABLED', true),
-        ssrPort: env.SSR_PORT || defaults.ssrPort,
-        ssrBaseUrl: env.SSR_BASE_URL || defaults.ssrBaseUrl,
+        ssrPort: env.SSR_PORT ?? defaults.ssrPort,
+        ssrBaseUrl: env.SSR_BASE_URL ?? defaults.ssrBaseUrl,
         environment: env.REACTEDGE_ENV || defaults.environment,
         allowedHosts: env.ALLOWED_HOSTS || defaults.allowedHosts,
     };
+}
+
+export function retainAdvancedSsrSettings(root: string, input: unknown): unknown {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) return input;
+    const submitted = input as Record<string, unknown>;
+    const stored = readConfiguration(root, String(submitted.storeCode ?? ''));
+    return { ...submitted, ssrPort: stored.ssrPort, ssrBaseUrl: stored.ssrBaseUrl };
 }
 
 export function validateConfiguration(input: unknown): Configuration {
@@ -88,9 +95,8 @@ export function validateConfiguration(input: unknown): Configuration {
     if (config.hasCatalog && (!config.sku || !config.category)) throw new Error('Demo SKU and category are required when the site has a catalog.');
     if (!isAbsolute(config.targetRoot)) throw new Error('Platform root must be an absolute path.');
     if (!['development', 'production'].includes(config.environment)) throw new Error('Environment must be development or production.');
-    if (!/^\d{1,5}$/.test(config.ssrPort) || +config.ssrPort < 1 || +config.ssrPort > 65535) throw new Error('SSR port must be between 1 and 65535.');
-    for (const [name, value] of [['Site URL', config.siteUrl], ['SSR URL', config.ssrBaseUrl], ['OpenTelemetry URL', config.otelHost]]) {
-        if (name !== 'Site URL' && ((name === 'SSR URL' && !config.ssrEnabled) || (name === 'OpenTelemetry URL' && !config.observabilityEnabled))) continue;
+    for (const [name, value] of [['Site URL', config.siteUrl], ['OpenTelemetry URL', config.otelHost]]) {
+        if (name === 'OpenTelemetry URL' && !config.observabilityEnabled) continue;
         try {
             const url = new URL(value);
             if (!['http:', 'https:'].includes(url.protocol) || !url.hostname) throw new Error();
@@ -124,7 +130,7 @@ export function planConfiguration(root: string, input: unknown) {
     files.set(join(root, `.env.${c.storeCode}`), envFile({
         STORE_CODE: c.storeCode, SITEURL: siteUrl, PHP_ENV: bool(c.phpEnv), TARGET_ROOT: c.targetRoot,
         CATALOG_ENABLED: bool(c.hasCatalog),
-        SSR_ENABLED: bool(c.ssrEnabled), SSR_PORT: c.ssrEnabled ? c.ssrPort : '', SSR_BASE_URL: c.ssrEnabled ? c.ssrBaseUrl : '',
+        SSR_ENABLED: bool(c.ssrEnabled), SSR_PORT: c.ssrPort, SSR_BASE_URL: c.ssrBaseUrl,
         ...(c.hasCatalog ? { SKU: c.sku, CATEGORY: c.category } : {}),
         OBSERVABILITY_ENABLED: bool(c.observabilityEnabled),
         INTENT_DISCOVERY_ENABLED: bool(c.intentDiscoveryEnabled), CLOUDFLARE_TURNSTILE_ENABLED: bool(c.turnstileEnabled),
@@ -133,7 +139,7 @@ export function planConfiguration(root: string, input: unknown) {
         REACTEDGE_ENV: c.environment, OTEL_HOST: c.observabilityEnabled ? c.otelHost : '', ALLOWED_HOSTS: c.allowedHosts,
     }));
     files.set(join(root, 'services/ssr/.env'), envFile({
-        SSR_PORT: c.ssrEnabled ? c.ssrPort : '', ALLOW_SELF_SIGNED_SSL: c.environment === 'development' ? 'true' : 'false',
+        SSR_PORT: c.ssrPort, ALLOW_SELF_SIGNED_SSL: c.environment === 'development' ? 'true' : 'false',
         OTEL_HOST: c.observabilityEnabled ? c.otelHost : '',
     }));
     files.set(join(root, `services/orchestrator/.env.${c.storeCode}`), envFile({

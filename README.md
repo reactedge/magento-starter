@@ -75,6 +75,8 @@ second store changes the active runtime configuration. Keep the Bash command for
 existing workflows while evaluating the UI.
 When the site has no product catalog, the UI omits demo SKU and category values;
 catalog widgets must be disabled in the store registry before building.
+The SSR port and public URL are retained in configuration but hidden from the
+basic form while those settings are unused.
 
 The configuration wizard will create:
 

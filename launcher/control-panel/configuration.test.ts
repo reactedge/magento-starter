@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { applyConfiguration, previewConfiguration, readConfiguration } from './configuration.ts';
+import { applyConfiguration, previewConfiguration, readConfiguration, retainAdvancedSsrSettings } from './configuration.ts';
 
 test('preview and save cover all configuration outputs without touching a real host', () => {
     const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
@@ -68,6 +68,30 @@ test('sites without a catalog do not require or write demo SKU and category', ()
         const runtime = JSON.parse(readFileSync(join(root, 'widgets/usp/public/reactedge-runtime.json'), 'utf8'));
         assert.deepEqual(runtime.context, { storeCode: 'site' });
         assert.equal(readConfiguration(root, 'site').hasCatalog, false);
+    } finally {
+        rmSync(root, { recursive: true, force: true });
+        rmSync(targetParent, { recursive: true, force: true });
+    }
+});
+
+test('hidden SSR settings survive saving other fields and disabling SSR', () => {
+    const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
+    const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
+    try {
+        mkdirSync(join(root, 'workspace.sample'));
+        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+        writeFileSync(join(root, '.env.site'), "SSR_PORT='4501'\nSSR_BASE_URL='https://legacy.example/ssr'\nSSR_ENABLED='1'\n");
+        const submitted: Record<string, unknown> = {
+            ...readConfiguration(root, 'site'), ssrEnabled: false, category: 'new-category', targetRoot: join(targetParent, 'site'),
+        };
+        delete submitted.ssrPort;
+        delete submitted.ssrBaseUrl;
+        applyConfiguration(root, retainAdvancedSsrSettings(root, submitted));
+        const env = readFileSync(join(root, '.env.site'), 'utf8');
+        assert.match(env, /SSR_ENABLED='0'/);
+        assert.match(env, /SSR_PORT='4501'/);
+        assert.match(env, /SSR_BASE_URL='https:\/\/legacy.example\/ssr'/);
+        assert.match(readFileSync(join(root, 'services/ssr/.env'), 'utf8'), /SSR_PORT='4501'/);
     } finally {
         rmSync(root, { recursive: true, force: true });
         rmSync(targetParent, { recursive: true, force: true });

@@ -42,10 +42,6 @@
     </fieldset>
     <fieldset><legend>Capabilities</legend>
       <label class="inline"><input type="checkbox" name="ssrEnabled">Generate SSR artefacts</label>
-      <div class="dependent" data-for="ssrEnabled">
-        <label><span>SSR port</span><input name="ssrPort" inputmode="numeric"></label>
-        <label><span>SSR public URL</span><input name="ssrBaseUrl" type="url"></label>
-      </div>
       <label class="inline"><input type="checkbox" name="observabilityEnabled">Observability</label>
       <div class="dependent" data-for="observabilityEnabled"><label><span>OpenTelemetry collector URL</span><input name="otelHost" type="url"></label></div>
       <label class="inline"><input type="checkbox" name="intentDiscoveryEnabled">Intent Discovery</label>

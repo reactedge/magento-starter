@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { applyConfiguration, previewConfiguration, readConfiguration, repositoryRoot } from './configuration.ts';
+import { applyConfiguration, previewConfiguration, readConfiguration, repositoryRoot, retainAdvancedSsrSettings } from './configuration.ts';
 
 const ui = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'index.html'), 'utf8');
 const host = '127.0.0.1';
@@ -33,7 +33,7 @@ const server = createServer(async (req, res) => {
                 body += chunk;
                 if (body.length > 65536) return send(413, { error: 'Configuration is too large.' });
             }
-            const input = JSON.parse(body);
+            const input = retainAdvancedSsrSettings(repositoryRoot, JSON.parse(body));
             return send(200, url.pathname === '/api/preview'
                 ? previewConfiguration(repositoryRoot, input)
                 : applyConfiguration(repositoryRoot, input));
