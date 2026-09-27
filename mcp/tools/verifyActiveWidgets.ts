@@ -8,7 +8,7 @@ import {
 import { basename, resolve } from 'node:path';
 import {
     spawn,
-    type ChildProcessWithoutNullStreams,
+    type ChildProcess,
 } from 'node:child_process';
 import { ReactEdgeRoot } from '@reactedge/filesystem/reactedgeRoot';
 import { getConfig } from '../config';
@@ -57,12 +57,10 @@ export function registerVerifyActiveWidgetsTool(server: McpServer) {
     }, async () => {
         const repositoryRoot = ReactEdgeRoot.get();
         const { storeCode } = getConfig();
-
         const activeInstances = listActiveInstances(
             repositoryRoot,
             storeCode,
         );
-
         const registry = readRegistry(repositoryRoot);
         const unresolved: Array<{
             instance: string;
@@ -84,8 +82,8 @@ export function registerVerifyActiveWidgetsTool(server: McpServer) {
             const widget = typeof entry.widget === 'string'
                 ? entry.widget
                 : instance;
-
             const instances = targets.get(widget) ?? [];
+
             instances.push(instance);
             targets.set(widget, instances);
         }
@@ -201,18 +199,13 @@ async function verifyWidget(
         };
     }
 
-    const dev = await verifyDevelopment(
-        repositoryRoot,
-        widget,
-    );
-
+    const dev = await verifyDevelopment(repositoryRoot, widget);
     const testCommand = await runCommand(
         'mise',
         ['run', 'widget-test', '--', widget],
         repositoryRoot,
         COMMAND_TIMEOUT_MS,
     );
-
     const test = {
         passed: testCommand.passed,
         ...(!testCommand.passed && {
@@ -220,7 +213,6 @@ async function verifyWidget(
             output: commandOutput(testCommand),
         }),
     };
-
     const build = await verifyBuild(
         repositoryRoot,
         widget,
@@ -252,15 +244,13 @@ async function verifyDevelopment(
             stdio: ['ignore', 'pipe', 'pipe'],
         },
     );
-
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', chunk => {
+    child.stdout?.on('data', chunk => {
         stdout = appendOutput(stdout, chunk.toString());
     });
-
-    child.stderr.on('data', chunk => {
+    child.stderr?.on('data', chunk => {
         stderr = appendOutput(stderr, chunk.toString());
     });
 
@@ -320,7 +310,7 @@ async function verifyDevelopment(
 }
 
 async function waitForDevelopmentServer(
-    child: ChildProcessWithoutNullStreams,
+    child: ChildProcess,
 ): Promise<void> {
     const startedAt = Date.now();
 
@@ -362,8 +352,9 @@ async function verifyBuild(
         widget,
         `widget-${widget}.manifest.json`,
     );
-    const buildStartedAt = Date.now();
-
+    const previousManifestMtime = existsSync(manifestPath)
+        ? statSync(manifestPath).mtimeMs
+        : undefined;
     const command = await runCommand(
         'mise',
         ['run', 'widget-build', '--', widget],
@@ -397,7 +388,6 @@ async function verifyBuild(
     const manifest = JSON.parse(
         readFileSync(manifestPath, 'utf8'),
     ) as { version?: unknown };
-
     const packageVersion =
         typeof packageJson.version === 'string'
             ? packageJson.version
@@ -406,12 +396,12 @@ async function verifyBuild(
         typeof manifest.version === 'string'
             ? manifest.version
             : undefined;
-    const manifestCreated =
-        statSync(manifestPath).mtimeMs >= buildStartedAt;
+    const currentManifestMtime = statSync(manifestPath).mtimeMs;
+    const manifestCreated = previousManifestMtime === undefined ||
+        currentManifestMtime > previousManifestMtime;
     const versionMatches =
         packageVersion !== undefined &&
         packageVersion === manifestVersion;
-
     const passed = manifestCreated && versionMatches;
 
     return {
@@ -441,16 +431,11 @@ try {
         waitUntil: 'domcontentloaded',
         timeout: 15000,
     });
-
     const element = page.locator(selector);
     await element.waitFor({
         state: 'attached',
         timeout: 10000,
     });
-
-    if (await element.count() < 1) {
-        throw new Error('DOM element not found: ' + selector);
-    }
 } finally {
     await browser.close();
 }
@@ -470,20 +455,17 @@ function runCommand(
             detached: process.platform !== 'win32',
             stdio: ['ignore', 'pipe', 'pipe'],
         });
-
         let stdout = '';
         let stderr = '';
         let spawnError: string | undefined;
         let timedOut = false;
 
-        child.stdout.on('data', chunk => {
+        child.stdout?.on('data', chunk => {
             stdout = appendOutput(stdout, chunk.toString());
         });
-
-        child.stderr.on('data', chunk => {
+        child.stderr?.on('data', chunk => {
             stderr = appendOutput(stderr, chunk.toString());
         });
-
         child.on('error', error => {
             spawnError = error.message;
         });
@@ -516,9 +498,7 @@ function runCommand(
     });
 }
 
-function terminateProcess(
-    child: ChildProcessWithoutNullStreams,
-) {
+function terminateProcess(child: ChildProcess) {
     if (!child.pid || child.exitCode !== null) {
         return;
     }
