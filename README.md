@@ -3,7 +3,7 @@
 ## 1. Clone the repository
 
 ```bash
-git clone https://github.com/reactedge/magento-starter ReactEdge
+git clone https://github.com/reactedge/platform ReactEdge
 cd ReactEdge
 ```
 
