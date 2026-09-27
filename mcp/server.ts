@@ -4,6 +4,7 @@ import { registerValidateContractTool } from "./tools/validateContract";
 import { registerValidateStructureTool } from "./tools/validateStructure";
 import { registerListWidgetsTool } from './tools/listWidgets';
 import { registerListActiveWidgetsTool } from './tools/listActiveWidgets';
+import { registerVerifyActiveWidgetsTool } from './tools/verifyActiveWidgets';
 import { registerCreateWidgetTool } from './tools/createWidget';
 import { registerWidgetResource } from './resources/capability';
 import { WidgetRegistry } from "../packages/widget-registry";
@@ -35,6 +36,7 @@ function createServer() {
     registerValidateWorkspaceTool(server)
     registerListWidgetsTool(server);
     registerListActiveWidgetsTool(server);
+    registerVerifyActiveWidgetsTool(server);
     registerCreateWidgetTool(server);
 
     return server;
