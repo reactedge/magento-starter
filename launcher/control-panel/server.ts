@@ -6,6 +6,7 @@ import { applyConfiguration, listEnvironments, previewConfiguration, readConfigu
 
 const ui = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'index.html'), 'utf8');
 const stylesheet = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'style.css'), 'utf8');
+const script = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'app.js'), 'utf8');
 const host = '127.0.0.1';
 const port = Number(process.env.REACTEDGE_UI_PORT || '4173');
 
@@ -24,6 +25,10 @@ const server = createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/style.css') {
         res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8', 'Cache-Control': 'no-store' });
         return res.end(stylesheet);
+    }
+    if (req.method === 'GET' && url.pathname === '/app.js') {
+        res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'no-store' });
+        return res.end(script);
     }
     try {
         if (req.method === 'GET' && url.pathname === '/api/environments') {
