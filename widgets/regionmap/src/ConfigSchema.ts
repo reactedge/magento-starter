@@ -19,6 +19,11 @@ export const RegionMapDataConfigSchema = z.object({
     region: MapPolygonSchema
 }).strict();
 
+const TranslationsSchema = z.record(
+    z.string(),
+    z.string()
+);
+
 export const WidgetConfigSchema = z.object({
     data: RegionMapDataConfigSchema,
 
@@ -28,10 +33,8 @@ export const WidgetConfigSchema = z.object({
         )
     }).optional(),
 
-    translations: z.record(
-        z.string(),
-        z.string()
-    ).default({})
+    translations: TranslationsSchema
+        .optional()
 }).strict();
 
 export type SchemaWidgetConfig =
