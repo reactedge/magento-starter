@@ -52,7 +52,7 @@ export async function processWidget(
         if (typeof widgetPackage.version !== 'string' || !widgetPackage.version) {
             throw new Error(`Missing widget version for ${widgetName}`);
         }
-        if (!Number.isInteger(capability.contractVersion) || capability.contractVersion < 1) {
+        if (capability.contractVersion !== undefined && (!Number.isInteger(capability.contractVersion) || capability.contractVersion < 1)) {
             throw new Error(`Missing contract version for ${widgetName}`);
         }
         buildWidget(widgetName, widgetPath, report);
@@ -142,7 +142,7 @@ export async function processWidget(
             id: instanceName,
             widget: widgetName,
             widgetVersion: widgetPackage.version,
-            contractVersion: capability.contractVersion,
+            contractVersion: capability.contractVersion ?? null,
             src: registryResult.src,
             css: registryResult.cssFilename,
             ssr: {
