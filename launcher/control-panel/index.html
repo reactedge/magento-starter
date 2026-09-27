@@ -28,11 +28,21 @@
 </head>
 <body>
   <h1>Configure ReactEdge</h1>
-  <p>Choose a store, review the files that will change, then save. This runs on your own machine.</p>
-  <form id="config">
+  <p>Create a new environment or load one already configured in this checkout.</p>
+  <section aria-label="Choose environment">
+    <fieldset><legend>Start</legend>
+      <button type="button" id="create">Create new environment</button>
+      <div id="existing-choice" hidden>
+        <label><span>Existing environment</span><select id="existing-environments"></select></label>
+        <button type="button" class="secondary" id="load">Load selected environment</button>
+      </div>
+      <p id="start-status" role="status"></p>
+    </fieldset>
+  </section>
+  <form id="config" hidden>
+    <h2 id="form-heading"></h2>
     <fieldset><legend>Store and platform</legend>
       <label><span>Store code</span><input name="storeCode" required pattern="[A-Za-z0-9_-]+"></label>
-      <button type="button" class="secondary" id="load">Load this store</button>
       <label><span>Site URL</span><input name="siteUrl" type="url" required></label>
       <label class="inline"><input type="checkbox" name="hasCatalog">This website has a product catalog</label>
       <label><span>Platform root directory</span><input name="targetRoot" required></label>
@@ -69,9 +79,14 @@
     const form = document.querySelector('#config');
     const result = document.querySelector('#result');
     const apply = document.querySelector('#apply');
+    const startStatus = document.querySelector('#start-status');
+    const existingChoice = document.querySelector('#existing-choice');
+    const existingSelect = document.querySelector('#existing-environments');
     const fields = [...form.elements].filter(el => el.name);
     let reviewed = '';
+    let operation = null;
     function values() { return Object.fromEntries(fields.map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value])); }
+    function submission() { return { ...values(), operation }; }
     function dependencies() {
       document.querySelectorAll('[data-for]').forEach(el => el.hidden = !form.elements[el.dataset.for].checked);
       document.querySelectorAll('[data-for-any]').forEach(el =>
@@ -93,36 +108,70 @@
       if (!response.ok) throw new Error(data.error || 'Request failed');
       return data;
     }
+    async function refreshEnvironments() {
+      const { environments } = await request('/api/environments');
+      existingSelect.replaceChildren(...environments.map(entry => {
+        const option = document.createElement('option');
+        option.value = entry.storeCode;
+        option.textContent = `${entry.storeCode} — ${entry.siteUrl}`;
+        return option;
+      }));
+      existingChoice.hidden = environments.length === 0;
+      startStatus.textContent = environments.length
+        ? `${environments.length} configured environment(s) found.`
+        : 'No environments configured yet. Create your first one.';
+    }
+    function showConfiguration(data, nextOperation) {
+      fields.forEach(el => { if (el.type === 'checkbox') el.checked = data[el.name]; else el.value = data[el.name]; });
+      operation = nextOperation;
+      form.hidden = false;
+      form.elements.storeCode.readOnly = nextOperation === 'update';
+      document.querySelector('#form-heading').textContent = nextOperation === 'create'
+        ? 'Create new environment' : `Edit ${data.storeCode}`;
+      invalidate();
+    }
+    async function create() {
+      try {
+        showConfiguration(await request('/api/config/template'), 'create');
+        form.elements.storeCode.focus();
+      } catch (error) { startStatus.textContent = error.message; }
+    }
     async function load() {
       try {
-        const store = form.elements.storeCode.value || 'default';
-        const data = await request('/api/config?store=' + encodeURIComponent(store));
-        fields.forEach(el => { if (el.type === 'checkbox') el.checked = data[el.name]; else el.value = data[el.name]; });
-        invalidate();
+        const store = existingSelect.value;
+        showConfiguration(await request('/api/config?store=' + encodeURIComponent(store)), 'update');
         result.textContent = `Loaded ${store}. Review the values before saving.`;
-      } catch (error) { result.textContent = error.message; }
+      } catch (error) { startStatus.textContent = error.message; }
     }
+    document.querySelector('#create').addEventListener('click', create);
     document.querySelector('#load').addEventListener('click', load);
     form.addEventListener('submit', async event => {
       event.preventDefault();
-      const data = values();
+      const data = submission();
       try {
         const preview = await request('/api/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
         reviewed = JSON.stringify(data);
-        result.textContent = `Store workspace: ${preview.workspace}\nTarget workspace: ${preview.targetWorkspace}\n\nAllowed URL hosts:\n${preview.allowedHosts.map(entry => `  ${entry.host} — ${entry.reason}`).join('\n')}\n\nFiles to change (${preview.changed.length}):\n${preview.changed.join('\n') || 'None'}\n\n${preview.note}`;
+        result.textContent = `Store workspace: ${preview.workspace}\nTarget workspace: ${preview.targetWorkspace}\n\nWorkspace setup:\n${preview.workspaceSetup.join('\n') || 'No new workspace paths'}\n\nAllowed URL hosts:\n${preview.allowedHosts.map(entry => `  ${entry.host} — ${entry.reason}`).join('\n')}\n\nFiles to change (${preview.changed.length}):\n${preview.changed.join('\n') || 'None'}\n\n${preview.note}`;
         apply.style.display = 'inline-block';
       } catch (error) { result.textContent = error.message; }
     });
     apply.addEventListener('click', async () => {
-      if (!reviewed || reviewed !== JSON.stringify(values())) return invalidate();
+      if (!reviewed || reviewed !== JSON.stringify(submission())) return invalidate();
       try {
         const saved = await request('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: reviewed });
+        operation = 'update';
+        form.elements.storeCode.readOnly = true;
+        document.querySelector('#form-heading').textContent = `Edit ${form.elements.storeCode.value}`;
+        try {
+          await refreshEnvironments();
+          existingSelect.value = form.elements.storeCode.value;
+        } catch (error) { startStatus.textContent = `Saved, but the environment list could not refresh: ${error.message}`; }
         reviewed = '';
         apply.style.display = 'none';
         result.textContent = `Saved ${saved.changed.length} files. Store workspace: ${saved.workspace}.`;
       } catch (error) { result.textContent = error.message; }
     });
-    load();
+    refreshEnvironments().catch(error => { startStatus.textContent = error.message; });
   </script>
 </body>
 </html>

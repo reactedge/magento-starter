@@ -3,14 +3,21 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { allowedHostDetails, applyConfiguration, previewConfiguration, readConfiguration, retainAdvancedSsrSettings } from './configuration.ts';
+import { allowedHostDetails, applyConfiguration, listEnvironments, previewConfiguration, readConfiguration, readConfigurationTemplate, retainAdvancedSsrSettings } from './configuration.ts';
+
+function writeWorkspaceSample(root: string) {
+    mkdirSync(join(root, 'workspace.sample/default/contracts'), { recursive: true });
+    mkdirSync(join(root, 'workspace.sample/release/source'), { recursive: true });
+    writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+    writeFileSync(join(root, 'workspace.sample/default/contracts/example.json'), '{}');
+    writeFileSync(join(root, 'workspace.sample/release/source/example.txt'), 'release');
+}
 
 test('preview and save cover all configuration outputs without touching a real host', () => {
     const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
     const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
     try {
-        mkdirSync(join(root, 'workspace.sample'), { recursive: true });
-        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+        writeWorkspaceSample(root);
         mkdirSync(join(root, 'widgets/usp/public'), { recursive: true });
         mkdirSync(join(root, 'packages/widget-template/runtime/public'), { recursive: true });
         writeFileSync(join(root, '.env.sample'), 'SITEURL=https://example.org\nALLOWED_HOSTS=localhost\n');
@@ -28,7 +35,8 @@ test('preview and save cover all configuration outputs without touching a real h
         applyConfiguration(root, config);
         assert.deepEqual(JSON.parse(readFileSync(join(root, 'widgets/usp/public/reactedge-runtime.json'), 'utf8')).integrations.googleMaps,
             { apiKey: 'a"b\\c', placeId: 'place-123' });
-        assert.equal(readFileSync(join(root, 'workspace/fr/registry.json'), 'utf8'), '{}');
+        assert.equal(readFileSync(join(root, 'workspace/registry.json'), 'utf8'), '{}');
+        assert.equal(readFileSync(join(root, 'workspace/fr/contracts/example.json'), 'utf8'), '{}');
         assert.equal(readConfiguration(root, 'fr').googleMapsApiKey, 'a"b\\c');
         assert.equal(previewConfiguration(root, config).changed.length, 0);
     } finally {
@@ -40,8 +48,7 @@ test('preview and save cover all configuration outputs without touching a real h
 test('rejects unsafe store paths and incomplete optional services before writing', () => {
     const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
     try {
-        mkdirSync(join(root, 'workspace.sample'));
-        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+        writeWorkspaceSample(root);
         const defaults = readConfiguration(root, 'default');
         assert.throws(() => previewConfiguration(root, { ...defaults, storeCode: '../other' }), /Store code/);
         assert.throws(() => previewConfiguration(root, { ...defaults, googleReviewsEnabled: true }), /Google Maps/);
@@ -54,9 +61,8 @@ test('sites without a catalog do not require or write demo SKU and category', ()
     const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
     const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
     try {
-        mkdirSync(join(root, 'workspace.sample'));
+        writeWorkspaceSample(root);
         mkdirSync(join(root, 'widgets/usp/public'), { recursive: true });
-        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
         const defaults = readConfiguration(root, 'site');
         assert.throws(() => previewConfiguration(root, { ...defaults, sku: '', category: '' }), /catalog/);
         const config = { ...defaults, hasCatalog: false, sku: '', category: '', targetRoot: join(targetParent, 'site') };
@@ -78,8 +84,7 @@ test('hidden SSR settings survive saving other fields and disabling SSR', () => 
     const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
     const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
     try {
-        mkdirSync(join(root, 'workspace.sample'));
-        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+        writeWorkspaceSample(root);
         writeFileSync(join(root, '.env.site'), "SSR_PORT='4501'\nSSR_BASE_URL='https://legacy.example/ssr'\nSSR_ENABLED='1'\n");
         const submitted: Record<string, unknown> = {
             ...readConfiguration(root, 'site'), ssrEnabled: false, category: 'new-category', targetRoot: join(targetParent, 'site'),
@@ -102,9 +107,8 @@ test('maps and reviews independently require the shared Google API key', () => {
     const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
     const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
     try {
-        mkdirSync(join(root, 'workspace.sample'));
+        writeWorkspaceSample(root);
         mkdirSync(join(root, 'widgets/storefinder/public'), { recursive: true });
-        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
         const defaults = { ...readConfiguration(root, 'maps'), targetRoot: join(targetParent, 'site') };
         assert.throws(() => previewConfiguration(root, { ...defaults, googleMapsEnabled: true }), /API key/);
         const maps = { ...defaults, googleMapsEnabled: true, googleMapsApiKey: 'shared-key' };
@@ -131,8 +135,7 @@ test('site and development hosts are explained and external contract hosts are e
     const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
     const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
     try {
-        mkdirSync(join(root, 'workspace.sample'));
-        writeFileSync(join(root, 'workspace.sample/registry.json'), '{}');
+        writeWorkspaceSample(root);
         writeFileSync(join(root, '.env.sample'), 'SITEURL=https://old.example\nALLOWED_HOSTS=localhost,127.0.0.1,old.example\n');
         const config = {
             ...readConfiguration(root, 'site'), siteUrl: 'https://new.example/path',
@@ -153,6 +156,41 @@ test('site and development hosts are explained and external contract hosts are e
         const production = { ...config, environment: 'production', additionalHosts: '' };
         assert.deepEqual(allowedHostDetails(production).map(entry => entry.host), ['new.example']);
         assert.throws(() => previewConfiguration(root, { ...config, additionalHosts: 'https://cdn.example' }), /hostname/);
+    } finally {
+        rmSync(root, { recursive: true, force: true });
+        rmSync(targetParent, { recursive: true, force: true });
+    }
+});
+
+test('fresh clones have no environments and create a store from the sample layout', () => {
+    const root = mkdtempSync(join(tmpdir(), 'reactedge-config-'));
+    const targetParent = mkdtempSync(join(tmpdir(), 'reactedge-target-'));
+    try {
+        writeWorkspaceSample(root);
+        writeFileSync(join(root, '.env.sample'), 'SITEURL=https://sample.example\nSTORE_CODE=default\n');
+        assert.deepEqual(listEnvironments(root), []);
+        const template = readConfigurationTemplate(root);
+        assert.equal(template.storeCode, '');
+        assert.equal(template.siteUrl, 'https://sample.example');
+
+        const config = { ...template, storeCode: 'new-store', targetRoot: join(targetParent, 'site') };
+        const preview = previewConfiguration(root, config);
+        assert.equal(preview.workspace, 'create from sample');
+        assert.deepEqual(preview.workspaceSetup, [
+            'workspace/new-store/ from workspace.sample/default/',
+            'workspace/registry.json from workspace.sample/',
+            'workspace/release/ from workspace.sample/release/',
+        ]);
+        applyConfiguration(root, config);
+        assert.deepEqual(listEnvironments(root), [{ storeCode: 'new-store', siteUrl: 'https://sample.example' }]);
+        assert.equal(readFileSync(join(root, 'workspace/registry.json'), 'utf8'), '{}');
+        assert.equal(readFileSync(join(root, 'workspace/new-store/contracts/example.json'), 'utf8'), '{}');
+        assert.equal(readFileSync(join(root, 'workspace/release/source/example.txt'), 'utf8'), 'release');
+        assert.equal(previewConfiguration(root, config).workspace, 'existing');
+        assert.deepEqual(previewConfiguration(root, config).workspaceSetup, []);
+
+        writeFileSync(join(root, '.env.default'), 'SITEURL=https://existing.example\n');
+        assert.equal(readConfigurationTemplate(root).siteUrl, 'https://sample.example');
     } finally {
         rmSync(root, { recursive: true, force: true });
         rmSync(targetParent, { recursive: true, force: true });

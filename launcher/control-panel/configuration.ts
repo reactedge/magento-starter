@@ -61,10 +61,10 @@ function parseEnv(file: string): Record<string, string> {
     return result;
 }
 
-export function readConfiguration(root: string, storeCode: string): Configuration {
+export function readConfiguration(root: string, storeCode: string, includeStoreEnv = true): Configuration {
     if (!/^[a-zA-Z0-9_-]+$/.test(storeCode)) throw new Error('Store code may contain letters, numbers, underscores and hyphens only.');
     const sample = parseEnv(join(root, '.env.sample'));
-    const env = { ...sample, ...parseEnv(join(root, `.env.${storeCode}`)) };
+    const env = { ...sample, ...(includeStoreEnv ? parseEnv(join(root, `.env.${storeCode}`)) : {}) };
     const enabled = (key: string, fallback: boolean) => env[key] === undefined ? fallback : env[key] === '1';
     const automaticallyAllowed = new Set([
         siteHostname(env.SITEURL || defaults.siteUrl), siteHostname(sample.SITEURL || defaults.siteUrl),
@@ -95,6 +95,20 @@ export function readConfiguration(root: string, storeCode: string): Configuratio
         additionalHosts: (env.ALLOWED_HOSTS || '').split(',').map(host => host.trim())
             .filter(host => host && !automaticallyAllowed.has(host.toLowerCase())).join(', '),
     };
+}
+
+export function readConfigurationTemplate(root: string): Configuration {
+    return { ...readConfiguration(root, 'default', false), storeCode: '' };
+}
+
+export function listEnvironments(root: string) {
+    return readdirSync(root, { withFileTypes: true })
+        .filter(entry => entry.isFile() && /^\.env\.[a-zA-Z0-9_-]+$/.test(entry.name) && entry.name !== '.env.sample')
+        .map(entry => {
+            const storeCode = entry.name.slice('.env.'.length);
+            return { storeCode, siteUrl: readConfiguration(root, storeCode).siteUrl };
+        })
+        .sort((a, b) => a.storeCode.localeCompare(b.storeCode));
 }
 
 export function retainAdvancedSsrSettings(root: string, input: unknown): unknown {
@@ -145,9 +159,11 @@ function envFile(values: Record<string, string>): string {
 
 export function planConfiguration(root: string, input: unknown) {
     const c = validateConfiguration(input);
-    const storePath = join(root, 'workspace', c.storeCode);
+    const workspaceRoot = join(root, 'workspace');
+    const storePath = join(workspaceRoot, c.storeCode);
     const samplePath = join(root, 'workspace.sample');
-    if (!existsSync(join(samplePath, 'registry.json')) && !existsSync(join(storePath, 'registry.json'))) {
+    if (!existsSync(join(samplePath, 'default')) && !existsSync(storePath)) throw new Error('Missing workspace.sample/default.');
+    if (!existsSync(join(samplePath, 'registry.json')) && !existsSync(join(workspaceRoot, 'registry.json'))) {
         throw new Error('Missing workspace.sample/registry.json.');
     }
     const siteUrl = c.siteUrl.replace(/\/+$/, '');
@@ -198,17 +214,24 @@ export function planConfiguration(root: string, input: unknown) {
             if (existsSync(publicPath)) files.set(join(publicPath, 'reactedge-runtime.json'), runtime);
         }
     }
-    return { config: c, files, storePath, samplePath, targetWorkspace: join(dirname(c.targetRoot), 'reactedge') };
+    return { config: c, files, workspaceRoot, storePath, samplePath, targetWorkspace: join(dirname(c.targetRoot), 'reactedge') };
 }
 
 export function previewConfiguration(root: string, input: unknown) {
     const plan = planConfiguration(root, input);
     const changed = [...plan.files].filter(([path, content]) => !existsSync(path) || readFileSync(path, 'utf8') !== content)
         .map(([path]) => path.slice(root.length + 1));
+    const workspaceSetup = [
+        ...(!existsSync(plan.storePath) ? [`workspace/${plan.config.storeCode}/ from workspace.sample/default/`] : []),
+        ...(!existsSync(join(plan.workspaceRoot, 'registry.json')) ? ['workspace/registry.json from workspace.sample/'] : []),
+        ...(!existsSync(join(plan.workspaceRoot, 'release')) && existsSync(join(plan.samplePath, 'release'))
+            ? ['workspace/release/ from workspace.sample/release/'] : []),
+    ];
     return {
         changed,
+        workspaceSetup,
         allowedHosts: allowedHostDetails(plan.config),
-        workspace: existsSync(join(plan.storePath, 'registry.json')) ? 'existing' : 'create from sample',
+        workspace: existsSync(plan.storePath) ? 'existing' : 'create from sample',
         targetWorkspace: plan.targetWorkspace,
         note: [
             'Runtime JSON and services/ssr/.env are shared across stores; saving another store replaces them.',
@@ -225,9 +248,13 @@ export function applyConfiguration(root: string, input: unknown) {
     const probe = join(plan.targetWorkspace, `.reactedge-write-test-${process.pid}`);
     writeFileSync(probe, '');
     rmSync(probe);
-    if (!existsSync(join(plan.storePath, 'registry.json'))) {
-        mkdirSync(plan.storePath, { recursive: true });
-        cpSync(plan.samplePath, plan.storePath, { recursive: true, force: false, errorOnExist: false });
+    mkdirSync(plan.workspaceRoot, { recursive: true });
+    if (!existsSync(plan.storePath)) cpSync(join(plan.samplePath, 'default'), plan.storePath, { recursive: true });
+    if (!existsSync(join(plan.workspaceRoot, 'registry.json'))) {
+        cpSync(join(plan.samplePath, 'registry.json'), join(plan.workspaceRoot, 'registry.json'));
+    }
+    if (!existsSync(join(plan.workspaceRoot, 'release')) && existsSync(join(plan.samplePath, 'release'))) {
+        cpSync(join(plan.samplePath, 'release'), join(plan.workspaceRoot, 'release'), { recursive: true });
     }
     for (const [path, content] of plan.files) {
         mkdirSync(dirname(path), { recursive: true });

@@ -81,6 +81,10 @@ Maps for Store Finder or Seller Finder and Google Reviews are separate choices;
 either one uses the same Google API key, and Reviews also needs a Place ID.
 The allowed URL hosts come from the Site URL and, in development, local hosts;
 only external domains referenced by widget contracts need to be added.
+On a fresh clone, choose **Create new environment** and supply its store code.
+After saving, **Load selected environment** lists the configurations found in
+root `.env.<store-code>` files. A new environment also initialises the store
+workspace, global registry and release directory from `workspace.sample`.
 
 The configuration wizard will create:
 

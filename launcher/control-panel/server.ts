@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { applyConfiguration, previewConfiguration, readConfiguration, repositoryRoot, retainAdvancedSsrSettings } from './configuration.ts';
+import { applyConfiguration, listEnvironments, previewConfiguration, readConfiguration, readConfigurationTemplate, repositoryRoot, retainAdvancedSsrSettings } from './configuration.ts';
 
 const ui = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'index.html'), 'utf8');
 const host = '127.0.0.1';
@@ -21,8 +21,18 @@ const server = createServer(async (req, res) => {
         return res.end(ui);
     }
     try {
+        if (req.method === 'GET' && url.pathname === '/api/environments') {
+            return send(200, { environments: listEnvironments(repositoryRoot) });
+        }
+        if (req.method === 'GET' && url.pathname === '/api/config/template') {
+            return send(200, readConfigurationTemplate(repositoryRoot));
+        }
         if (req.method === 'GET' && url.pathname === '/api/config') {
-            return send(200, readConfiguration(repositoryRoot, url.searchParams.get('store') || 'default'));
+            const storeCode = url.searchParams.get('store') || '';
+            if (!listEnvironments(repositoryRoot).some(entry => entry.storeCode === storeCode)) {
+                return send(404, { error: `Environment "${storeCode}" does not exist.` });
+            }
+            return send(200, readConfiguration(repositoryRoot, storeCode));
         }
         if (req.method === 'POST' && ['/api/preview', '/api/config'].includes(url.pathname)) {
             if (req.headers.origin !== origin || req.headers['content-type']?.split(';')[0] !== 'application/json') {
@@ -33,7 +43,15 @@ const server = createServer(async (req, res) => {
                 body += chunk;
                 if (body.length > 65536) return send(413, { error: 'Configuration is too large.' });
             }
-            const input = retainAdvancedSsrSettings(repositoryRoot, JSON.parse(body));
+            const submitted = JSON.parse(body);
+            if (!submitted || typeof submitted !== 'object' || Array.isArray(submitted) ||
+                !['create', 'update'].includes(submitted.operation) || typeof submitted.storeCode !== 'string') {
+                return send(400, { error: 'Choose Create new or Load existing environment first.' });
+            }
+            const exists = listEnvironments(repositoryRoot).some(entry => entry.storeCode === submitted.storeCode);
+            if (submitted.operation === 'create' && exists) return send(409, { error: `Environment "${submitted.storeCode}" already exists. Load it instead.` });
+            if (submitted.operation === 'update' && !exists) return send(404, { error: `Environment "${submitted.storeCode}" does not exist. Create it instead.` });
+            const input = retainAdvancedSsrSettings(repositoryRoot, submitted);
             return send(200, url.pathname === '/api/preview'
                 ? previewConfiguration(repositoryRoot, input)
                 : applyConfiguration(repositoryRoot, input));
