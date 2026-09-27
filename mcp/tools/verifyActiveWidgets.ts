@@ -10,7 +10,7 @@ import { spawn } from 'node:child_process';
 import { ReactEdgeRoot } from '@reactedge/filesystem/reactedgeRoot';
 import { getConfig } from '../config';
 
-const COMMAND_TIMEOUT_MS = 50_000;
+const COMMAND_TIMEOUT_MS = 15_000;
 const MAX_OUTPUT_LENGTH = 6_000;
 
 type RegistryEntry = {
@@ -23,6 +23,8 @@ type CommandResult = {
     passed: boolean;
     stdout: string;
     stderr: string;
+    timedOut?: boolean;
+    timeoutMs?: number;
     error?: string;
 };
 
@@ -157,6 +159,10 @@ async function verifyTest(
         ? { passed: true }
         : {
             passed: false,
+            ...(command.timedOut && {
+                timedOut: true,
+                timeoutMs: command.timeoutMs,
+            }),
             error: command.error ?? 'Widget E2E tests failed.',
             output: commandOutput(command),
         };
@@ -189,6 +195,10 @@ async function verifyBuild(
             passed: false,
             manifestCreated: false,
             versionMatches: false,
+            ...(command.timedOut && {
+                timedOut: true,
+                timeoutMs: command.timeoutMs,
+            }),
             error: command.error ?? 'Widget build failed.',
             output: commandOutput(command),
         };
@@ -257,7 +267,8 @@ function runCommand(
         let stdout = '';
         let stderr = '';
         let spawnError: string | undefined;
-        let timedOut = false;
+        let finished = false;
+        let timeout: ReturnType<typeof setTimeout> | undefined;
 
         child.stdout.on('data', chunk => {
             stdout = appendOutput(stdout, chunk.toString());
@@ -271,28 +282,46 @@ function runCommand(
             spawnError = error.message;
         });
 
-        const timeout = setTimeout(() => {
-            timedOut = true;
+        const finish = (commandResult: CommandResult) => {
+            if (finished) {
+                return;
+            }
+
+            finished = true;
+
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+
+            resolveCommand(commandResult);
+        };
+
+        timeout = setTimeout(() => {
             terminateProcess(child);
+
+            finish({
+                passed: false,
+                stdout,
+                stderr,
+                timedOut: true,
+                timeoutMs,
+                error:
+                    `Command timed out after ${timeoutMs}ms: ${command} ${args.join(' ')}`,
+            });
         }, timeoutMs);
 
         child.on('close', code => {
-            clearTimeout(timeout);
-
             const passed =
-                !timedOut &&
                 !spawnError &&
                 code === 0;
 
-            resolveCommand({
+            finish({
                 passed,
                 stdout,
                 stderr,
                 ...(!passed && {
-                    error: timedOut
-                        ? `Command timed out after ${timeoutMs}ms: ${command} ${args.join(' ')}`
-                        : spawnError ??
-                            `Command exited with code ${code}: ${command} ${args.join(' ')}`,
+                    error: spawnError ??
+                        `Command exited with code ${code}: ${command} ${args.join(' ')}`,
                 }),
             });
         });
