@@ -28,6 +28,11 @@ type CommandResult = {
     error?: string;
 };
 
+type TestCounts = {
+    passed: number;
+    failed: number;
+};
+
 export function registerVerifyActiveWidgetTool(server: McpServer) {
     server.registerTool(
         'verify_active_widget',
@@ -154,11 +159,16 @@ async function verifyTest(
         repositoryRoot,
         COMMAND_TIMEOUT_MS,
     );
+    const counts = parseTestCounts(command);
 
     return command.passed
-        ? { passed: true }
+        ? {
+            passed: true,
+            tests: counts,
+        }
         : {
             passed: false,
+            tests: counts,
             ...(command.timedOut && {
                 timedOut: true,
                 timeoutMs: command.timeoutMs,
@@ -166,6 +176,31 @@ async function verifyTest(
             error: command.error ?? 'Widget E2E tests failed.',
             output: commandOutput(command),
         };
+}
+
+function parseTestCounts(command: CommandResult): TestCounts {
+    const output = `${command.stdout}\n${command.stderr}`;
+
+    return {
+        passed: findLastCount(output, 'passed'),
+        failed: findLastCount(output, 'failed'),
+    };
+}
+
+function findLastCount(
+    output: string,
+    status: 'passed' | 'failed',
+): number {
+    const matches = [
+        ...output.matchAll(
+            new RegExp(`(\\d+)\\s+${status}\\b`, 'g'),
+        ),
+    ];
+    const value = matches.at(-1)?.[1];
+
+    return value
+        ? Number.parseInt(value, 10)
+        : 0;
 }
 
 async function verifyBuild(
