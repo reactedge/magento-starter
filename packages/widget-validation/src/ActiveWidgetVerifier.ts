@@ -281,7 +281,6 @@ export class ActiveWidgetVerifier {
             let stderr = '';
             let spawnError: string | undefined;
             let finished = false;
-            let timeout: ReturnType<typeof setTimeout> | undefined;
 
             child.stdout.on('data', chunk => {
                 stdout = this.appendOutput(
@@ -308,14 +307,12 @@ export class ActiveWidgetVerifier {
 
                 finished = true;
 
-                if (timeout) {
-                    clearTimeout(timeout);
-                }
+                clearTimeout(timeout);
 
                 resolveCommand(commandResult);
             };
 
-            timeout = setTimeout(() => {
+            const timeout = setTimeout(() => {
                 this.terminateProcess(child);
 
                 finish({

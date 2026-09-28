@@ -25,7 +25,7 @@ export function wrapContract(
     contract: ContractWrapper
 ): ContractWrapper {
 
-    let resolved =
+    const resolved =
         resolveContractTags(contract);
 
     return resolved
