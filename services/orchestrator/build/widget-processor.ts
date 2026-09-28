@@ -3,11 +3,11 @@
  */
 import type { ProcessedWidget } from "./types.ts";
 import { resolveWidgetEntry } from "../deployment/registry-loader.ts";
-import { buildWidget } from "./widget-processor/build-widget.ts";
+import { WidgetBuilder } from "./widget-processor/build-widget.ts";
 import { Report } from "../deployment/report.ts";
 import { updateAssetRegistry } from "./widget-processor/asset-registry.ts";
 import { loadContract } from "../contract/contract-loader.ts";
-import { loadSsrCss } from "./widget-processor/ssr-css-loader.ts";
+import { SsrLoader } from "./widget-processor/ssr-css-loader.ts";
 import { writeManifest } from "./widget-processor/manifest-writer.ts";
 import { getContractPath, getWidgetPath } from "./paths.ts";
 import { ContractImageProcessor } from "../contract/optimiser/validate-images.ts";
@@ -21,6 +21,9 @@ import {getFilename} from "./util";
 type RegistryResult = ReturnType<typeof updateAssetRegistry>;
 type ResolvedWidget = ReturnType<typeof resolveWidgetEntry>;
 type LoadedContract = Awaited<ReturnType<typeof loadContract>>;
+
+const widgetBuilder = new WidgetBuilder();
+const ssrLoader = new SsrLoader();
 
 async function loadWidgetContract(
     widgetName: string,
@@ -79,7 +82,7 @@ export async function processWidget(
 
     try {
         const widgetPath = getWidgetPath(widgetName);
-        buildWidget(widgetName, widgetPath, report);
+        widgetBuilder.build(widgetName, widgetPath, report);
 
         const registryResult = updateAssetRegistry(widgetName, instanceName, report);
         let contractResult = await loadWidgetContract(
@@ -109,7 +112,7 @@ export async function processWidget(
 
         const contractFile = getFilename(registryResult.contract)
 
-        const cssSsr = loadSsrCss(widgetName, registryResult.cssFilename)
+        const cssSsr = ssrLoader.load(widgetName, registryResult.cssFilename)
 
         const ssrStrategy =
             resolved?.ssr?.strategy ?? 'disabled';
