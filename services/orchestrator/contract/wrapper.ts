@@ -1,5 +1,5 @@
-import { getConfig } from "../../config.ts";
-import type { ContractWrapper } from "../types.ts";
+import { getConfig } from "../deployment/config.ts";
+import type { ContractWrapper } from "../build/types.ts";
 
 /**
  * Produces the final deployable contract consumed by ReactEdge.

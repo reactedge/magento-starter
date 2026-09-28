@@ -2,8 +2,8 @@
  * Entry point. Orchestrates the rebuild process. Knows the overall workflow but performs no business logic itself.
  */
 
-import { Report } from "./report.ts";
-import { resolveWidgets } from './rebuild-registry/registry-loader.ts';
+import { Report } from "../deployment/report.ts";
+import { resolveWidgets } from '../deployment/registry-loader.ts';
 import { processWidget } from './widget-processor.ts';
 import { runCiVerification } from "../test/playwright-verification.ts";
 import type { BuildWidgetRegistry } from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";

@@ -2,7 +2,7 @@
 
 import { Worker } from "bullmq";
 import { createRedisConnection } from "./ssr-worker/connection";
-import { loadConfig } from "./config"
+import { loadConfig } from "./deployment/config"
 import {
     GENERATE_SSR_JOB,
     SSR_GENERATION_QUEUE,

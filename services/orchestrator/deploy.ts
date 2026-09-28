@@ -1,9 +1,9 @@
 import {rebuildRegistry} from "./build/rebuild-registry.ts";
-import {Report} from "./build/report.ts";
-import {loadRegistry} from "./build/rebuild-registry/registry-loader.ts";
+import {Report} from "./deployment/report.ts";
+import {loadRegistry} from "./deployment/registry-loader.ts";
 import {selectTarget} from "./build/target-selection.ts";
 import {selectWidgets} from "./build/widget-selection.ts";
-import {loadConfig} from "./config.ts";
+import {loadConfig} from "./deployment/config.ts";
 
 const target = await selectTarget()
 loadConfig(target);

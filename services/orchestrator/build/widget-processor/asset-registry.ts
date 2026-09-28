@@ -2,7 +2,7 @@
  * Updates registry entries after a widget build. Owns updateRegistry() interactions and resulting asset metadata.
  */
 
-import {Report} from "../report.ts";
+import {Report} from "../../deployment/report.ts";
 import {updateRegistry} from "../asset-registry/registry-updater.ts";
 import {getRegistryPath, getWidgetAssetsPath} from "../paths.ts";
 import type {AssetRegistryResult} from "../types.ts";

@@ -3,10 +3,10 @@
  */
 import fs from "fs";
 import path from "path";
-import {Report} from "../report.ts";
+import {Report} from "../../deployment/report.ts";
 import {getContractPath, getWidgetPath} from "../paths.ts";
 import {exec} from "node:child_process";
-import {resolveContractTags} from "../contract-loader/wrapper.ts";
+import {resolveContractTags} from "../../contract/wrapper.ts";
 import {SsrVariant} from "@reactedge/framework/contracts/WidgetSsrConfig.ts";
 import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot.ts";
 

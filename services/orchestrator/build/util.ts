@@ -1,5 +1,5 @@
 // util.ts
-import { getConfig } from "../config.ts";
+import { getConfig } from "../deployment/config.ts";
 import { pathToFileURL } from "node:url";
 import { randomUUID } from 'node:crypto';
 import { rename, writeFile } from 'node:fs/promises';

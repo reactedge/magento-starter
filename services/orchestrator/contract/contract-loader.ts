@@ -1,13 +1,13 @@
 /**
  * Resolves and loads widget contracts from disk. Returns contract metadata and parsed content.
  */
-import type { ContractResult, ContractWrapper } from "../types.ts";
+import type { ContractResult, ContractWrapper } from "../build/types.ts";
 import fs from "fs";
-import { getContractPath } from "../paths.ts";
-import { Report } from "../report.ts";
-import { getFilename } from "../util.ts";
-import { validateContract } from "../contract-loader/validator.ts";
-import { wrapContract } from "../contract-loader/wrapper.ts";
+import { getContractPath } from "../build/paths.ts";
+import { Report } from "../deployment/report.ts";
+import { getFilename } from "../build/util.ts";
+import { validateContract } from "./validator.ts";
+import { wrapContract } from "./wrapper.ts";
 
 export async function loadContract(
     widgetName: string,

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import dotenv from 'dotenv';
-import type { Config } from "./build/types.ts";
+import type { Config } from "../build/types.ts";
 
 let CONFIG: Config;
 

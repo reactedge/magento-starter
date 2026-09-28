@@ -3,7 +3,7 @@
  */
 
 import path from 'path';
-import { getConfig } from "../config.ts";
+import { getConfig } from "../deployment/config.ts";
 import { ReactEdgeRoot } from "@reactedge/filesystem/reactedgeRoot.ts";
 
 export function getWidgetPath(

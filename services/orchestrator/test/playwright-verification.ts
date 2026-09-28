@@ -1,4 +1,4 @@
-import type {Report} from "../build/report.ts";
+import type {Report} from "../deployment/report.ts";
 import {testWidget} from "./test-widget.ts";
 
 export async function runCiVerification(

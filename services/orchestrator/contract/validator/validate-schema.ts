@@ -1,7 +1,7 @@
 import {ZodError} from "zod";
-import {importParseConfig} from "../../util.ts";
-import {getWidgetPath} from "../../paths.ts";
-import type {ValidationIssue} from "../../types.ts";
+import {importParseConfig} from "../../build/util.ts";
+import {getWidgetPath} from "../../build/paths.ts";
+import type {ValidationIssue} from "../../build/types.ts";
 
 export async function validateWidget(
     widgetName: string,

@@ -1,7 +1,7 @@
 /**
  * Creates and writes widget manifest files. Owns manifest serialization and storage.
  */
-import {Report} from "../report.ts";
+import {Report} from "../../deployment/report.ts";
 import fs from 'fs';
 import {getWidgetManifestsPath} from "../paths.ts";
 import {WidgetManifest} from "@reactedge/framework/contracts/WidgetManifest.ts";
