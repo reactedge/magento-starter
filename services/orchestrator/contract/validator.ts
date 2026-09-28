@@ -1,6 +1,6 @@
 import {validateUrls} from "./validator/validation-url.ts";
 import {validateWidget} from "./validator/validate-schema.ts";
-import type {ValidationIssue} from "../types.ts";
+import type {ValidationIssue} from "../build/types.ts";
 
 export async function validateContract(
     widgetName: string,

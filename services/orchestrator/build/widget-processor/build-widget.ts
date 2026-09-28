@@ -1,72 +1,74 @@
 import { execSync } from 'child_process';
 import path from 'path';
-import {Report} from "../report.ts";
-import {getConfig} from "../../config.ts";
+import {Report} from "../../deployment/report.ts";
+import {getConfig} from "../../deployment/config.ts";
 
-const buildCache = new Set<string>();
+export class WidgetBuilder {
+    private readonly buildCache = new Set<string>();
 
-export function buildWidget(
-    widgetName: string,
-    widgetPath: string,
-    report: Report
-): void {
-    const config = getConfig()
+    build(
+        widgetName: string,
+        widgetPath: string,
+        report: Report
+    ): void {
+        const config = getConfig()
 
-    if (buildCache.has(widgetName)) {
+        if (this.buildCache.has(widgetName)) {
+
+            report.info(
+                'Widget build skipped (cached)',
+                {
+                    widget: widgetName
+                }
+            );
+
+            return;
+        }
+
+        const buildCommand = config.phpEnv
+            ? "build"
+            : "build:ssr";
+
 
         report.info(
-            'Widget build skipped (cached)',
+            'Building widget',
             {
-                widget: widgetName
+                widget: widgetName,
+                buildCommand
             }
         );
 
-        return;
-    }
+        try {
+            execSync(
+                `npm run ${buildCommand} --prefix ${path.join(
+                    widgetPath
+                )}`,
+                {
+                    stdio: 'inherit'
+                }
+            );
 
-    const buildCommand = config.phpEnv
-        ? "build"
-        : "build:ssr";
+            this.buildCache.add(
+                widgetName
+            );
 
+            report.success(
+                'Widget build completed',
+                {
+                    widget: widgetName
+                }
+            );
 
-    report.info(
-        'Building widget',
-        {
-            widget: widgetName,
-            buildCommand
+        } catch (error) {
+
+            report.error(
+                'Widget build failed',
+                {
+                    widget: widgetName
+                }
+            );
+
+            throw error;
         }
-    );
-
-    try {
-        execSync(
-            `npm run ${buildCommand} --prefix ${path.join(
-                widgetPath
-            )}`,
-            {
-                stdio: 'inherit'
-            }
-        );
-
-        buildCache.add(
-            widgetName
-        );
-
-        report.success(
-            'Widget build completed',
-            {
-                widget: widgetName
-            }
-        );
-
-    } catch (error) {
-
-        report.error(
-            'Widget build failed',
-            {
-                widget: widgetName
-            }
-        );
-
-        throw error;
     }
 }

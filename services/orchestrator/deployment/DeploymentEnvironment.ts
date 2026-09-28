@@ -1,0 +1,43 @@
+import 'dotenv/config';
+import dotenv from 'dotenv';
+import type { Config } from "../build/types.ts";
+
+export class DeploymentEnvironment {
+    private config?: Config;
+
+    load(envFile: string): void {
+        dotenv.config({
+            path: envFile,
+            override: true
+        });
+
+        this.config = {
+            target: envFile,
+            storeCode: process.env.STORE_CODE!,
+            targetSiteUrl: process.env.SITEURL!,
+            allowedHosts: (process.env.ALLOWED_HOSTS ?? '')
+                .split(',')
+                .map(host => host.trim())
+                .filter(Boolean),
+            updateIntegrity: process.env.UPDATE_INTEGRITY
+                ? process.env.UPDATE_INTEGRITY === '1'
+                : false,
+            ssrEnabled: process.env.SSR_ENABLED
+                ? process.env.SSR_ENABLED === '1'
+                : false,
+            phpEnv: process.env.PHP_ENV
+                ? process.env.PHP_ENV === '1'
+                : false,
+        };
+    }
+
+    get(): Config {
+        if (!this.config) {
+            throw new Error(
+                'Configuration has not been initialised'
+            );
+        }
+
+        return this.config;
+    }
+}

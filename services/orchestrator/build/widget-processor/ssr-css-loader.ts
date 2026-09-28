@@ -8,28 +8,30 @@ import fs from 'fs';
 import path from 'path';
 import {getWidgetAssetsPath} from "../paths.ts";
 
-export function loadSsrCss(
-    widgetName: string,
-    cssSsrFilename?: string
-): string | null {
-    const widgetAssetsDir =
-        getWidgetAssetsPath(
-            widgetName
-        );
+export class SsrLoader {
+    load(
+        widgetName: string,
+        cssSsrFilename?: string
+    ): string | null {
+        const widgetAssetsDir =
+            getWidgetAssetsPath(
+                widgetName
+            );
 
-    if (!cssSsrFilename) {
-        return null;
-    }
+        if (!cssSsrFilename) {
+            return null;
+        }
 
-    try {
-        return fs.readFileSync(
-            path.join(
-                widgetAssetsDir,
-                cssSsrFilename
-            ),
-            'utf-8'
-        );
-    } catch {
-        return null;
+        try {
+            return fs.readFileSync(
+                path.join(
+                    widgetAssetsDir,
+                    cssSsrFilename
+                ),
+                'utf-8'
+            );
+        } catch {
+            return null;
+        }
     }
 }

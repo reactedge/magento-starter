@@ -2,21 +2,58 @@
  * Coordinates all processing required for a single widget. Owns the "process one widget" workflow.
  */
 import type { ProcessedWidget } from "./types.ts";
-import { resolveWidgetEntry } from "./rebuild-registry/registry-loader.ts";
-import { buildWidget } from "./widget-processor/build-widget.ts";
-import { Report } from "./report.ts";
+import { resolveWidgetEntry } from "../deployment/registry-loader.ts";
+import { WidgetBuilder } from "./widget-processor/build-widget.ts";
+import { Report } from "../deployment/report.ts";
 import { updateAssetRegistry } from "./widget-processor/asset-registry.ts";
-import { loadContract } from "./widget-processor/contract-loader.ts";
-import { loadSsrCss } from "./widget-processor/ssr-css-loader.ts";
+import { loadContract } from "../contract/contract-loader.ts";
+import { SsrLoader } from "./widget-processor/ssr-css-loader.ts";
 import { writeManifest } from "./widget-processor/manifest-writer.ts";
 import { getContractPath, getWidgetPath } from "./paths.ts";
-import { ContractImageProcessor } from "./contract-loader/optimiser/validate-images.ts";
+import { ContractImageProcessor } from "../contract/optimiser/validate-images.ts";
 import type { BuildWidgetRegistry } from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
 import type { SsrViewMap } from "@reactedge/framework/contracts/buiild/WidgetSsrConfig.ts";
 import { enqueueSsrGeneration } from "../ssr-worker/queue.ts"
-import { getConfig } from "../config.ts";
+import { getConfig } from "../deployment/config.ts";
 import { resolveGenerationInputs } from "../ssr-worker/queue-input-resolver";
 import {getFilename} from "./util";
+
+type RegistryResult = ReturnType<typeof updateAssetRegistry>;
+type ResolvedWidget = ReturnType<typeof resolveWidgetEntry>;
+type LoadedContract = Awaited<ReturnType<typeof loadContract>>;
+
+const widgetBuilder = new WidgetBuilder();
+const ssrLoader = new SsrLoader();
+
+async function loadWidgetContract(
+    widgetName: string,
+    registryResult: RegistryResult,
+    report: Report
+): Promise<LoadedContract> {
+    return loadContract(
+        widgetName,
+        registryResult.contract,
+        report
+    );
+}
+
+async function processContract(
+    instanceName: string,
+    contractResult: LoadedContract,
+    resolved: ResolvedWidget,
+    report: Report
+): Promise<LoadedContract> {
+    if (resolved?.imageOptimisation) {
+        const imageProcessor = new ContractImageProcessor(instanceName);
+        return imageProcessor.transform(
+            contractResult,
+            resolved.imageOptimisation,
+            report
+        );
+    }
+
+    return contractResult;
+}
 
 export async function processWidget(
     instanceName: string,
@@ -45,10 +82,14 @@ export async function processWidget(
 
     try {
         const widgetPath = getWidgetPath(widgetName);
-        buildWidget(widgetName, widgetPath, report);
+        widgetBuilder.build(widgetName, widgetPath, report);
 
         const registryResult = updateAssetRegistry(widgetName, instanceName, report);
-        let contractResult = await loadContract(widgetName, registryResult.contract, report);
+        let contractResult = await loadWidgetContract(
+            widgetName,
+            registryResult,
+            report
+        );
 
         if (contractResult === null) {
 
@@ -62,18 +103,16 @@ export async function processWidget(
             };
         }
 
-        if (resolved?.imageOptimisation) {
-            const imageProcessor = new ContractImageProcessor(instanceName);
-            contractResult = await imageProcessor.transform(
-                contractResult,
-                resolved.imageOptimisation,
-                report
-            );
-        }
+        contractResult = await processContract(
+            instanceName,
+            contractResult,
+            resolved,
+            report
+        );
 
         const contractFile = getFilename(registryResult.contract)
 
-        const cssSsr = loadSsrCss(widgetName, registryResult.cssFilename)
+        const cssSsr = ssrLoader.load(widgetName, registryResult.cssFilename)
 
         const ssrStrategy =
             resolved?.ssr?.strategy ?? 'disabled';

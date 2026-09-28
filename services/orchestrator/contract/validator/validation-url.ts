@@ -1,5 +1,5 @@
-import {getConfig} from "../../../config.ts";
-import type {ValidationIssue} from "../../types.ts";
+import {getConfig} from "../../deployment/config.ts";
+import type {ValidationIssue} from "../../build/types.ts";
 import {extractUrls} from "../data-extractor/url.ts";
 
 export function validateUrls(

@@ -1,8 +1,8 @@
-import { getFilename } from "../../util.ts";
+import { getFilename } from "../../build/util.ts";
 import path from "path";
 import https from 'https';
 import sharp from 'sharp';
-import { getConfig } from "../../../config.ts"
+import { getConfig } from "../../deployment/config.ts"
 import {WidgetImageOptimisationConfig} from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
 
 const MAX_WIDTH = 700;

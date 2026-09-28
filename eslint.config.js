@@ -57,5 +57,12 @@ export default [
             "react-hooks/rules-of-hooks": "error",
             "react-hooks/exhaustive-deps": "warn"
         }
+    },
+
+    {
+        files: ["services/orchestrator/**/*.{ts,tsx}"],
+        rules: {
+            complexity: ["warn", { max: 15 }]
+        }
     }
 ];

@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 import path from 'path';
-import type {Report} from "../build/report.ts";
+import type {Report} from "../deployment/report.ts";
 import {ReactEdgeRoot} from "@reactedge/filesystem/reactedgeRoot.ts";
 
 export function testWidget(

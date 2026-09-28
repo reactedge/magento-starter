@@ -1,6 +1,6 @@
 import path from "path";
 import {readFileSync} from "fs";
-import {getConfig} from "../../config.ts";
+import {getConfig} from "../../deployment/config.ts";
 
 export function updateRegistry({ widgetName, buildTarget, registryPath, widgetAssetsDir }) {
     const CONFIG = getConfig()
