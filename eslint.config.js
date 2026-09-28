@@ -9,7 +9,6 @@ export default [
         ignores: [
             "**/node_modules/**",
             "**/dist/**",
-            "**/build/**",
             "**/coverage/**",
             "**/release/**",
             "**/workspace/**",
@@ -56,6 +55,20 @@ export default [
             "react/react-in-jsx-scope": "off",
             "react-hooks/rules-of-hooks": "error",
             "react-hooks/exhaustive-deps": "warn"
+        }
+    },
+
+    {
+        files: ["services/orchestrator/**/*.{ts,tsx}"],
+        rules: {
+            "no-console": "off",
+            complexity: ["warn", { max: 15 }]
+        }
+    },
+    {
+        files: ["widgets/**/*.{ts,tsx}"],
+        rules: {
+            "no-console": "error"
         }
     },
 

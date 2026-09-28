@@ -1,5 +1,5 @@
 import path from 'path';
-import {WidgetImageOptimisationConfig} from "@reactedge/framework/contracts/BuildWidgetRegistry.ts";
+import type {WidgetImageOptimisationConfig} from "@reactedge/framework/contracts/BuildWidgetRegistry.ts";
 
 interface ImageReference {
     src: string;

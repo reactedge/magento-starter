@@ -3,7 +3,7 @@ import path from "path";
 import https from 'https';
 import sharp from 'sharp';
 import { getConfig } from "../../deployment/config.ts"
-import {WidgetImageOptimisationConfig} from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
+import type {WidgetImageOptimisationConfig} from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
 
 const MAX_WIDTH = 700;
 
