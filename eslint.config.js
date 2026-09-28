@@ -60,6 +60,15 @@ export default [
     },
 
     {
+        files: ["launcher/control-panel/**/*.js"],
+        languageOptions: {
+            globals: {
+                ...globals.browser
+            }
+        }
+    },
+
+    {
         files: ["services/orchestrator/**/*.{ts,tsx}"],
         rules: {
             complexity: ["warn", { max: 15 }]
