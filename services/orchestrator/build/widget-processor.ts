@@ -18,6 +18,40 @@ import { getConfig } from "../deployment/config.ts";
 import { resolveGenerationInputs } from "../ssr-worker/queue-input-resolver";
 import {getFilename} from "./util";
 
+type RegistryResult = ReturnType<typeof updateAssetRegistry>;
+type ResolvedWidget = ReturnType<typeof resolveWidgetEntry>;
+type LoadedContract = Awaited<ReturnType<typeof loadContract>>;
+
+async function loadWidgetContract(
+    widgetName: string,
+    registryResult: RegistryResult,
+    report: Report
+): Promise<LoadedContract> {
+    return loadContract(
+        widgetName,
+        registryResult.contract,
+        report
+    );
+}
+
+async function processContract(
+    instanceName: string,
+    contractResult: LoadedContract,
+    resolved: ResolvedWidget,
+    report: Report
+): Promise<LoadedContract> {
+    if (resolved?.imageOptimisation) {
+        const imageProcessor = new ContractImageProcessor(instanceName);
+        return imageProcessor.transform(
+            contractResult,
+            resolved.imageOptimisation,
+            report
+        );
+    }
+
+    return contractResult;
+}
+
 export async function processWidget(
     instanceName: string,
     registry: BuildWidgetRegistry,
@@ -48,7 +82,11 @@ export async function processWidget(
         buildWidget(widgetName, widgetPath, report);
 
         const registryResult = updateAssetRegistry(widgetName, instanceName, report);
-        let contractResult = await loadContract(widgetName, registryResult.contract, report);
+        let contractResult = await loadWidgetContract(
+            widgetName,
+            registryResult,
+            report
+        );
 
         if (contractResult === null) {
 
@@ -62,14 +100,12 @@ export async function processWidget(
             };
         }
 
-        if (resolved?.imageOptimisation) {
-            const imageProcessor = new ContractImageProcessor(instanceName);
-            contractResult = await imageProcessor.transform(
-                contractResult,
-                resolved.imageOptimisation,
-                report
-            );
-        }
+        contractResult = await processContract(
+            instanceName,
+            contractResult,
+            resolved,
+            report
+        );
 
         const contractFile = getFilename(registryResult.contract)
 
