@@ -6,7 +6,6 @@ import fs from "fs";
 import { getContractPath } from "../build/paths.ts";
 import { Report } from "../deployment/report.ts";
 import { getFilename } from "../build/util.ts";
-import { validateContract } from "./validator.ts";
 import { wrapContract } from "./wrapper.ts";
 
 export async function loadContract(
