@@ -391,10 +391,6 @@ export class StoreWorkspaceValidator {
             if (typeof content.html !== "string") {
                 errors.push(`${artifact}: SSR html is missing.`);
             }
-
-            if (!Object.prototype.hasOwnProperty.call(content, "bootstrap")) {
-                errors.push(`${artifact}: SSR bootstrap is missing.`);
-            }
         }
 
         return {
