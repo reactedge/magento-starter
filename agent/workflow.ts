@@ -25,21 +25,29 @@ export async function runWorkflow({ call, report, object, message }: WorkflowCon
     if (new Set(ids).size !== ids.length) throw new Error('Duplicate active widget IDs');
 
     for (const instance of ids) {
-        try {
-            const { data, isError } = await call('verify_active_widget', { instance, check: 'build' });
-            if (data.instance !== instance || data.store !== store || data.check !== 'build' ||
-                typeof data.passed !== 'boolean' || (isError && data.passed)) {
-                throw new Error(`Invalid verification response: ${JSON.stringify(data)}`);
+        for (const check of ['build', 'test'] as const) {
+            try {
+                const { data, isError } = await call('verify_active_widget', { instance, check });
+                if (data.instance !== instance || data.store !== store || data.check !== check ||
+                    typeof data.passed !== 'boolean' || (isError && data.passed)) {
+                    throw new Error(`Invalid verification response: ${JSON.stringify(data)}`);
+                }
+                const detail = typeof data.error === 'string' ? data.error :
+                    data.passed ? 'Verification passed' : 'Verification failed';
+                report.results.push({
+                    instance,
+                    status: data.passed ? 'PASS' : 'FAIL',
+                    detail: `${check}: ${detail}`,
+                    result: data,
+                });
+            } catch (error) {
+                report.results.push({
+                    instance,
+                    status: 'ERROR',
+                    detail: `${check}: ${message(error)}`,
+                    result: { instance, store, check },
+                });
             }
-            report.results.push({
-                instance,
-                status: data.passed ? 'PASS' : 'FAIL',
-                detail: typeof data.error === 'string' ? data.error :
-                    data.passed ? 'Build and manifest checks passed' : 'Build verification failed',
-                result: data,
-            });
-        } catch (error) {
-            report.results.push({ instance, status: 'ERROR', detail: message(error) });
         }
     }
 }
