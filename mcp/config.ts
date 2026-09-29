@@ -31,6 +31,10 @@ export function loadConfig(
             .split(",")
             .map(host => host.trim())
             .filter(Boolean),
+        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || undefined,
+        googlePlaceId: process.env.GOOGLE_PLACE_ID || undefined,
+        cloudflareTurnstileSiteKey:
+            process.env.CLOUDFLARE_TURNSTILE_SITE_KEY || undefined,
     };
 }
 
