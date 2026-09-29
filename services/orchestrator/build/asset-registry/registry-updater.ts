@@ -70,9 +70,3 @@ export class AssetRegistryUpdater {
         };
     }
 }
-
-const assetRegistryUpdater = new AssetRegistryUpdater();
-
-export function updateRegistry(input: RegistryUpdateInput) {
-    return assetRegistryUpdater.update(input);
-}

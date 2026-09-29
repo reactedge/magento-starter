@@ -1,18 +1,20 @@
 /**
- * Updates registry entries after a widget build. Owns updateRegistry() interactions and resulting asset metadata.
+ * Updates registry entries after a widget build. Owns asset registry update orchestration and reporting.
  */
 
-import {Report} from "../../deployment/report.ts";
-import {updateRegistry} from "../asset-registry/registry-updater.ts";
-import {getRegistryPath, getWidgetAssetsPath} from "../paths.ts";
+import type {Report} from "../../deployment/report.ts";
+import {AssetRegistryUpdater} from "../asset-registry/registry-updater.ts";
+import {BuildPaths} from "../paths.ts";
 import type {AssetRegistryResult} from "../types.ts";
+
+const buildPaths = new BuildPaths();
+const assetRegistryUpdater = new AssetRegistryUpdater();
 
 export function updateAssetRegistry(
     widgetName: string,
     name: string,
     report: Report
 ): AssetRegistryResult {
-
     report.info(
         'Updating asset registry',
         {
@@ -21,14 +23,11 @@ export function updateAssetRegistry(
         }
     );
 
-    const registryPath = getRegistryPath();
-    const widgetAssetsDir = getWidgetAssetsPath(widgetName);
-
-    const result = updateRegistry({
+    const result = assetRegistryUpdater.update({
         widgetName: name,
         buildTarget: widgetName,
-        registryPath,
-        widgetAssetsDir
+        registryPath: buildPaths.getRegistryPath(),
+        widgetAssetsDir: buildPaths.getWidgetAssetsPath(widgetName)
     });
 
     report.success(

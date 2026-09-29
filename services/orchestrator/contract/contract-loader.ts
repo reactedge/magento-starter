@@ -4,7 +4,7 @@
 import type { ContractWrapper, ValidationIssue } from "../build/types.ts";
 import fs from "fs";
 import { BuildPaths } from "../build/paths.ts";
-import { Report } from "../deployment/report.ts";
+import type { Report } from "../deployment/report.ts";
 import { getFilename } from "../build/util.ts";
 import { wrapContract } from "./wrapper.ts";
 import { ContractValidator } from "./validator.ts";
@@ -60,15 +60,4 @@ export class ContractLoader {
             manifestContract
         );
     }
-}
-
-export async function loadContract(
-    widgetName: string,
-    manifestContract: string,
-    report: Report
-): Promise<ContractWrapper | null> {
-    return new ContractLoader(report).load(
-        widgetName,
-        manifestContract
-    );
 }
