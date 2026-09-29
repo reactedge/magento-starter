@@ -24,9 +24,3 @@ export class WidgetSelector {
         });
     }
 }
-
-export async function selectWidgets(
-    registry: BuildWidgetRegistry
-): Promise<string[]> {
-    return new WidgetSelector(registry).select();
-}

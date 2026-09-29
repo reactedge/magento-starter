@@ -24,9 +24,3 @@ export class TargetSelector {
         });
     }
 }
-
-const targetSelector = new TargetSelector();
-
-export async function selectTarget(): Promise<string> {
-    return targetSelector.select();
-}

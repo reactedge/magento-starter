@@ -52,14 +52,3 @@ export class RegistryRebuilder {
         this.report.renderConsole();
     }
 }
-
-export async function rebuildRegistry(
-    selectedWidgets: string[],
-    registry: BuildWidgetRegistry,
-    report: Report
-): Promise<void> {
-    return new RegistryRebuilder(
-        registry,
-        report
-    ).rebuild(selectedWidgets);
-}
