@@ -5,48 +5,61 @@
 import { Report } from "../deployment/report.ts";
 import { resolveWidgets } from '../deployment/registry-loader.ts';
 import { processWidget } from './widget-processor.ts';
-import { runCiVerification } from "../test/playwright-verification.ts";
 import type { BuildWidgetRegistry } from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
+
+export class RegistryRebuilder {
+    constructor(
+        private readonly registry: BuildWidgetRegistry,
+        private readonly report: Report
+    ) {}
+
+    async rebuild(selectedWidgets: string[]): Promise<void> {
+        const widgets =
+            resolveWidgets(
+                selectedWidgets,
+                this.registry
+            );
+
+        this.report.info(
+            'Widget selection resolved',
+            {
+                widgets: widgets.length
+            }
+        );
+
+        const processedWidgets =
+            await Promise.all(
+                widgets.map(widget =>
+                    processWidget(
+                        widget,
+                        this.registry,
+                        this.report
+                    )
+                )
+            );
+
+        this.report.success(
+            'Widget processing completed',
+            {
+                widgets: processedWidgets.length
+            }
+        );
+
+        this.report.success(
+            'Registry rebuild completed'
+        );
+
+        this.report.renderConsole();
+    }
+}
 
 export async function rebuildRegistry(
     selectedWidgets: string[],
     registry: BuildWidgetRegistry,
     report: Report
-) {
-    const widgets =
-        resolveWidgets(
-            selectedWidgets,
-            registry
-        );
-
-    report.info(
-        'Widget selection resolved',
-        {
-            widgets: widgets.length
-        }
-    );
-
-    const processedWidgets =
-        await Promise.all(
-            widgets.map(widget =>
-                processWidget(
-                    widget,
-                    registry,
-                    report
-                )
-            )
-        );
-
-    report.success(
-        'Widget processing completed',
-        {
-            widgets: processedWidgets.length
-        }
-    );
-
-    report.success(
-        'Registry rebuild completed'
-    );
-
-    report.renderConsole()
+): Promise<void> {
+    return new RegistryRebuilder(
+        registry,
+        report
+    ).rebuild(selectedWidgets);
 }
