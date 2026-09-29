@@ -1,12 +1,19 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { ReactEdgeRoot } from '@reactedge/filesystem/reactedgeRoot';
-import { ActiveWidgetVerifier } from '@reactedge/widget-validation';
+import {
+    ActiveWidgetVerifier,
+    RuntimeReadinessValidator,
+} from '@reactedge/widget-validation';
 import { getConfig } from '../config';
 
 export function registerVerifyActiveWidgetTool(server: McpServer) {
+    const repositoryRoot = ReactEdgeRoot.get();
+    const readinessValidator = new RuntimeReadinessValidator(
+        repositoryRoot,
+    );
     const verifier = new ActiveWidgetVerifier(
-        ReactEdgeRoot.get(),
+        repositoryRoot,
     );
 
     server.registerTool(
@@ -14,22 +21,40 @@ export function registerVerifyActiveWidgetTool(server: McpServer) {
         {
             title: 'Verify an active ReactEdge widget',
             description:
-                'Runs one bounded build or E2E test check for one active widget instance. Use list_active_widgets first, then verify one check at a time.',
+                'Checks that one active widget can run in the current environment before executing one bounded build or E2E test check.',
             inputSchema: {
                 instance: z.string().min(1),
                 check: z.enum(['build', 'test']),
             },
         },
         async ({ instance, check }) => {
-            const { storeCode } = getConfig();
+            const config = getConfig();
+
+            const readiness = readinessValidator.validate(
+                config.storeCode,
+                instance,
+                config,
+            );
+
+            if (!readiness.passed) {
+                return result(
+                    readiness,
+                    true,
+                );
+            }
+
             const verification = await verifier.verify(
-                storeCode,
+                config.storeCode,
                 instance,
                 check,
             );
 
             return result(
-                verification,
+                {
+                    ...verification,
+                    runtimeReady: true,
+                    runtimeRequirements: readiness.requirements,
+                },
                 !verification.passed,
             );
         },

@@ -1,41 +1,47 @@
 /**
  * Creates and writes widget manifest files. Owns manifest serialization and storage.
  */
-import {Report} from "../../deployment/report.ts";
 import fs from 'fs';
-import {getWidgetManifestsPath} from "../paths.ts";
-import {WidgetManifest} from "@reactedge/framework/contracts/WidgetManifest.ts";
+import type {Report} from "../../deployment/report.ts";
+import {BuildPaths} from "../paths.ts";
+import type {WidgetManifest} from "@reactedge/framework/contracts/WidgetManifest.ts";
 
-export function writeManifest(
-    manifest: WidgetManifest,
-    name: string,
-    report: Report
-): string {
-    report.info(
-        'Writing widget manifest',
-        {
-            widget: name
-        }
-    );
+export class ManifestWriter {
+    constructor(
+        private readonly report: Report,
+        private readonly paths: BuildPaths = new BuildPaths()
+    ) {}
 
-    const filePath = getWidgetManifestsPath(`${name}.json`);
+    write(
+        manifest: WidgetManifest,
+        name: string
+    ): string {
+        this.report.info(
+            'Writing widget manifest',
+            {
+                widget: name
+            }
+        );
 
-    fs.writeFileSync(
-        filePath,
-        JSON.stringify(
-            manifest,
-            null,
-            2
-        )
-    );
+        const filePath = this.paths.getWidgetManifestsPath(`${name}.json`);
 
-    report.success(
-        'Widget manifest written',
-        {
-            widget: name,
-            path: filePath
-        }
-    );
+        fs.writeFileSync(
+            filePath,
+            JSON.stringify(
+                manifest,
+                null,
+                2
+            )
+        );
 
-    return filePath;
+        this.report.success(
+            'Widget manifest written',
+            {
+                widget: name,
+                path: filePath
+            }
+        );
+
+        return filePath;
+    }
 }

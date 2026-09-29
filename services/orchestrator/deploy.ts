@@ -1,11 +1,11 @@
-import {rebuildRegistry} from "./build/rebuild-registry.ts";
+import {RegistryRebuilder} from "./build/rebuild-registry.ts";
 import {Report} from "./deployment/report.ts";
 import {loadRegistry} from "./deployment/registry-loader.ts";
-import {selectTarget} from "./build/target-selection.ts";
-import {selectWidgets} from "./build/widget-selection.ts";
+import {TargetSelector} from "./build/target-selection.ts";
+import {WidgetSelector} from "./build/widget-selection.ts";
 import {loadConfig} from "./deployment/config.ts";
 
-const target = await selectTarget()
+const target = await new TargetSelector().select()
 loadConfig(target);
 
 const report = new Report();
@@ -20,8 +20,8 @@ report.info(
     }
 );
 
-const widgets = await selectWidgets(registry)
-rebuildRegistry(widgets, registry, report)
+const widgets = await new WidgetSelector(registry).select()
+new RegistryRebuilder(registry, report).rebuild(widgets)
 
 await new Promise(
     resolve => setTimeout(resolve, 10000)

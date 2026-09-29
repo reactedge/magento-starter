@@ -203,7 +203,13 @@ export function planConfiguration(root: string, input: unknown) {
         PHP_ENV: bool(c.phpEnv), ALLOWED_HOSTS: allowedHosts,
     }));
     files.set(join(root, `mcp/.env.${c.storeCode}`), envFile({
-        STORE_CODE: c.storeCode, SITEURL: siteUrl, PHP_ENV: bool(c.phpEnv), ALLOWED_HOSTS: allowedHosts,
+        STORE_CODE: c.storeCode,
+        SITEURL: siteUrl,
+        PHP_ENV: bool(c.phpEnv),
+        ALLOWED_HOSTS: allowedHosts,
+        CLOUDFLARE_TURNSTILE_SITE_KEY: c.turnstileEnabled ? c.turnstileSiteKey : '',
+        GOOGLE_MAPS_API_KEY: c.googleMapsEnabled || c.googleReviewsEnabled ? c.googleMapsApiKey : '',
+        GOOGLE_PLACE_ID: c.googleReviewsEnabled ? c.googlePlaceId : '',
     }));
     files.set(join(root, `browser-mcp/.env.${c.storeCode}`), envFile({ SITEURL: siteUrl }));
     for (const parent of ['widgets', 'packages/widget-template']) {
