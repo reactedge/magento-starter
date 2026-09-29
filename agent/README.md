@@ -144,3 +144,22 @@ Real builds must be validated in your configured ReactEdge environment.
 - **Missing registry or widget package:** check your local workspace configuration.
 - **`mise` not found or build timeout:** resolve the build prerequisite or inspect
   the verifier's timeout; increasing the client timeout alone will not fix it.
+
+## HTML and reusable JSON exports
+
+Every run automatically saves `report.json` and `report.html` together in a new
+`artifacts/agent/run-<unique suffix>/` directory. The terminal prints the exact
+paths on stderr. Open `report.html` in your browser; no web server or external
+assets are required. The existing JSON stdout output remains available.
+
+`report.ts` owns the export. `renderHtml(report)` is a pure function consuming the
+same completed report object that is serialized to JSON. It does not rerun checks
+or modify the report. The workflow is unchanged. Other consumers can reuse JSON,
+and another program can import `renderHtml` to render a previously saved report.
+
+The view shows each check, its status, test counts, and expandable evidence/logs.
+Timeouts are labelled `TIMEOUT` with incomplete test counts; the original JSON
+values are preserved. The failed total includes timeouts. All report text is HTML
+escaped. Exports also run after check failures or top-level errors. Export errors
+are printed to stderr and produce exit code 1; JSON stdout is still available.
+Generated reports are covered by the repository's existing `artifacts/` ignore rule.

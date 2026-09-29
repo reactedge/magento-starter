@@ -1,3 +1,4 @@
+import { exportReport } from './report.js';
 import { runWorkflow } from './workflow.js';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
@@ -67,7 +68,7 @@ try {
     } catch (error) {
         report.error = [report.error, `MCP cleanup failed: ${message(error)}`].filter(Boolean).join('; ');
     }
-    console.log(JSON.stringify({
+    const completedReport = {
         ...report,
         summary: {
             checked: report.results.length,
@@ -77,6 +78,14 @@ try {
         },
         outcome: report.error ? 'ERROR' : report.results.length === 0 ? 'NO_ACTIVE_WIDGETS' :
             report.results.every(row => row.status === 'PASS') ? 'PASS' : 'FAIL',
-    }, null, 2));
+    };
+    console.log(JSON.stringify(completedReport, null, 2));
     process.exitCode = report.error || report.results.some(row => row.status !== 'PASS') ? 1 : 0;
+    try {
+        const directory = await exportReport(completedReport, resolve(root, 'artifacts', 'agent'));
+        console.error(`Reports saved: ${directory}/report.json and ${directory}/report.html`);
+    } catch (error) {
+        console.error(`Report export failed: ${message(error)}`);
+        process.exitCode = 1;
+    }
 }
