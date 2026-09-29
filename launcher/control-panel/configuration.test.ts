@@ -35,6 +35,10 @@ test('preview and save cover all configuration outputs without touching a real h
         applyConfiguration(root, config);
         assert.deepEqual(JSON.parse(readFileSync(join(root, 'widgets/usp/public/reactedge-runtime.json'), 'utf8')).integrations.googleMaps,
             { apiKey: 'a"b\\c', placeId: 'place-123' });
+        const mcpEnv = readFileSync(join(root, 'mcp/.env.fr'), 'utf8');
+        assert.match(mcpEnv, /CLOUDFLARE_TURNSTILE_SITE_KEY='site-key'/);
+        assert.match(mcpEnv, /GOOGLE_MAPS_API_KEY='a"b\\c'/);
+        assert.match(mcpEnv, /GOOGLE_PLACE_ID='place-123'/);
         assert.equal(readFileSync(join(root, 'workspace/registry.json'), 'utf8'), '{}');
         assert.equal(readFileSync(join(root, 'workspace/fr/contracts/example.json'), 'utf8'), '{}');
         assert.equal(readConfiguration(root, 'fr').googleMapsApiKey, 'a"b\\c');
@@ -117,12 +121,16 @@ test('maps and reviews independently require the shared Google API key', () => {
         assert.deepEqual(mapRuntime.integrations.googleMaps, { apiKey: 'shared-key' });
         assert.equal(readConfiguration(root, 'maps').googleMapsEnabled, true);
         assert.match(readFileSync(join(root, '.env.maps'), 'utf8'), /GOOGLE_MAPS_API_KEY='shared-key'/);
+        assert.match(readFileSync(join(root, 'mcp/.env.maps'), 'utf8'), /GOOGLE_MAPS_API_KEY='shared-key'/);
 
         const reviews = { ...maps, storeCode: 'reviews', googleMapsEnabled: false, googleReviewsEnabled: true };
         assert.throws(() => previewConfiguration(root, reviews), /Place ID/);
         applyConfiguration(root, { ...reviews, googlePlaceId: 'place-123' });
         const reviewsRuntime = JSON.parse(readFileSync(join(root, 'widgets/storefinder/public/reactedge-runtime.json'), 'utf8'));
         assert.deepEqual(reviewsRuntime.integrations.googleMaps, { apiKey: 'shared-key', placeId: 'place-123' });
+        const reviewsMcpEnv = readFileSync(join(root, 'mcp/.env.reviews'), 'utf8');
+        assert.match(reviewsMcpEnv, /GOOGLE_MAPS_API_KEY='shared-key'/);
+        assert.match(reviewsMcpEnv, /GOOGLE_PLACE_ID='place-123'/);
         assert.equal(readConfiguration(root, 'reviews').googleMapsEnabled, false);
         assert.equal(readConfiguration(root, 'reviews').googleReviewsEnabled, true);
     } finally {
