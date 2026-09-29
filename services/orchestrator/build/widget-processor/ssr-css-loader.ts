@@ -6,15 +6,19 @@
  */
 import fs from 'fs';
 import path from 'path';
-import {getWidgetAssetsPath} from "../paths.ts";
+import {BuildPaths} from "../paths.ts";
 
 export class SsrLoader {
+    constructor(
+        private readonly paths: BuildPaths = new BuildPaths()
+    ) {}
+
     load(
         widgetName: string,
         cssSsrFilename?: string
     ): string | null {
         const widgetAssetsDir =
-            getWidgetAssetsPath(
+            this.paths.getWidgetAssetsPath(
                 widgetName
             );
 

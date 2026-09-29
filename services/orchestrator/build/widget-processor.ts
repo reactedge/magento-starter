@@ -5,24 +5,26 @@ import type { ProcessedWidget } from "./types.ts";
 import { RegistryResolver } from "../deployment/RegistryResolver.ts";
 import { WidgetBuilder } from "./widget-processor/build-widget.ts";
 import type { Report } from "../deployment/report.ts";
-import { updateAssetRegistry } from "./widget-processor/asset-registry.ts";
 import { ContractLoader } from "../contract/contract-loader.ts";
 import { SsrLoader } from "./widget-processor/ssr-css-loader.ts";
-import { writeManifest } from "./widget-processor/manifest-writer.ts";
+import { ManifestWriter } from "./widget-processor/manifest-writer.ts";
 import { BuildPaths } from "./paths.ts";
+import { AssetRegistryUpdater } from "./asset-registry/registry-updater.ts";
 import { ContractImageProcessor } from "../contract/optimiser/validate-images.ts";
 import type { BuildWidgetRegistry } from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
 import { getFilename } from "./util";
 import { SsrGenerationCoordinator } from "./widget-processor/ssr-generation-coordinator.ts";
 
 const widgetBuilder = new WidgetBuilder();
-const ssrLoader = new SsrLoader();
 
 export class WidgetProcessor {
     private readonly registryResolver = new RegistryResolver();
     private readonly paths = new BuildPaths();
     private readonly contractLoader: ContractLoader;
+    private readonly assetRegistry: AssetRegistryUpdater;
+    private readonly ssrLoader: SsrLoader;
     private readonly ssrGeneration: SsrGenerationCoordinator;
+    private readonly manifestWriter: ManifestWriter;
 
     constructor(
         private readonly registry: BuildWidgetRegistry,
@@ -32,7 +34,18 @@ export class WidgetProcessor {
             report,
             this.paths
         );
+        this.assetRegistry = new AssetRegistryUpdater(
+            report,
+            this.paths
+        );
+        this.ssrLoader = new SsrLoader(
+            this.paths
+        );
         this.ssrGeneration = new SsrGenerationCoordinator(
+            report,
+            this.paths
+        );
+        this.manifestWriter = new ManifestWriter(
             report,
             this.paths
         );
@@ -64,10 +77,9 @@ export class WidgetProcessor {
             const widgetPath = this.paths.getWidgetPath(widgetName);
             widgetBuilder.build(widgetName, widgetPath, this.report);
 
-            const registryResult = updateAssetRegistry(
+            const registryResult = this.assetRegistry.update(
                 widgetName,
-                instanceName,
-                this.report
+                instanceName
             );
 
             if (!registryResult.contract) {
@@ -101,8 +113,11 @@ export class WidgetProcessor {
                 );
             }
 
-            const contractFile = getFilename(registryResult.contract)
-            const cssSsr = ssrLoader.load(widgetName, registryResult.cssFilename)
+            const contractFile = getFilename(registryResult.contract);
+            const cssSsr = this.ssrLoader.load(
+                widgetName,
+                registryResult.cssFilename
+            );
             const ssrStrategy =
                 resolved?.ssr?.strategy ?? 'disabled';
 
@@ -134,7 +149,10 @@ export class WidgetProcessor {
                 contractFile
             };
 
-            manifestResult = writeManifest(manifest, instanceName, this.report);
+            manifestResult = this.manifestWriter.write(
+                manifest,
+                instanceName
+            );
 
             this.report.info(
                 'Widget Manifest',
