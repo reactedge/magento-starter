@@ -6,7 +6,8 @@ version uses a programmed workflow, with no model, API key, or reasoning loop.
 
 ## Files
 
-- `index.ts`: MCP connection, discovery, sequential verification, and JSON report.
+- `index.ts`: stable runner for the MCP connection, tool calls, cleanup, and JSON report.
+- `workflow.ts`: the goal-specific discovery and sequential build verification.
 - `package.json`: standalone dependencies and commands.
 
 The existing MCP server and widget verifier remain responsible for platform work.
@@ -68,6 +69,19 @@ JSON report is written to stdout. The subprocess inherits your shell environment
 A discovery or connection failure prevents the widget loop and produces a report
 with a top-level `error`. No widgets is explicitly reported as `NO_ACTIVE_WIDGETS`;
 it is not evidence that any build passed.
+
+## Changing the workflow
+
+Edit `workflow.ts` to add or change the MCP actions. `runWorkflow` receives the
+`call` function, the mutable `report`, and the existing validation/error helpers.
+It records per-instance results in `report.results` and can set `report.store`.
+The runner invokes it once after connecting, then handles cleanup and reporting.
+
+The extracted workflow preserves the original action order and error handling.
+Its report entries use the existing `Row` contract (`instance`, `status`,
+`detail`, and optional `result`). Additional workflows must fit this report
+contract to keep the runner unchanged. No workflow registry or framework is
+introduced for this first goal.
 
 ## What a build check does
 
