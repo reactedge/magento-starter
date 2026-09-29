@@ -2,7 +2,7 @@
  * Coordinates all processing required for a single widget. Owns the "process one widget" workflow.
  */
 import type { ProcessedWidget } from "./types.ts";
-import { resolveWidgetEntry } from "../deployment/registry-loader.ts";
+import { RegistryResolver } from "../deployment/RegistryResolver.ts";
 import { WidgetBuilder } from "./widget-processor/build-widget.ts";
 import { Report } from "../deployment/report.ts";
 import { updateAssetRegistry } from "./widget-processor/asset-registry.ts";
@@ -19,7 +19,7 @@ import { resolveGenerationInputs } from "../ssr-worker/queue-input-resolver";
 import {getFilename} from "./util";
 
 type RegistryResult = ReturnType<typeof updateAssetRegistry>;
-type ResolvedWidget = ReturnType<typeof resolveWidgetEntry>;
+type ResolvedWidget = ReturnType<RegistryResolver["resolveWidgetEntry"]>;
 type LoadedContract = Awaited<ReturnType<typeof loadContract>>;
 
 const widgetBuilder = new WidgetBuilder();
@@ -55,162 +55,173 @@ async function processContract(
     return contractResult;
 }
 
-export async function processWidget(
-    instanceName: string,
-    registry: BuildWidgetRegistry,
-    report: Report
-): Promise<ProcessedWidget> {
-    let manifestResult: string | null = null;
-    let ssrViews: SsrViewMap = {};
+export class WidgetProcessor {
+    private readonly registryResolver = new RegistryResolver();
 
-    const resolved =
-        resolveWidgetEntry(
-            instanceName,
-            registry
-        );
+    constructor(
+        private readonly registry: BuildWidgetRegistry,
+        private readonly report: Report
+    ) {}
 
-    const widgetName =
-        resolved.widget || instanceName;
+    async process(
+        instanceName: string
+    ): Promise<ProcessedWidget> {
+        let manifestResult: string | null = null;
+        let ssrViews: SsrViewMap = {};
 
-    report.info(
-        'Widget processing started',
-        {
-            widget: instanceName,
-            buildTarget: widgetName
-        }
-    );
-
-    try {
-        const widgetPath = getWidgetPath(widgetName);
-        widgetBuilder.build(widgetName, widgetPath, report);
-
-        const registryResult = updateAssetRegistry(widgetName, instanceName, report);
-        let contractResult = await loadWidgetContract(
-            widgetName,
-            registryResult,
-            report
-        );
-
-        if (contractResult === null) {
-
-            report.error(
-                'Contract not found'
+        const resolved =
+            this.registryResolver.resolveWidgetEntry(
+                instanceName,
+                this.registry
             );
 
-            return {
-                name: instanceName,
-                manifestFile: ''
-            };
-        }
+        const widgetName =
+            resolved.widget || instanceName;
 
-        contractResult = await processContract(
-            instanceName,
-            contractResult,
-            resolved,
-            report
-        );
-
-        const contractFile = getFilename(registryResult.contract)
-
-        const cssSsr = ssrLoader.load(widgetName, registryResult.cssFilename)
-
-        const ssrStrategy =
-            resolved?.ssr?.strategy ?? 'disabled';
-
-        const CONFIG = getConfig()
-
-        if (CONFIG.ssrEnabled && ssrStrategy !== 'disabled') {
-            const variants =
-                resolved?.ssr?.variants ?? ['desktop'];
-
-            for (const variant of variants) {
-
-                report.info(
-                    `SSR variant ${variant} queued`,
-                    {
-                        widget: instanceName,
-                        contract: contractResult,
-                        strategy: ssrStrategy,
-                    },
-                );
-
-                const localPath = getContractPath(widgetName, contractFile)
-                const generationInputs = await resolveGenerationInputs(
-                    contractResult,
-                    localPath
-                );
-
-                for (const input of generationInputs) {
-                    const result = await enqueueSsrGeneration({
-                        target: CONFIG.target,
-                        widget: widgetName,
-                        contract: input.contract,
-                        bootstrap: input.bootstrap,
-                        ...(input.key !== undefined && { key: input.key }),
-                        variant,
-                        outputFile: `${instanceName}/output${input.key !== undefined ? `-${input.key}` : ''}.json`,
-                    });
-
-                    report.info(
-                        `SSR variant ${variant} generated`,
-                        {
-                            widget: instanceName,
-                            artifactPath: result.artifactPath,
-                        },
-                    );
-                }
-            }
-        }
-
-        const {
-            entries: _entries,
-            ...manifestContract
-        } = contractResult;
-
-        const manifest = {
-            id: instanceName,
-            widget: widgetName,
-            src: registryResult.src,
-            css: registryResult.cssFilename,
-            ssr: {
-                css: cssSsr,
-                strategy: resolved?.ssr?.strategy
-            },
-            integrity: registryResult.integrity,
-            contract: manifestContract,
-            contractFile
-        };
-
-        manifestResult = writeManifest(manifest, instanceName, report);
-
-        report.info(
-            'Widget Manifest',
-            {
-                manifest
-            }
-        );
-
-        report.success(
-            'Widget processing completed',
-            {
-                widget: instanceName
-            }
-        );
-    }
-    catch (error) {
-        report.error(
-            'Widget processing failed',
+        this.report.info(
+            'Widget processing started',
             {
                 widget: instanceName,
-                error
+                buildTarget: widgetName
             }
         );
-    } finally {
 
+        try {
+            const widgetPath = getWidgetPath(widgetName);
+            widgetBuilder.build(widgetName, widgetPath, this.report);
+
+            const registryResult = updateAssetRegistry(
+                widgetName,
+                instanceName,
+                this.report
+            );
+            let contractResult = await loadWidgetContract(
+                widgetName,
+                registryResult,
+                this.report
+            );
+
+            if (contractResult === null) {
+
+                this.report.error(
+                    'Contract not found'
+                );
+
+                return {
+                    name: instanceName,
+                    manifestFile: ''
+                };
+            }
+
+            contractResult = await processContract(
+                instanceName,
+                contractResult,
+                resolved,
+                this.report
+            );
+
+            const contractFile = getFilename(registryResult.contract)
+
+            const cssSsr = ssrLoader.load(widgetName, registryResult.cssFilename)
+
+            const ssrStrategy =
+                resolved?.ssr?.strategy ?? 'disabled';
+
+            const CONFIG = getConfig()
+
+            if (CONFIG.ssrEnabled && ssrStrategy !== 'disabled') {
+                const variants =
+                    resolved?.ssr?.variants ?? ['desktop'];
+
+                for (const variant of variants) {
+
+                    this.report.info(
+                        `SSR variant ${variant} queued`,
+                        {
+                            widget: instanceName,
+                            contract: contractResult,
+                            strategy: ssrStrategy,
+                        },
+                    );
+
+                    const localPath = getContractPath(widgetName, contractFile)
+                    const generationInputs = await resolveGenerationInputs(
+                        contractResult,
+                        localPath
+                    );
+
+                    for (const input of generationInputs) {
+                        const result = await enqueueSsrGeneration({
+                            target: CONFIG.target,
+                            widget: widgetName,
+                            contract: input.contract,
+                            bootstrap: input.bootstrap,
+                            ...(input.key !== undefined && { key: input.key }),
+                            variant,
+                            outputFile: `${instanceName}/output${input.key !== undefined ? `-${input.key}` : ''}.json`,
+                        });
+
+                        this.report.info(
+                            `SSR variant ${variant} generated`,
+                            {
+                                widget: instanceName,
+                                artifactPath: result.artifactPath,
+                            },
+                        );
+                    }
+                }
+            }
+
+            const {
+                entries: _entries,
+                ...manifestContract
+            } = contractResult;
+
+            const manifest = {
+                id: instanceName,
+                widget: widgetName,
+                src: registryResult.src,
+                css: registryResult.cssFilename,
+                ssr: {
+                    css: cssSsr,
+                    strategy: resolved?.ssr?.strategy
+                },
+                integrity: registryResult.integrity,
+                contract: manifestContract,
+                contractFile
+            };
+
+            manifestResult = writeManifest(manifest, instanceName, this.report);
+
+            this.report.info(
+                'Widget Manifest',
+                {
+                    manifest
+                }
+            );
+
+            this.report.success(
+                'Widget processing completed',
+                {
+                    widget: instanceName
+                }
+            );
+        }
+        catch (error) {
+            this.report.error(
+                'Widget processing failed',
+                {
+                    widget: instanceName,
+                    error
+                }
+            );
+        } finally {
+
+        }
+
+        return {
+            name: instanceName,
+            manifestFile: manifestResult
+        };
     }
-
-    return {
-        name: instanceName,
-        manifestFile: manifestResult
-    };
 }

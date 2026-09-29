@@ -3,19 +3,27 @@
  */
 
 import { Report } from "../deployment/report.ts";
-import { resolveWidgets } from '../deployment/registry-loader.ts';
-import { processWidget } from './widget-processor.ts';
+import { RegistryResolver } from "../deployment/RegistryResolver.ts";
+import { WidgetProcessor } from "./widget-processor.ts";
 import type { BuildWidgetRegistry } from "@reactedge/framework/contracts/buiild/BuildWidgetRegistry.ts";
 
 export class RegistryRebuilder {
+    private readonly registryResolver = new RegistryResolver();
+    private readonly widgetProcessor: WidgetProcessor;
+
     constructor(
         private readonly registry: BuildWidgetRegistry,
         private readonly report: Report
-    ) {}
+    ) {
+        this.widgetProcessor = new WidgetProcessor(
+            registry,
+            report
+        );
+    }
 
     async rebuild(selectedWidgets: string[]): Promise<void> {
         const widgets =
-            resolveWidgets(
+            this.registryResolver.resolveWidgets(
                 selectedWidgets,
                 this.registry
             );
@@ -30,11 +38,7 @@ export class RegistryRebuilder {
         const processedWidgets =
             await Promise.all(
                 widgets.map(widget =>
-                    processWidget(
-                        widget,
-                        this.registry,
-                        this.report
-                    )
+                    this.widgetProcessor.process(widget)
                 )
             );
 
