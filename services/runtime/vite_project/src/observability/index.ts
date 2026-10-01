@@ -28,7 +28,9 @@ export function startObservability(observabilityConfig: ObservabilityConfig) {
                 (event as ActivityEvent).detail;
 
             const span = getTracer().startSpan(
-                `widget.${payload.widget}.${payload.phase}`
+                `widget.${payload.widget}.${payload.phase}`,
+                undefined,
+                getPageContext()
             );
 
             span.setAttributes({
