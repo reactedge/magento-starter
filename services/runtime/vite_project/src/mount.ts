@@ -2,7 +2,7 @@ import type {OnScrollMode, ResolvedWidget, WidgetLoadMode, WidgetModule} from ".
 import type { RuntimeWidgetRegistry } from "@reactedge/framework/contracts/runtime/RuntimeWidgetRegistry.ts";
 import {buildRuntimeConfig, stripMeta} from "./util.ts";
 import {WidgetActivity} from "@reactedge/framework/activity";
-import {registerInstance, startObservability} from "./observability";
+import {finishPageActivity, registerInstance, startObservability} from "./observability";
 import type { WidgetGlobalKey} from "./types.ts"
 
 let registryCache: RuntimeWidgetRegistry | null = null;
@@ -310,7 +310,9 @@ export function boot() {
     if (runtimeConfig?.observability) {
         startObservability(runtimeConfig.observability);
     }
+
     scheduleWidgets();
+    finishPageActivity();
 }
 
 if (document.readyState === 'loading') {

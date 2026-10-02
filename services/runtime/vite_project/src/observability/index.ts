@@ -1,5 +1,6 @@
 import {getTracer, setupTelemetry} from "./telemetry.ts";
 import type {ObservabilityConfig} from "@reactedge/framework/observability/config.ts"
+import {finishPageActivity, getPageContext, startPageActivity} from "./page-activity.ts";
 
 export type ActivityEvent =
     CustomEvent<ActivityPayload>;
@@ -18,6 +19,7 @@ export interface ActivityPayload {
 
 export function startObservability(observabilityConfig: ObservabilityConfig) {
     setupTelemetry(observabilityConfig);
+    startPageActivity();
 
     window.addEventListener(
         'reactedge:activity',
@@ -26,7 +28,9 @@ export function startObservability(observabilityConfig: ObservabilityConfig) {
                 (event as ActivityEvent).detail;
 
             const span = getTracer().startSpan(
-                `widget.${payload.widget}.${payload.phase}`
+                `widget.${payload.widget}.${payload.phase}`,
+                undefined,
+                getPageContext()
             );
 
             span.setAttributes({
@@ -41,6 +45,8 @@ export function startObservability(observabilityConfig: ObservabilityConfig) {
         }
     );
 }
+
+export {finishPageActivity, getPageContext};
 
 interface WidgetContext {
     widget: string;
